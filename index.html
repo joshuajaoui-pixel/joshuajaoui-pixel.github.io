@@ -201,6 +201,29 @@ background:var(--card);font-size:0.9rem;outline:none;transition:border var(--tra
 display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--transition)}
 .chat-send:hover{background:var(--pri-dark);transform:scale(1.05)}
 
+/* === AI SETTINGS === */
+.ai-settings{margin-bottom:12px;padding:14px 16px;background:var(--bg3);border-radius:var(--radius-sm);font-size:0.85rem}
+.ai-settings summary{cursor:pointer;font-weight:600;color:var(--pri);user-select:none;display:flex;align-items:center;gap:6px}
+.ai-settings summary::-webkit-details-marker{display:none}
+.ai-settings summary::before{content:'⚙️'}
+.ai-settings .ai-form{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.ai-settings label{display:flex;flex-direction:column;gap:4px;font-size:0.8rem;color:var(--text2)}
+.ai-settings input,.ai-settings select{padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-xs);
+background:var(--card);font-size:0.85rem;outline:none}
+.ai-settings input:focus{border-color:var(--pri)}
+.ai-status{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;padding:4px 10px;border-radius:12px;font-weight:600}
+.ai-status.online{background:rgba(0,206,201,0.12);color:var(--acc)}
+.ai-status.offline{background:rgba(253,121,168,0.12);color:var(--acc2)}
+.ai-status.local{background:rgba(108,92,231,0.12);color:var(--pri)}
+.ai-settings .save-key-btn{padding:8px 16px;border-radius:var(--radius-xs);background:var(--pri);color:#fff;
+font-weight:600;font-size:0.8rem;cursor:pointer;border:none;align-self:flex-start;margin-top:4px}
+.chat-msg.bot .msg-source{font-size:0.65rem;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:4px}
+.chat-msg.bot code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:0.82rem}
+.chat-msg.bot strong{color:var(--pri)}
+[data-theme="dark"] .chat-msg.bot strong{color:var(--pri-light)}
+.chat-msg.bot ul,.chat-msg.bot ol{margin:6px 0 6px 18px}
+.chat-msg.bot li{margin-bottom:3px}
+
 /* === EXAMS === */
 .exam-setup{text-align:center;padding:40px 20px}
 .exam-setup h2{margin-bottom:8px}
@@ -615,50 +638,274 @@ EXAMS.psychology=[
 {q:"What is neuroplasticity?",opts:["The hardening of neural tissue","The brain's inability to change","The brain's ability to reorganize by forming new connections","A type of brain scan"],ans:2,exp:"Neuroplasticity is the brain's ability to reorganize itself by forming new neural connections throughout life."}
 ];
 
-// === AI TUTOR RESPONSES ===
+// === INTELLIGENT AI ENGINE ===
+const AI_CONFIG={apiKey:'',provider:'local',model:'',endpoint:''};
+(function(){const s=localStorage.getItem('studypal-ai');if(s){try{Object.assign(AI_CONFIG,JSON.parse(s))}catch(e){}}})();
+function saveAIConfig(){localStorage.setItem('studypal-ai',JSON.stringify(AI_CONFIG))}
+
+// Build searchable knowledge base from all lesson content
+const KNOWLEDGE_BASE=[];
+SUBJECTS.forEach(subj=>{
+  subj.topics.forEach(topic=>{
+    const plain=topic.content.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+    const takeawayText=topic.takeaways.join('. ');
+    KNOWLEDGE_BASE.push({
+      subject:subj.name,subjectId:subj.id,topicName:topic.name,topicId:topic.id,
+      text:plain,takeaways:takeawayText,
+      words:(plain+' '+takeawayText+' '+topic.name).toLowerCase().split(/\W+/).filter(w=>w.length>2)
+    });
+  });
+});
+const EXAM_KNOWLEDGE=[];
+Object.entries(EXAMS).forEach(([sid,qs])=>{
+  qs.forEach(q=>{EXAM_KNOWLEDGE.push({subjectId:sid,q:q.q,answer:q.opts[q.ans],exp:q.exp,
+    words:(q.q+' '+q.exp+' '+q.opts.join(' ')).toLowerCase().split(/\W+/).filter(w=>w.length>2)});});
+});
+
+// Keyword responses (fast-path fallback)
 const AI_RESPONSES=[
-{kw:['cell','cells','organelle'],r:"Great question about cells! Cells are the basic unit of life. Remember the key organelles: the nucleus (control center), mitochondria (energy/ATP production), ribosomes (protein synthesis), ER (protein/lipid processing), and Golgi apparatus (packaging). Plant cells additionally have cell walls, chloroplasts, and large vacuoles. Would you like to explore any organelle in detail?"},
-{kw:['dna','gene','genetic','chromosome'],r:"DNA is fascinating! It's a double helix made of nucleotides with base pairing rules: A-T and G-C. The Central Dogma describes information flow: DNA → RNA (transcription) → Protein (translation). Genes are segments of DNA that code for proteins. Mutations in genes can lead to variations that drive evolution. What specific aspect of genetics interests you?"},
-{kw:['evolution','natural selection','darwin','species'],r:"Evolution by natural selection is one of biology's most important concepts. Darwin observed that: 1) populations show variation, 2) traits are heritable, 3) more offspring are produced than can survive, and 4) individuals with advantageous traits reproduce more. Over time, this leads to adaptation. Evidence comes from fossils, DNA comparisons, homologous structures, and biogeography. What would you like to know more about?"},
-{kw:['photosynthesis','chloroplast','chlorophyll'],r:"Photosynthesis converts light energy into chemical energy! The equation: 6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂. It has two stages: 1) Light-dependent reactions in thylakoid membranes produce ATP and NADPH, 2) The Calvin Cycle in the stroma uses these to fix CO₂ into glucose. Chlorophyll absorbs red and blue light (reflecting green). Rate depends on light intensity, CO₂ levels, and temperature."},
-{kw:['atom','atomic','proton','neutron','electron'],r:"Atoms consist of protons (+) and neutrons (neutral) in the nucleus, with electrons (-) in orbitals around it. The atomic number (protons) defines the element. Electrons fill orbitals following the Aufbau principle (lowest energy first), Pauli exclusion principle (2 electrons max per orbital), and Hund's rule (fill empty orbitals first). Electron configuration determines chemical properties!"},
-{kw:['bond','ionic','covalent','metallic'],r:"Chemical bonding! Three main types: 1) Ionic bonds — electron transfer between metals and nonmetals, forming crystal lattices with high melting points. 2) Covalent bonds — electron sharing between nonmetals, can be polar or nonpolar. 3) Metallic bonds — delocalized 'sea of electrons' explaining conductivity and malleability. Bond type depends on electronegativity differences between atoms."},
-{kw:['acid','base','ph','neutral'],r:"Acids donate protons (H⁺), bases accept them (Brønsted-Lowry definition). The pH scale: 0-7 is acidic, 7 is neutral, 7-14 is basic. Each pH unit = 10× change in H⁺ concentration. Strong acids (HCl) fully dissociate; weak acids (acetic acid) partially dissociate. Neutralization: acid + base → salt + water. Buffers resist pH changes and are vital in biology (blood pH ≈ 7.4)."},
-{kw:['newton','force','motion','inertia','f=ma'],r:"Newton's Three Laws: 1st Law (Inertia): objects stay at rest or in uniform motion unless acted on by a net force. 2nd Law: F = ma — force equals mass × acceleration. 3rd Law: every action has an equal and opposite reaction (on different objects). These form the foundation of classical mechanics. The unit of force is the Newton (N) = 1 kg·m/s²."},
-{kw:['thermodynamic','entropy','heat','energy conservation'],r:"The Laws of Thermodynamics: 0th — thermal equilibrium is transitive. 1st — energy is conserved (ΔU = Q - W). 2nd — entropy of an isolated system always increases; heat flows from hot to cold. 3rd — entropy approaches minimum as temperature approaches absolute zero (0 K). These are universal principles governing energy transfer in all physical systems!"},
-{kw:['circuit','ohm','voltage','current','resistance','resistor'],r:"Ohm's Law: V = IR (Voltage = Current × Resistance). In series circuits: same current flows through all components, resistances add. In parallel circuits: same voltage across branches, total resistance decreases (1/R_total = 1/R₁ + 1/R₂...). Power: P = IV = I²R = V²/R. These relationships are fundamental to understanding all electrical systems."},
-{kw:['wave','frequency','wavelength','light','electromagnetic'],r:"Waves transfer energy without transferring matter. Key properties: wavelength (λ), frequency (f), amplitude, and speed (v = fλ). Transverse waves oscillate perpendicular to travel (light); longitudinal waves oscillate parallel (sound). The EM spectrum ranges from radio waves to gamma rays. Light speed in vacuum ≈ 3×10⁸ m/s. Reflection, refraction (Snell's law), and diffraction describe light behavior."},
-{kw:['quantum','heisenberg','uncertainty','wave-particle'],r:"Quantum mechanics describes physics at atomic scales! Key ideas: energy is quantized (E = hf), wave-particle duality (light and matter show both behaviors), Heisenberg's Uncertainty Principle (can't precisely know both position and momentum), and electrons exist in probability clouds (orbitals). The Schrödinger equation describes how quantum states evolve. These principles underpin modern technology like semiconductors and lasers."},
-{kw:['algebra','equation','quadratic','polynomial'],r:"Algebra uses symbols to represent unknowns. Linear equations (ax + b = 0) graph as lines. Quadratic equations (ax² + bx + c = 0) use the quadratic formula: x = (-b ± √(b²-4ac))/2a. The discriminant (b²-4ac) tells you the number of solutions: positive = 2, zero = 1, negative = none. Key techniques: factoring, completing the square, and substitution for systems of equations."},
-{kw:['calculus','derivative','integral','differentiation','integration'],r:"Calculus studies continuous change! Differentiation finds instantaneous rate of change (slope of tangent). Key rules: power rule d/dx[xⁿ] = nxⁿ⁻¹, product rule, quotient rule, chain rule. Integration is the reverse — finding area under curves. The Fundamental Theorem of Calculus: ∫ₐᵇ f(x)dx = F(b) - F(a) where F is the antiderivative. Applications span physics, engineering, and economics."},
-{kw:['statistics','probability','mean','standard deviation','normal distribution'],r:"Statistics organizes and interprets data. Central tendency: mean (average), median (middle), mode (most frequent). Spread: variance and standard deviation. The normal distribution (bell curve) follows the 68-95-99.7 rule. Probability ranges 0 to 1. The Central Limit Theorem: sample means approach normal distribution with large samples. Hypothesis testing uses p-values to evaluate claims."},
-{kw:['trigonometry','sine','cosine','tangent','trig'],r:"Trigonometry! SOH-CAH-TOA: sin = opposite/hypotenuse, cos = adjacent/hypotenuse, tan = opposite/adjacent. The unit circle extends trig to all angles: coordinates are (cosθ, sinθ). Key identity: sin²θ + cos²θ = 1. Law of sines: a/sinA = b/sinB = c/sinC. Law of cosines: c² = a² + b² - 2ab·cosC. Applications include waves, navigation, and engineering."},
-{kw:['matrix','vector','eigenvalue','linear algebra','determinant'],r:"Linear algebra! Vectors have magnitude and direction. The dot product (a·b = |a||b|cosθ) measures alignment — zero means perpendicular. Matrices represent linear transformations. Determinant ≠ 0 means invertible. Eigenvalues/eigenvectors satisfy Av = λv — they reveal directions only scaled by the transformation. These concepts are fundamental to machine learning, computer graphics, and quantum mechanics."},
-{kw:['essay','writing','thesis','paragraph','argument'],r:"Essay writing structure: Introduction (hook → context → thesis statement), Body paragraphs (using PEE: Point, Evidence, Explanation), and Conclusion (synthesize, don't introduce new ideas). Your thesis should be a clear, arguable claim. Each body paragraph needs a topic sentence, specific evidence (quotes/examples), and analysis explaining WHY the evidence matters. Use transitions between paragraphs for flow."},
-{kw:['shakespeare','hamlet','macbeth','othello','romeo'],r:"Shakespeare (1564-1616) wrote ~39 plays in three main genres: Tragedies (Hamlet, Macbeth, Othello, King Lear) — featuring heroes with fatal flaws; Comedies (A Midsummer Night's Dream, Twelfth Night) — featuring mistaken identity and ending in marriage; Histories (Henry V, Richard III). He wrote in blank verse (unrhymed iambic pentameter) and coined 1,700+ words still used today. Analyze his soliloquies for character insight!"},
-{kw:['metaphor','simile','literary device','personification','irony'],r:"Key literary devices: Metaphor (direct comparison: 'life is a journey'), Simile (using like/as: 'brave as a lion'), Personification (human qualities to non-human: 'wind whispered'), Hyperbole (exaggeration), Irony (dramatic — audience knows what characters don't; situational — opposite outcome; verbal — saying opposite of meaning), Foreshadowing, Symbolism, and Alliteration. Always explain HOW devices create meaning!"},
-{kw:['world war','wwi','wwii','ww1','ww2','treaty of versailles'],r:"WWI (1914-18): Caused by Militarism, Alliances, Imperialism, Nationalism (M.A.I.N.). Featured trench warfare; ~17 million deaths. Treaty of Versailles punished Germany. WWII (1939-45): Hitler's Nazi Germany invaded Poland. Key events: Battle of Britain, Holocaust, D-Day, atomic bombs. ~70-85 million deaths. Aftermath: UN established, Cold War began, decolonization accelerated."},
-{kw:['cold war','soviet','ussr','nato','nuclear'],r:"The Cold War (1947-1991): US/NATO vs. Soviet Union/Warsaw Pact. Ideological: democracy/capitalism vs. communism. Never direct conflict — fought through proxy wars (Korea, Vietnam). Nuclear arms race led to MAD doctrine. Cuban Missile Crisis (1962) = closest to nuclear war. Space Race: US moon landing 1969. Ended with Soviet dissolution 1991, Berlin Wall fell 1989."},
-{kw:['renaissance','humanism','florence','medici'],r:"The Renaissance ('rebirth') began in 14th-century Italy. Funded by patrons like the Medici family. Humanism emphasized human potential and classical learning. Art innovations: linear perspective, chiaroscuro, anatomical accuracy. Key figures: Leonardo da Vinci, Michelangelo, Raphael. Scientific advances: Copernicus (heliocentric model), Galileo (telescope). Gutenberg's printing press (c.1440) revolutionized knowledge spread."},
-{kw:['industrial revolution','factory','steam engine'],r:"The Industrial Revolution began in Britain ~1760. Key inventions: spinning jenny, steam engine (Watt), iron/steel production. Created the factory system and massive urbanization. Social impacts: overcrowding, pollution, child labor, but also economic growth and eventual labor reforms. Britain became the dominant global power. The second wave (late 1800s) brought electricity, petroleum, and the internal combustion engine."},
-{kw:['civil rights','mlk','segregation','rosa parks'],r:"The US Civil Rights Movement (1954-1968): Fought to end racial segregation and secure equal rights. Key events: Brown v. Board of Education (1954), Montgomery Bus Boycott (1955-56, Rosa Parks), March on Washington (1963, MLK's 'I Have a Dream'). Used nonviolent direct action. Legislative victories: Civil Rights Act (1964), Voting Rights Act (1965), Fair Housing Act (1968)."},
-{kw:['programming','code','variable','function','loop'],r:"Programming fundamentals: Variables store data. Data types include integers, floats, strings, and booleans. Control flow: if/else for decisions, for/while loops for repetition. Functions are reusable code blocks with parameters and return values. Scope determines variable accessibility (local vs. global). Major paradigms: procedural (step-by-step), OOP (objects with attributes/methods), and functional (pure functions, no side effects)."},
-{kw:['data structure','array','linked list','tree','hash','stack','queue'],r:"Key data structures: Arrays — O(1) access by index, O(n) insert. Linked Lists — O(1) insert at known position, O(n) access. Stacks (LIFO) and Queues (FIFO). Binary Search Trees — O(log n) when balanced. Hash Tables — average O(1) lookup using key-value pairs. Graphs — vertices + edges, traversed with BFS/DFS. Choose the right structure based on your access patterns and performance needs!"},
-{kw:['algorithm','sort','search','big o','complexity','binary search'],r:"Algorithms! Big O notation measures efficiency: O(1) constant, O(log n) logarithmic, O(n) linear, O(n log n) linearithmic, O(n²) quadratic. Sorting: bubble/selection/insertion are O(n²); merge sort and quicksort are O(n log n). Binary search is O(log n) on sorted data. Advanced techniques: dynamic programming (store subproblem results), greedy algorithms (local optimums), divide-and-conquer."},
-{kw:['database','sql','table','query','nosql'],r:"Databases organize data for efficient access. Relational (SQL): tables with rows/columns, primary/foreign keys, JOIN operations. Normalization reduces redundancy (1NF, 2NF, 3NF). ACID ensures reliable transactions. NoSQL types: Document (MongoDB), Key-Value (Redis), Column (Cassandra), Graph (Neo4j). Choose SQL for structured data with complex relations; NoSQL for scalability with flexible schemas."},
-{kw:['network','tcp','ip','http','dns','internet','protocol'],r:"Networking! The OSI model has 7 layers (Physical → Application). TCP/IP model: 4 layers. IP addresses identify devices; DNS translates domain names to IPs. TCP provides reliable delivery; UDP is faster but unreliable. HTTP is the web protocol; HTTPS adds TLS encryption. Key devices: routers (direct traffic between networks), switches (connect devices within networks), firewalls (filter traffic)."},
-{kw:['security','cyber','hack','encrypt','firewall','phishing','malware'],r:"Cybersecurity fundamentals! CIA triad: Confidentiality, Integrity, Availability. Common threats: malware, phishing, SQL injection, XSS, DDoS, man-in-the-middle. Defenses: firewalls, encryption, MFA, input validation, regular patching. Principles: defense in depth (multiple layers), least privilege (minimal access), zero trust (always verify). Stay safe: use strong unique passwords, enable 2FA, be skeptical of unexpected emails."},
-{kw:['memory','attention','cognitive','bias','heuristic'],r:"Cognitive psychology! Memory: sensory → short-term (7±2 items, ~30 sec) → long-term (unlimited). Working memory model: central executive + phonological loop + visuospatial sketchpad. Attention: selective (filter model) and divided. Key biases: confirmation (seeking confirming info), availability (overestimating memorable events), anchoring (first info influences judgment). Awareness of biases improves decision-making!"},
-{kw:['conditioning','pavlov','skinner','reinforcement','punishment','behaviorism'],r:"Behavioral psychology! Classical conditioning (Pavlov): neutral stimulus paired with unconditioned stimulus creates conditioned response (bell → salivation). Operant conditioning (Skinner): behavior shaped by consequences. Positive reinforcement (add pleasant → increase), negative reinforcement (remove unpleasant → increase), positive punishment (add unpleasant → decrease), negative punishment (remove pleasant → decrease)."},
-{kw:['neuron','brain','neurotransmitter','synapse','cortex','dopamine','serotonin'],r:"Neuroscience! The brain has ~86 billion neurons communicating via electrochemical signals. At synapses, neurotransmitters cross the gap: dopamine (reward), serotonin (mood), GABA (inhibition), norepinephrine (alertness). The cortex has 4 lobes: frontal (planning), parietal (sensation), temporal (hearing/memory), occipital (vision). Neuroplasticity means the brain can form new connections throughout life!"},
-{kw:['conformity','obedience','milgram','asch','social'],r:"Social psychology! Asch's conformity experiments: ~75% conformed to obviously wrong group answers at least once. Milgram's obedience study: 65% delivered maximum shocks when ordered by authority. Fundamental attribution error: overemphasizing personality, underestimating situation when explaining others' behavior. Groups cause: social facilitation (better on easy tasks), social loafing (less effort), groupthink (poor decisions for harmony)."},
-{kw:['piaget','erikson','development','attachment','bowlby'],r:"Developmental psychology! Piaget's cognitive stages: Sensorimotor (0-2, object permanence), Preoperational (2-7, egocentric), Concrete operational (7-11, conservation), Formal operational (12+, abstract thought). Erikson's 8 psychosocial stages span the lifespan (trust vs. mistrust through integrity vs. despair). Attachment theory (Bowlby/Ainsworth): secure, anxious, and avoidant styles form in infancy."},
-{kw:['anxiety','depression','mental health','disorder','therapy','cbt','dsm'],r:"Abnormal psychology! Anxiety disorders: GAD (persistent worry), panic disorder, phobias, OCD. Mood disorders: major depression (persistent low mood) and bipolar (alternating depression/mania). The biopsychosocial model considers biological, psychological, and social factors. Treatments: CBT (changing maladaptive thoughts/behaviors), medications (SSRIs, mood stabilizers), or combined approaches. Recovery is possible with appropriate support!"},
-{kw:['hello','hi','hey','help','start','what can you'],r:"Hello! I'm your StudyPal AI Tutor. I can help you with Biology, Chemistry, Physics, Mathematics, English Literature, History, Computer Science, and Psychology. Try asking me about specific topics like 'explain photosynthesis', 'how do circuits work', or 'what is the quadratic formula'. You can also select a subject from the dropdown above to get focused help. What would you like to learn about?"},
-{kw:['thank','thanks'],r:"You're welcome! Keep up the great studying. Remember, consistent practice is the key to mastery. Feel free to ask me anything else — I'm here to help you learn. What topic would you like to explore next?"},
-{kw:['exam','test','quiz','prepare','study tip'],r:"Great that you're preparing! Here are some study tips: 1) Use active recall — test yourself instead of just re-reading. 2) Space your practice over time (spaced repetition). 3) Teach concepts to someone else (or explain aloud). 4) Practice with our Mock Exams section! 5) Focus on understanding WHY, not just memorizing. 6) Take breaks — your brain consolidates learning during rest. You've got this!"}
+{kw:['cell','cells','organelle'],r:"Cells are the basic unit of life. Key organelles: nucleus (control center), mitochondria (ATP/energy), ribosomes (protein synthesis), ER (processing), Golgi (packaging). Plant cells also have cell walls, chloroplasts, and large vacuoles."},
+{kw:['dna','gene','genetic','chromosome'],r:"DNA is a double helix with base pairing: A-T and G-C. The Central Dogma: DNA → RNA (transcription) → Protein (translation). Genes code for proteins; mutations drive variation and evolution."},
+{kw:['evolution','natural selection','darwin'],r:"Natural selection: variation exists, traits are heritable, advantageous traits increase reproduction. Over time → adaptation. Evidence: fossils, DNA comparisons, homologous structures, biogeography."},
+{kw:['photosynthesis','chloroplast','chlorophyll'],r:"6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂. Light reactions in thylakoids produce ATP/NADPH. Calvin Cycle in stroma fixes CO₂ into glucose. Chlorophyll absorbs red/blue light."},
+{kw:['atom','atomic','proton','neutron','electron'],r:"Atoms: protons (+) and neutrons in nucleus, electrons in orbitals. Atomic number = protons. Electrons fill by Aufbau principle, Pauli exclusion, Hund's rule."},
+{kw:['bond','ionic','covalent','metallic'],r:"Ionic: electron transfer, crystal lattices, high melting points. Covalent: electron sharing, polar or nonpolar. Metallic: delocalized electron sea → conductivity, malleability."},
+{kw:['acid','base','ph'],r:"Acids donate H⁺, bases accept H⁺. pH: 0-7 acidic, 7 neutral, 7-14 basic. Each unit = 10× H⁺ change. Neutralization: acid + base → salt + water. Buffers resist pH changes."},
+{kw:['newton','force','motion','inertia','f=ma'],r:"1st Law: inertia — objects resist change in motion. 2nd Law: F = ma. 3rd Law: equal and opposite reactions. Foundation of classical mechanics."},
+{kw:['thermodynamic','entropy','heat'],r:"1st Law: energy conserved (ΔU = Q - W). 2nd Law: entropy always increases in isolated systems. 3rd Law: entropy → minimum at absolute zero."},
+{kw:['circuit','ohm','voltage','current','resistance'],r:"V = IR. Series: same current, resistances add. Parallel: same voltage, 1/R_total = 1/R₁ + 1/R₂. Power: P = IV."},
+{kw:['wave','frequency','wavelength','electromagnetic'],r:"v = fλ. Transverse: perpendicular oscillation (light). Longitudinal: parallel (sound). EM spectrum: radio → gamma. Light ≈ 3×10⁸ m/s."},
+{kw:['quantum','heisenberg','uncertainty'],r:"Energy quantized (E = hf). Wave-particle duality. Uncertainty Principle: can't know position and momentum precisely. Electrons in probability clouds."},
+{kw:['algebra','equation','quadratic'],r:"Quadratic formula: x = (-b ± √(b²-4ac))/2a. Discriminant determines solutions: +ve=2, 0=1, -ve=none. Techniques: factoring, completing the square."},
+{kw:['calculus','derivative','integral'],r:"Derivatives: rate of change. Power rule: d/dx[xⁿ] = nxⁿ⁻¹. Integration: area under curves. Fundamental Theorem: ∫ₐᵇ f(x)dx = F(b) - F(a)."},
+{kw:['statistics','probability','mean','standard deviation'],r:"Mean, median, mode for central tendency. Standard deviation for spread. Normal distribution: 68-95-99.7 rule. Central Limit Theorem: sample means → normal."},
+{kw:['trigonometry','sine','cosine','tangent','trig'],r:"SOH-CAH-TOA. Unit circle: (cosθ, sinθ). sin²θ + cos²θ = 1. Law of sines/cosines for all triangles."},
+{kw:['matrix','vector','eigenvalue','linear algebra'],r:"Vectors: magnitude + direction. Dot product measures alignment. Matrices = linear transformations. det ≠ 0 → invertible. Eigenvalues: Av = λv."},
+{kw:['essay','writing','thesis','paragraph'],r:"Structure: Introduction (hook + thesis), Body (PEE: Point, Evidence, Explanation), Conclusion (synthesize). Each paragraph needs topic sentence, evidence, analysis."},
+{kw:['shakespeare','hamlet','macbeth','othello'],r:"~39 plays: Tragedies (fatal flaws), Comedies (mistaken identity), Histories. Iambic pentameter. 1,700+ coined words. Analyze soliloquies for character insight."},
+{kw:['metaphor','simile','literary device','irony'],r:"Metaphor: direct comparison. Simile: like/as. Personification: human traits to non-human. Irony: dramatic, situational, verbal. Foreshadowing hints at future events."},
+{kw:['world war','wwi','wwii'],r:"WWI: M.A.I.N. causes, trench warfare, 17M deaths, Treaty of Versailles. WWII: Hitler invaded Poland, Holocaust, D-Day, atomic bombs, 70-85M deaths. Led to UN, Cold War."},
+{kw:['cold war','soviet','nato','nuclear'],r:"1947-1991: US/NATO vs. USSR/Warsaw Pact. Proxy wars, MAD doctrine, Cuban Missile Crisis. Space Race. Ended with Soviet dissolution 1991."},
+{kw:['renaissance','humanism','florence'],r:"14th-century Italy. Humanism, perspective art, Da Vinci, Michelangelo. Gutenberg's press (c.1440). Led to Scientific Revolution."},
+{kw:['industrial revolution','factory','steam'],r:"Britain ~1760. Steam engine, factories, urbanization. Child labor → reforms. Second wave: electricity, petroleum, combustion engine."},
+{kw:['civil rights','mlk','segregation'],r:"1954-1968. Brown v. Board, Montgomery Boycott, March on Washington. Nonviolent action. Civil Rights Act 1964, Voting Rights Act 1965."},
+{kw:['programming','code','variable','loop'],r:"Variables store data. if/else for decisions, for/while loops. Functions: reusable blocks. Paradigms: procedural, OOP, functional."},
+{kw:['data structure','array','linked list','hash'],r:"Arrays: O(1) access. Linked Lists: O(1) insert. Stacks (LIFO), Queues (FIFO). BSTs: O(log n). Hash Tables: O(1) average."},
+{kw:['algorithm','sort','big o','complexity'],r:"O(1) < O(log n) < O(n) < O(n log n) < O(n²). Merge/quick sort: O(n log n). Binary search: O(log n). Dynamic programming avoids recomputation."},
+{kw:['database','sql','query','nosql'],r:"SQL: tables, keys, JOINs. Normalization 1NF-3NF. ACID transactions. NoSQL: Document (MongoDB), Key-Value (Redis), Graph (Neo4j)."},
+{kw:['network','tcp','ip','http','dns'],r:"OSI 7 layers. TCP reliable, UDP fast. DNS: names → IPs. HTTPS = encrypted HTTP. Routers, switches, firewalls."},
+{kw:['security','cyber','encrypt','phishing'],r:"CIA triad. Threats: malware, phishing, SQL injection, XSS, DDoS. Defense: firewalls, encryption, MFA, least privilege, zero trust."},
+{kw:['memory','attention','cognitive','bias'],r:"Memory: sensory → short-term (7±2) → long-term. Working memory model. Biases: confirmation, availability, anchoring."},
+{kw:['conditioning','pavlov','skinner','reinforcement'],r:"Classical (Pavlov): association. Operant (Skinner): consequences. +/- reinforcement increases behavior; +/- punishment decreases."},
+{kw:['neuron','brain','neurotransmitter','dopamine'],r:"86B neurons. Dopamine (reward), serotonin (mood), GABA (inhibition). 4 lobes: frontal, parietal, temporal, occipital. Neuroplasticity."},
+{kw:['conformity','obedience','milgram','asch'],r:"Asch: 75% conformed. Milgram: 65% obeyed to max shock. Fundamental attribution error. Groups: facilitation, loafing, groupthink."},
+{kw:['piaget','erikson','development','attachment'],r:"Piaget: 4 stages (sensorimotor → formal operational). Erikson: 8 psychosocial crises. Attachment: secure, anxious, avoidant."},
+{kw:['anxiety','depression','mental health','therapy','cbt'],r:"Anxiety: GAD, panic, phobias, OCD. Depression + Bipolar. Biopsychosocial model. Treatment: CBT, SSRIs, combined."}
 ];
 
+// Conversation context
+let aiContext={subject:null,topicHistory:[],turnCount:0,lastTopicMatches:[]};
+const STOP_WORDS=new Set('the and what how does why can you tell about explain this that with for from are was were has have had not but its they their which would could should will also been being more some than into other then these those each make like just know take come get give want please is it a an of to in on do me my'.split(' '));
+
+function searchKnowledge(query){
+  const words=query.toLowerCase().split(/\W+/).filter(w=>w.length>2);
+  const meaningful=words.filter(w=>!STOP_WORDS.has(w));
+  if(meaningful.length===0)return[];
+  return KNOWLEDGE_BASE.map(kb=>{
+    let score=0;
+    const kbSet=new Set(kb.words);
+    meaningful.forEach(w=>{
+      if(kbSet.has(w))score+=2;
+      for(const kw of kb.words){if(kw!==w&&(kw.includes(w)||w.includes(kw))){score+=0.5;break;}}
+    });
+    if(aiContext.subject&&kb.subjectId===aiContext.subject)score*=1.4;
+    meaningful.forEach(w=>{if(kb.topicName.toLowerCase().includes(w))score+=5;});
+    return {...kb,score};
+  }).filter(kb=>kb.score>0).sort((a,b)=>b.score-a.score).slice(0,3);
+}
+
+function searchExamKnowledge(query){
+  const words=query.toLowerCase().split(/\W+/).filter(w=>w.length>2&&!STOP_WORDS.has(w));
+  return EXAM_KNOWLEDGE.filter(ek=>{
+    const ekSet=new Set(ek.words);
+    return words.filter(w=>ekSet.has(w)).length>=2;
+  }).slice(0,2);
+}
+
+function detectIntent(msg){
+  const l=msg.toLowerCase();
+  if(/^(hi|hello|hey|yo|sup|good morning|good evening)/i.test(l))return 'greeting';
+  if(/thank|thanks|thx/i.test(l))return 'thanks';
+  if(/(quiz|test|question|practice).*(me|give|create|generate)/i.test(l)||/give me.*(question|quiz)/i.test(l)||/ask me/i.test(l))return 'quiz_me';
+  if(/(explain|what is|what are|what does|how does|how do|tell me about|describe|define|meaning of)/i.test(l))return 'explain';
+  if(/(why|reason|cause)/i.test(l))return 'why';
+  if(/(compare|difference|vs|versus|between)/i.test(l))return 'compare';
+  if(/(example|instance|illustrate|show me)/i.test(l))return 'example';
+  if(/(list|enumerate|name all|what are the)/i.test(l))return 'list';
+  if(/(formula|equation|calculate|solve)/i.test(l))return 'formula';
+  if(/(summary|summarize|overview|recap)/i.test(l))return 'summary';
+  if(/(help|stuck|confused|don't understand|dont understand|i don't get)/i.test(l))return 'help';
+  return 'general';
+}
+
+function detectSubject(msg){
+  const l=msg.toLowerCase();
+  const map={
+    biology:['biology','bio','cell','dna','gene','evolution','photosynthesis','ecology','mitochondria','protein','enzyme','species','chromosome','allele'],
+    chemistry:['chemistry','chem','atom','molecule','bond','reaction','acid','base','ph','element','periodic','organic','ion','compound'],
+    physics:['physics','newton','force','energy','wave','circuit','quantum','thermodynamic','entropy','voltage','momentum','gravity'],
+    mathematics:['math','algebra','calculus','geometry','trigonometry','statistics','probability','equation','derivative','integral','matrix','vector'],
+    english:['english','literature','essay','poem','poetry','shakespeare','novel','literary','metaphor','simile','irony','narrative','sonnet'],
+    history:['history','war','revolution','civilization','renaissance','cold war','civil rights','ancient','medieval','empire','treaty'],
+    cs:['computer','programming','algorithm','data structure','code','software','database','network','cyber','coding','binary','recursion'],
+    psychology:['psychology','psych','cognitive','behavior','brain','neuron','memory','freud','piaget','conditioning','mental health','anxiety']
+  };
+  let best=null,bs=0;
+  Object.entries(map).forEach(([sid,kws])=>{const s=kws.filter(kw=>l.includes(kw)).length;if(s>bs){bs=s;best=sid;}});
+  return best;
+}
+
+function generateQuizResponse(subject){
+  const sid=subject||aiContext.subject;
+  const pool=sid?EXAMS[sid]:null;
+  if(!pool)return "Tell me which subject you'd like to be quizzed on — Biology, Chemistry, Physics, Math, English, History, Computer Science, or Psychology!";
+  const q=pool[Math.floor(Math.random()*pool.length)];
+  const name=SUBJECTS.find(s=>s.id===sid)?.name||sid;
+  return `<strong>📝 ${name} Quiz Question:</strong>\n\n${q.q}\n\n`+
+    q.opts.map((o,i)=>`<strong>${'ABCD'[i]})</strong> ${o}`).join('\n')+
+    `\n\nThink about it, then scroll down for the answer...\n\n<details style="margin-top:8px;cursor:pointer"><summary style="color:var(--pri);font-weight:600">Reveal Answer</summary>\n<div style="margin-top:8px"><strong>✅ ${'ABCD'[q.ans]}) ${q.opts[q.ans]}</strong>\n\n${q.exp}</div></details>`;
+}
+
+function getLocalAIResponse(msg){
+  const intent=detectIntent(msg);
+  const subject=detectSubject(msg);
+  if(subject)aiContext.subject=subject;
+  aiContext.turnCount++;
+  // Check selected subject from dropdown
+  const selSubj=document.getElementById('chatSubject');
+  if(selSubj&&selSubj.value&&!aiContext.subject)aiContext.subject=selSubj.value;
+
+  if(intent==='greeting')return "Hello! I'm your StudyPal AI tutor with deep knowledge of <strong>8 subjects and 48 topics</strong>. I can:\n\n• <strong>Explain</strong> any concept from our lessons\n• <strong>Quiz you</strong> with practice questions\n• <strong>Compare</strong> concepts side by side\n• <strong>Give examples</strong> and worked problems\n• <strong>Summarize</strong> entire topics\n\nAsk me anything — like \"explain photosynthesis\" or \"quiz me on physics\"!";
+  if(intent==='thanks')return "You're welcome! Keep studying — consistency is key. What shall we tackle next?";
+  if(intent==='quiz_me')return generateQuizResponse(subject);
+
+  const kbResults=searchKnowledge(msg);
+  const examResults=searchExamKnowledge(msg);
+
+  // Keyword fallback scoring
+  const lower=msg.toLowerCase();
+  let bestKw=null,bestKwScore=0;
+  for(const r of AI_RESPONSES){let s=0;for(const kw of r.kw){if(lower.includes(kw))s++;}if(s>bestKwScore){bestKwScore=s;bestKw=r;}}
+
+  if(kbResults.length>0&&kbResults[0].score>3){
+    const top=kbResults[0];
+    aiContext.lastTopicMatches=[top];
+    const sentences=top.text.split(/\.\s+/).filter(s=>s.length>20);
+    const qWords=new Set(msg.toLowerCase().split(/\W+/).filter(w=>w.length>2&&!STOP_WORDS.has(w)));
+    const relevant=sentences.filter(s=>{const sw=s.toLowerCase().split(/\W+/);return sw.some(w=>qWords.has(w));}).slice(0,5);
+    const takeaways=top.takeaways.split('. ').map(t=>'• '+t).join('\n');
+    let r='';
+
+    if(intent==='summary'){
+      r=`<strong>📚 ${top.topicName}</strong> (${top.subject})\n\n`;
+      r+=(relevant.length>0?relevant:sentences.slice(0,4)).join('. ')+'.\n\n';
+      r+=`<strong>Key takeaways:</strong>\n${takeaways}`;
+    } else if(intent==='list'){
+      r=`Key points about <strong>${top.topicName}</strong>:\n\n${takeaways}`;
+    } else if(intent==='compare'&&kbResults.length>1){
+      const t1=kbResults[0],t2=kbResults[1];
+      r=`<strong>⚖️ ${t1.topicName} vs. ${t2.topicName}:</strong>\n\n`;
+      r+=`<strong>${t1.topicName}:</strong>\n${t1.takeaways.split('. ').slice(0,2).map(t=>'• '+t).join('\n')}\n\n`;
+      r+=`<strong>${t2.topicName}:</strong>\n${t2.takeaways.split('. ').slice(0,2).map(t=>'• '+t).join('\n')}`;
+    } else if(intent==='example'){
+      r=`From <strong>${top.topicName}</strong>:\n\n`;
+      r+=(relevant.length>0?relevant:sentences.slice(1,4)).join('. ')+'.';
+      if(examResults.length>0){
+        r+=`\n\n<strong>📝 Worked example:</strong> ${examResults[0].q}\n<strong>Answer:</strong> ${examResults[0].answer}\n<em>${examResults[0].exp}</em>`;
+      }
+    } else if(intent==='formula'){
+      r=`From <strong>${top.topicName}</strong>:\n\n`;
+      const formulas=sentences.filter(s=>/[=×÷±²³√∫∑πΔ]|formula|equation/i.test(s));
+      r+=(formulas.length>0?formulas:relevant.slice(0,3)).join('. ')+'.';
+    } else if(intent==='why'){
+      r=`<strong>Why?</strong> Let me explain from <strong>${top.topicName}</strong>:\n\n`;
+      r+=(relevant.length>0?relevant:sentences.slice(0,4)).join('. ')+'.';
+    } else {
+      r=`<strong>${top.topicName}</strong> (${top.subject}):\n\n`;
+      r+=(relevant.length>2?relevant:sentences.slice(0,5)).join('. ')+'.';
+      r+=`\n\n<strong>Key points:</strong>\n${top.takeaways.split('. ').slice(0,3).map(t=>'• '+t).join('\n')}`;
+    }
+
+    // Add exam question as bonus
+    if(examResults.length>0&&intent!=='example'){
+      r+=`\n\n<strong>🧪 Test yourself:</strong> ${examResults[0].q}\n<details><summary style="color:var(--pri);font-weight:600;cursor:pointer">Show answer</summary>${examResults[0].answer} — ${examResults[0].exp}</details>`;
+    }
+
+    const followups=['Want me to quiz you on this?','Should I explain a related concept?','Any follow-up questions?','Want a deeper dive into any part?'];
+    r+='\n\n'+followups[Math.floor(Math.random()*followups.length)];
+    return r;
+  }
+
+  if(bestKw&&bestKwScore>0){
+    let r=bestKw.r;
+    if(examResults.length>0)r+=`\n\n<strong>🧪 Quick check:</strong> ${examResults[0].q}\n<details><summary style="color:var(--pri);font-weight:600;cursor:pointer">Answer</summary>${examResults[0].answer} — ${examResults[0].exp}</details>`;
+    return r;
+  }
+
+  if(intent==='help')return "Let's work through this! Tell me:\n\n1. Which <strong>subject</strong>? (Biology, Chemistry, Physics, etc.)\n2. What <strong>specific concept</strong> is tricky?\n\nThe more specific, the better I can help — e.g. \"I don't understand ionic bonds\" or \"explain the quadratic formula step by step.\"";
+
+  const subjectName=subject?SUBJECTS.find(s=>s.id===subject)?.name:null;
+  if(subjectName){
+    const subj=SUBJECTS.find(s=>s.id===subject);
+    return `I see you're interested in <strong>${subjectName}</strong>! Here are our topics:\n\n`+
+      subj.topics.map(t=>`• <strong>${t.name}</strong>`).join('\n')+
+      `\n\nAsk about any of these — like "explain ${subj.topics[0].name}" or "quiz me on ${subjectName}"!`;
+  }
+
+  return "I'm your expert tutor for <strong>Biology, Chemistry, Physics, Math, English Literature, History, Computer Science, and Psychology</strong>.\n\nTry:\n• \"Explain photosynthesis\"\n• \"What is Newton's second law?\"\n• \"Quiz me on chemistry\"\n• \"Compare ionic and covalent bonds\"\n• \"Summarize the Cold War\"\n\nOr pick a subject from the dropdown!";
+}
+
+// API-based AI (when configured)
+async function callAIAPI(msg){
+  const sys=`You are StudyPal AI Tutor. You teach Biology, Chemistry, Physics, Mathematics, English Literature, History, Computer Science, and Psychology. Be concise, educational, encouraging. Use bullet points and bold (**term**) for key terms. Keep responses under 300 words. Format with HTML: <strong>, <em>, bullet lists.`;
+  const recent=chatMessages.slice(-6).map(m=>({role:m.role==='user'?'user':'assistant',content:m.text.replace(/<[^>]+>/g,'')}));
+  try{
+    let url,headers,body;
+    if(AI_CONFIG.provider==='openai'){
+      url='https://api.openai.com/v1/chat/completions';
+      headers={'Content-Type':'application/json','Authorization':'Bearer '+AI_CONFIG.apiKey};
+      body=JSON.stringify({model:AI_CONFIG.model||'gpt-4o-mini',messages:[{role:'system',content:sys},...recent,{role:'user',content:msg}],max_tokens:600,temperature:0.7});
+    } else if(AI_CONFIG.provider==='groq'){
+      url='https://api.groq.com/openai/v1/chat/completions';
+      headers={'Content-Type':'application/json','Authorization':'Bearer '+AI_CONFIG.apiKey};
+      body=JSON.stringify({model:AI_CONFIG.model||'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},...recent,{role:'user',content:msg}],max_tokens:600,temperature:0.7});
+    } else if(AI_CONFIG.provider==='custom'){
+      url=AI_CONFIG.endpoint||'https://api.openai.com/v1/chat/completions';
+      headers={'Content-Type':'application/json','Authorization':'Bearer '+AI_CONFIG.apiKey};
+      body=JSON.stringify({model:AI_CONFIG.model||'gpt-4o-mini',messages:[{role:'system',content:sys},...recent,{role:'user',content:msg}],max_tokens:600,temperature:0.7});
+    } else throw new Error('Unknown provider');
+    const resp=await fetch(url,{method:'POST',headers,body});
+    if(!resp.ok)throw new Error(await resp.text());
+    const data=await resp.json();
+    let text=data.choices[0].message.content;
+    // Convert markdown bold to HTML
+    text=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    text=text.replace(/\*(.+?)\*/g,'<em>$1</em>');
+    text=text.replace(/\n/g,'<br>');
+    return {text,source:'api'};
+  } catch(e){
+    console.error('API error:',e);
+    return {text:getLocalAIResponse(msg)+'<br><br><span class="msg-source">⚠️ API call failed — using built-in AI</span>',source:'fallback'};
+  }
+}
+
+async function getAIResponse(msg){
+  if(AI_CONFIG.apiKey&&AI_CONFIG.provider&&AI_CONFIG.provider!=='local'){
+    const r=await callAIAPI(msg);
+    return r.text;
+  }
+  return getLocalAIResponse(msg);
+}
 // === NAVIGATION & RENDERING ===
 let currentPage='home';
 let currentSubject=null;
@@ -814,68 +1061,106 @@ function toggleComplete(sid,tid){
 }
 
 // === AI TUTOR ===
+// === TUTOR RENDERING ===
 function renderTutor(){
   const el=document.getElementById('page-tutor');
-  const suggestions=['What is photosynthesis?','Explain Newton\'s laws','How does DNA replication work?','What is the quadratic formula?','Tell me about Shakespeare','Explain the Cold War'];
+  const isAPI=AI_CONFIG.apiKey&&AI_CONFIG.provider!=='local';
+  const statusClass=isAPI?'online':'local';
+  const statusText=isAPI?`${AI_CONFIG.provider.toUpperCase()} Connected`:'Built-in AI';
+  const suggestions=['Explain photosynthesis','How do circuits work?','Quiz me on biology','Compare ionic and covalent bonds','Summarize the Cold War','What is the quadratic formula?','Explain Newton\'s laws','Tell me about Shakespeare'];
+
   el.innerHTML=`
   <div class="chat-container">
     <div class="chat-header">
       <div class="chat-avatar">🤖</div>
-      <div class="chat-header-info"><h3>StudyPal AI Tutor</h3><p>Ask me anything about your subjects</p></div>
-      <select class="chat-subject-select" id="chatSubject">
+      <div class="chat-header-info">
+        <h3>StudyPal AI Tutor</h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="ai-status ${statusClass}">● ${statusText}</span>
+        </div>
+      </div>
+      <select class="chat-subject-select" id="chatSubject" onchange="aiContext.subject=this.value||null">
         <option value="">All Subjects</option>
-        ${SUBJECTS.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('')}
+        ${SUBJECTS.map(s=>`<option value="${s.id}" ${aiContext.subject===s.id?'selected':''}>${s.icon} ${s.name}</option>`).join('')}
       </select>
     </div>
+    <details class="ai-settings">
+      <summary>AI Settings — Connect your own API key for smarter responses</summary>
+      <div class="ai-form">
+        <label>AI Provider
+          <select id="aiProvider" onchange="document.getElementById('aiEndpointRow').style.display=this.value==='custom'?'flex':'none'">
+            <option value="local" ${AI_CONFIG.provider==='local'?'selected':''}>Built-in AI (no key needed)</option>
+            <option value="openai" ${AI_CONFIG.provider==='openai'?'selected':''}>OpenAI (GPT-4o-mini / GPT-4o)</option>
+            <option value="groq" ${AI_CONFIG.provider==='groq'?'selected':''}>Groq (Llama 3.3 — free)</option>
+            <option value="custom" ${AI_CONFIG.provider==='custom'?'selected':''}>Custom OpenAI-compatible API</option>
+          </select>
+        </label>
+        <label>API Key
+          <input type="password" id="aiApiKey" placeholder="sk-... or gsk_..." value="${AI_CONFIG.apiKey||''}">
+        </label>
+        <label>Model (optional)
+          <input type="text" id="aiModel" placeholder="e.g. gpt-4o-mini, llama-3.3-70b-versatile" value="${AI_CONFIG.model||''}">
+        </label>
+        <label id="aiEndpointRow" style="display:${AI_CONFIG.provider==='custom'?'flex':'none'}">Custom Endpoint URL
+          <input type="text" id="aiEndpoint" placeholder="https://api.example.com/v1/chat/completions" value="${AI_CONFIG.endpoint||''}">
+        </label>
+        <button class="save-key-btn" onclick="AI_CONFIG.provider=document.getElementById('aiProvider').value;AI_CONFIG.apiKey=document.getElementById('aiApiKey').value;AI_CONFIG.model=document.getElementById('aiModel').value;AI_CONFIG.endpoint=document.getElementById('aiEndpoint')?.value||'';saveAIConfig();renderTutor();">Save Settings</button>
+        <div style="font-size:0.75rem;color:var(--text3);margin-top:4px">Your API key is stored locally in your browser only — never sent to our servers. For free AI, try <strong>Groq</strong> (groq.com — free API key).</div>
+      </div>
+    </details>
     <div class="chat-messages" id="chatMessages">
-      ${chatMessages.length===0?'<div class="chat-msg bot">Hi there! I\'m your AI tutor. I can help with Biology, Chemistry, Physics, Math, English, History, Computer Science, and Psychology. Ask me anything or click a suggestion below!</div>':''}
+      ${chatMessages.length===0?`<div class="chat-msg bot">Hi! I'm your StudyPal AI tutor with deep knowledge of <strong>8 subjects and 48 topics</strong>. Ask me anything — I can explain concepts, quiz you, compare ideas, and help you study smarter. ${isAPI?'I\'m connected to '+AI_CONFIG.provider+' for advanced responses!':'I\'m using my built-in knowledge engine. Connect an API key in settings above for even smarter responses!'}</div>`:''}
       ${chatMessages.map(m=>`<div class="chat-msg ${m.role}">${m.text}</div>`).join('')}
     </div>
     <div class="chat-suggestions" id="chatSuggestions">
-      ${suggestions.map(s=>`<button onclick="sendChat('${s.replace(/'/g,"\\\'")}')">${s}</button>`).join('')}
+      ${suggestions.sort(()=>Math.random()-0.5).slice(0,5).map(s=>`<button onclick="sendChat('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}
     </div>
     <div class="chat-input-row">
-      <input type="text" id="chatInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')sendChat()">
+      <input type="text" id="chatInput" placeholder="Ask anything about your subjects..." onkeydown="if(event.key==='Enter')sendChat()">
       <button class="chat-send" onclick="sendChat()">➤</button>
     </div>
   </div>`;
   const msgs=document.getElementById('chatMessages');
   if(msgs)msgs.scrollTop=msgs.scrollHeight;
 }
-function sendChat(text){
+
+async function sendChat(text){
   const input=document.getElementById('chatInput');
-  const msg=text||input.value.trim();
+  const msg=text||input?.value?.trim();
   if(!msg)return;
   chatMessages.push({role:'user',text:msg});
   if(input)input.value='';
-  renderTutorMessages();
-  // Typing indicator
-  setTimeout(()=>{
-    const response=getAIResponse(msg);
-    chatMessages.push({role:'bot',text:response});
-    renderTutorMessages();
-  },800+Math.random()*600);
-}
-function renderTutorMessages(){
-  const container=document.getElementById('chatMessages');
-  if(!container)return;
-  const isTyping=chatMessages[chatMessages.length-1]?.role==='user';
-  container.innerHTML=chatMessages.map(m=>`<div class="chat-msg ${m.role}">${m.text}</div>`).join('')
-    +(isTyping?'<div class="chat-msg bot typing"><div class="dots"><span></span><span></span><span></span></div></div>':'');
-  container.scrollTop=container.scrollHeight;
-}
-function getAIResponse(msg){
-  const lower=msg.toLowerCase();
-  let best=null,bestScore=0;
-  for(const r of AI_RESPONSES){
-    let score=0;
-    for(const kw of r.kw){if(lower.includes(kw))score++;}
-    if(score>bestScore){bestScore=score;best=r;}
+  renderTutorMessages(true); // show typing
+
+  const isAsync=AI_CONFIG.apiKey&&AI_CONFIG.provider!=='local';
+  if(isAsync){
+    try{
+      const response=await getAIResponse(msg);
+      chatMessages.push({role:'bot',text:response});
+      renderTutorMessages(false);
+    }catch(e){
+      chatMessages.push({role:'bot',text:getLocalAIResponse(msg)});
+      renderTutorMessages(false);
+    }
+  } else {
+    setTimeout(()=>{
+      const response=getLocalAIResponse(msg);
+      chatMessages.push({role:'bot',text:response});
+      renderTutorMessages(false);
+    },400+Math.random()*500);
   }
-  if(best&&bestScore>0)return best.r;
-  return "That's an interesting question! While I don't have a specific prepared answer for that, I'd encourage you to explore the relevant subject in the Subjects tab for detailed lessons. You can also try rephrasing your question using key topic terms. For example, ask about 'photosynthesis', 'Newton's laws', 'DNA', 'quadratic formula', 'Shakespeare', or any specific topic. I'm here to help!";
 }
 
+function renderTutorMessages(showTyping){
+  const container=document.getElementById('chatMessages');
+  if(!container)return;
+  container.innerHTML=chatMessages.map(m=>`<div class="chat-msg ${m.role}">${m.text}</div>`).join('')
+    +(showTyping?'<div class="chat-msg bot typing"><div class="dots"><span></span><span></span><span></span></div></div>':'');
+  container.scrollTop=container.scrollHeight;
+  // Refresh suggestions
+  const sugBox=document.getElementById('chatSuggestions');
+  if(sugBox&&chatMessages.length>2)sugBox.style.display='none';
+}
 // === STUDY MODE (AI-Assisted Learning) ===
 let studyState=null; // {subject,questions,current,answers[],chatLog[],hintUsed,phase:'select'|'active'|'feedback'|'done'}
 

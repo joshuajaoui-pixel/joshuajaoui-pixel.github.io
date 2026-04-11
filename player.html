@@ -611,6 +611,94 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .song-row { animation: fadeIn 0.2s ease both; }
+
+    /* ════════════════════════════════════
+       MOBILE
+    ════════════════════════════════════ */
+    @media (max-width: 640px) {
+      :root { --player-h: 130px; --sidebar-w: 0px; }
+
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr var(--player-h);
+        grid-template-areas:
+          "main"
+          "player";
+      }
+
+      #sidebar { display: none; }
+
+      #topbar { padding: 14px 16px; }
+      #topbar h2 { font-size: 1.1rem; }
+
+      .upload-btn { padding: 7px 12px; font-size: 0.72rem; }
+
+      #song-area { padding: 0 12px 24px; }
+
+      /* Simplify song rows on mobile — hide artist column, show delete always */
+      .song-list-header {
+        grid-template-columns: 36px 1fr 50px;
+      }
+      .song-list-header span:nth-child(3) { display: none; }
+
+      .song-row {
+        grid-template-columns: 36px 1fr 50px;
+        padding: 5px 8px;
+      }
+
+      /* Hide the standalone artist column cell */
+      .song-row > div:nth-child(3) { display: none; }
+
+      .song-art { width: 36px; height: 36px; }
+
+      .song-delete { opacity: 1; }
+
+      /* Player bar — stack vertically on mobile */
+      #player {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        padding: 10px 16px 12px;
+        gap: 8px;
+      }
+
+      /* Hide volume on mobile */
+      .vol-row { display: none; }
+
+      .now-playing { gap: 10px; }
+
+      .np-art { width: 40px; height: 40px; font-size: 1.1rem; border-radius: 4px; }
+      .np-title { font-size: 0.78rem; }
+      .np-artist { font-size: 0.65rem; }
+
+      .controls { width: 100%; gap: 4px; }
+
+      .ctrl-buttons { gap: 24px; }
+
+      #btn-play { width: 38px; height: 38px; font-size: 1.1rem; }
+
+      .progress-row { gap: 8px; }
+
+      /* Modal full screen on mobile */
+      #modal {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 24px 20px 32px;
+      }
+
+      #modal-overlay.open {
+        align-items: flex-end;
+      }
+
+      .file-drop { padding: 16px; }
+      .file-drop .drop-icon { font-size: 1.4rem; }
+    }
   </style>
 </head>
 <body>

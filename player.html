@@ -23,8 +23,8 @@
       --text2:     #b3b3b3;
       --text3:     #6a6a6a;
       --font:      'Figtree', sans-serif;
-      --player-h:  88px;
-      --sidebar-w: 260px;
+      --player-h:  100px;
+      --sidebar-w: 300px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,7 +60,7 @@
 
     .sb-logo {
       padding: 24px 20px 16px;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 800;
       letter-spacing: -0.04em;
       color: var(--accent);
@@ -157,7 +157,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 24px;
+      padding: 20px 32px;
       flex-shrink: 0;
       position: sticky;
       top: 0;
@@ -165,7 +165,7 @@
       z-index: 5;
     }
 
-    #topbar h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.03em; }
+    #topbar h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
 
     .upload-btn {
       display: flex;
@@ -187,12 +187,12 @@
     .upload-btn:active { transform: scale(0.98); }
 
     /* SONG LIST */
-    #song-area { padding: 0 24px 24px; flex: 1; }
+    #song-area { padding: 0 32px 32px; flex: 1; }
 
     .song-list-header {
       display: grid;
-      grid-template-columns: 40px 1fr 160px 60px;
-      padding: 0 12px 8px;
+      grid-template-columns: 48px 1fr 180px 70px;
+      padding: 0 14px 10px;
       border-bottom: 1px solid var(--border);
       margin-bottom: 4px;
       font-size: 0.68rem;
@@ -204,9 +204,9 @@
 
     .song-row {
       display: grid;
-      grid-template-columns: 40px 1fr 160px 60px;
+      grid-template-columns: 48px 1fr 180px 70px;
       align-items: center;
-      padding: 6px 12px;
+      padding: 9px 14px;
       border-radius: 6px;
       cursor: pointer;
       transition: background 0.1s;
@@ -228,21 +228,21 @@
     .song-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
 
     .song-art {
-      width: 40px; height: 40px;
-      border-radius: 4px;
+      width: 48px; height: 48px;
+      border-radius: 5px;
       object-fit: cover;
       background: var(--surface2);
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       overflow: hidden;
     }
 
     .song-art img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
 
     .song-text { overflow: hidden; }
-    .song-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .song-artist { font-size: 0.72rem; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-title { font-size: 0.92rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-artist { font-size: 0.78rem; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .song-duration { font-size: 0.75rem; color: var(--text3); font-variant-numeric: tabular-nums; text-align: right; }
 
@@ -322,20 +322,20 @@
     }
 
     .np-art {
-      width: 52px; height: 52px;
-      border-radius: 6px;
+      width: 64px; height: 64px;
+      border-radius: 8px;
       background: var(--surface2);
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
+      font-size: 1.8rem;
       overflow: hidden;
     }
 
     .np-art img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
     .np-text { overflow: hidden; }
-    .np-title { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .np-artist { font-size: 0.7rem; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .np-title { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .np-artist { font-size: 0.78rem; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Controls */
     .controls {
@@ -348,7 +348,7 @@
     .ctrl-buttons {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 28px;
     }
 
     .ctrl-btn {
@@ -366,11 +366,11 @@
     .ctrl-btn:hover { color: var(--text); transform: scale(1.1); }
 
     #btn-play {
-      width: 36px; height: 36px;
+      width: 44px; height: 44px;
       background: var(--text);
       border-radius: 50%;
       color: #000;
-      font-size: 1rem;
+      font-size: 1.2rem;
       transition: transform 0.1s, background 0.12s;
     }
 
@@ -612,6 +612,158 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .song-row { animation: fadeIn 0.2s ease both; }
 
+
+    /* ════════════════════════════════════
+       FULLSCREEN NOW PLAYING
+    ════════════════════════════════════ */
+    #fs-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: #0a0a0a;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      gap: 32px;
+    }
+
+    #fs-overlay.open { display: flex; }
+
+    #fs-close {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: color 0.15s, background 0.15s;
+      line-height: 1;
+    }
+
+    #fs-close:hover { color: var(--text); background: var(--surface2); }
+
+    #fs-art {
+      width: min(340px, 70vw);
+      height: min(340px, 70vw);
+      border-radius: 16px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      flex-shrink: 0;
+    }
+
+    #fs-art img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+
+    .fs-info {
+      text-align: center;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    #fs-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #fs-artist {
+      font-size: 1rem;
+      color: var(--text2);
+      margin-top: 6px;
+    }
+
+    .fs-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .fs-btns {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .fs-ctrl-btn {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 1.4rem;
+      padding: 8px;
+      border-radius: 50%;
+      transition: color 0.12s, transform 0.1s;
+    }
+
+    .fs-ctrl-btn:hover { color: var(--text); transform: scale(1.1); }
+
+    #fs-btn-play {
+      width: 64px; height: 64px;
+      background: var(--text);
+      border-radius: 50%;
+      color: #000;
+      font-size: 1.6rem;
+      transition: transform 0.1s;
+    }
+
+    #fs-btn-play:hover { transform: scale(1.06); }
+
+    .fs-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .fs-time { font-size: 0.75rem; color: var(--text3); font-variant-numeric: tabular-nums; min-width: 36px; }
+    .fs-time.right { text-align: right; }
+
+    #fs-progress-bar {
+      flex: 1;
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: height 0.1s;
+    }
+
+    #fs-progress-bar:hover { height: 8px; }
+
+    #fs-progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    /* Clickable np-art in player bar */
+    .now-playing { cursor: pointer; }
+    .now-playing:hover .np-title { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      #fs-overlay { padding: 20px 24px 40px; gap: 24px; }
+      #fs-art { width: min(280px, 80vw); height: min(280px, 80vw); }
+      #fs-title { font-size: 1.3rem; }
+    }
+
     /* ════════════════════════════════════
        MOBILE
     ════════════════════════════════════ */
@@ -760,7 +912,7 @@
 ════════════════════════════════════ -->
 <div id="player">
   <!-- Now playing -->
-  <div class="now-playing">
+  <div class="now-playing" onclick="openFullscreen()" title="Open now playing">
     <div class="np-art" id="np-art">♪</div>
     <div class="np-text">
       <div class="np-title" id="np-title">No song playing</div>
@@ -840,6 +992,35 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeUpload()">Cancel</button>
       <button class="btn-upload" id="btn-do-upload" onclick="doUpload()">Upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     FULLSCREEN NOW PLAYING
+════════════════════════════════════ -->
+<div id="fs-overlay">
+  <button id="fs-close" onclick="closeFullscreen()">&#8964;</button>
+
+  <div id="fs-art">♪</div>
+
+  <div class="fs-info">
+    <div id="fs-title">No song playing</div>
+    <div id="fs-artist">—</div>
+  </div>
+
+  <div class="fs-controls">
+    <div class="fs-btns">
+      <button class="fs-ctrl-btn" onclick="prevSong()">⏮</button>
+      <button class="fs-ctrl-btn" id="fs-btn-play" onclick="togglePlay()">▶</button>
+      <button class="fs-ctrl-btn" onclick="nextSong()">⏭</button>
+    </div>
+    <div class="fs-progress-row">
+      <span class="fs-time" id="fs-time-cur">0:00</span>
+      <div id="fs-progress-bar" onclick="fsSeek(event)">
+        <div id="fs-progress-fill"></div>
+      </div>
+      <span class="fs-time right" id="fs-time-total">0:00</span>
     </div>
   </div>
 </div>
@@ -943,24 +1124,44 @@ function renderSongs(list) {
 }
 
 // ── Play ──
+function updateNowPlayingUI(s) {
+  document.getElementById('np-title').textContent = s.title;
+  document.getElementById('np-artist').textContent = s.artist || 'Unknown Artist';
+  document.getElementById('np-art').innerHTML = s.art_url ? `<img src="${s.art_url}" />` : '♪';
+  // Update fullscreen view too
+  document.getElementById('fs-title').textContent = s.title;
+  document.getElementById('fs-artist').textContent = s.artist || 'Unknown Artist';
+  document.getElementById('fs-art').innerHTML = s.art_url ? `<img src="${s.art_url}" />` : '♪';
+  document.getElementById('btn-play').textContent = '⏸';
+  document.getElementById('fs-btn-play').textContent = '⏸';
+}
+
 function playSong(idx) {
   if (idx < 0 || idx >= songs.length) return;
   currentIdx = idx;
   const s = songs[idx];
+  updateNowPlayingUI(s);
   audio.src = s.file_url;
-  audio.play();
-  document.getElementById('np-title').textContent = s.title;
-  document.getElementById('np-artist').textContent = s.artist || 'Unknown Artist';
-  const artEl = document.getElementById('np-art');
-  artEl.innerHTML = s.art_url ? `<img src="${s.art_url}" />` : '♪';
-  document.getElementById('btn-play').textContent = '⏸';
+  audio.load();
+  const onReady = () => {
+    audio.play().catch(err => console.warn('Play error:', err));
+    audio.removeEventListener('canplay', onReady);
+  };
+  audio.addEventListener('canplay', onReady);
   renderSongs(songs);
 }
 
 function togglePlay() {
   if (!audio.src || audio.src === window.location.href) return;
-  if (audio.paused) { audio.play(); document.getElementById('btn-play').textContent = '⏸'; }
-  else              { audio.pause(); document.getElementById('btn-play').textContent = '▶'; }
+  if (audio.paused) {
+    audio.play();
+    document.getElementById('btn-play').textContent = '⏸';
+    document.getElementById('fs-btn-play').textContent = '⏸';
+  } else {
+    audio.pause();
+    document.getElementById('btn-play').textContent = '▶';
+    document.getElementById('fs-btn-play').textContent = '▶';
+  }
 }
 
 function nextSong() { playSong((currentIdx + 1) % songs.length); }
@@ -971,8 +1172,11 @@ audio.addEventListener('ended', nextSong);
 audio.addEventListener('timeupdate', () => {
   const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
   document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('fs-progress-fill').style.width = pct + '%';
   document.getElementById('time-cur').textContent = fmtTime(audio.currentTime);
   document.getElementById('time-total').textContent = fmtTime(audio.duration || 0);
+  document.getElementById('fs-time-cur').textContent = fmtTime(audio.currentTime);
+  document.getElementById('fs-time-total').textContent = fmtTime(audio.duration || 0);
 });
 
 function seek(e) {
@@ -1141,6 +1345,25 @@ function showLibrary() { loadSongs(); }
     else { artFile = f; document.getElementById('art-name').textContent = f.name; }
   });
 });
+
+
+// ── Fullscreen now playing ──
+function openFullscreen() {
+  if (!audio.src || audio.src === window.location.href) return;
+  document.getElementById('fs-overlay').classList.add('open');
+}
+
+function closeFullscreen() {
+  document.getElementById('fs-overlay').classList.remove('open');
+}
+
+function fsSeek(e) {
+  const bar = document.getElementById('fs-progress-bar');
+  const pct = e.offsetX / bar.offsetWidth;
+  if (audio.duration) audio.currentTime = pct * audio.duration;
+}
+
+// Close fullscreen on song row click (open fullscreen instead when a song is clicked while one is playing)
 
 init();
 </script>

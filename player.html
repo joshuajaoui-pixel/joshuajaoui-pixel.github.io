@@ -613,6 +613,185 @@
     .song-row { animation: fadeIn 0.2s ease both; }
 
 
+
+    /* ════════════════════════════════════
+       PLAYLIST STYLES
+    ════════════════════════════════════ */
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.1s;
+      margin: 0 8px 2px;
+      position: relative;
+    }
+    .playlist-item:hover { background: var(--surface2); }
+    .playlist-item.active { background: var(--surface2); }
+    .playlist-item .pl-art {
+      width: 36px; height: 36px;
+      border-radius: 4px;
+      background: var(--surface2);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      overflow: hidden;
+    }
+    .playlist-item .pl-info { overflow: hidden; flex: 1; }
+    .playlist-item .pl-name { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .playlist-item .pl-count { font-size: 0.68rem; color: var(--text3); margin-top: 1px; }
+    .playlist-item .pl-delete {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 0.7rem;
+      padding: 2px 5px;
+      border-radius: 3px;
+      transition: color 0.1s, opacity 0.1s;
+      flex-shrink: 0;
+    }
+    .playlist-item:hover .pl-delete { opacity: 1; }
+    .playlist-item .pl-delete:hover { color: #ff4444; }
+
+    /* Add to playlist modal */
+    #pl-pick-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #pl-pick-overlay.open { display: flex; }
+    #pl-pick-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 360px;
+      max-width: 95vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #pl-pick-modal h3 { font-size: 1rem; font-weight: 800; }
+    .pl-pick-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.1s;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .pl-pick-item:hover { background: var(--surface2); }
+    .pl-pick-item .pl-pick-icon { font-size: 1.1rem; }
+    #pl-pick-list { overflow-y: auto; flex: 1; }
+    .pl-pick-cancel {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color 0.15s;
+    }
+    .pl-pick-cancel:hover { border-color: var(--text2); }
+
+    /* New playlist modal */
+    #new-pl-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #new-pl-overlay.open { display: flex; }
+    #new-pl-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 340px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #new-pl-modal h3 { font-size: 1rem; font-weight: 800; }
+    #new-pl-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.88rem;
+      padding: 10px 12px;
+      border-radius: 7px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #new-pl-input:focus { border-color: var(--accent); }
+    .new-pl-actions { display: flex; gap: 8px; }
+    .new-pl-actions button:first-child {
+      flex: 1;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+    .new-pl-actions button:last-child {
+      flex: 2;
+      background: var(--accent);
+      border: none;
+      color: #000;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 8px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    /* Add to playlist button on song rows */
+    .song-add-pl {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: color 0.1s, opacity 0.1s;
+    }
+    .song-row:hover .song-add-pl { opacity: 1; }
+    .song-add-pl:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .song-add-pl { opacity: 1; }
+      .playlist-item .pl-delete { opacity: 1; }
+    }
+
     /* ════════════════════════════════════
        FULLSCREEN NOW PLAYING
     ════════════════════════════════════ */
@@ -862,25 +1041,18 @@
   <div class="sb-logo">Jaouis <span>Music</span></div>
 
   <div class="sb-section">
-    <button class="sb-btn active" onclick="showLibrary()">
+    <button class="sb-btn active" id="sb-library-btn" onclick="showLibrary()">
       <span class="icon">♪</span> Library
     </button>
   </div>
 
   <div class="sb-divider"></div>
 
-  <div class="sb-section">
-    <h3>Playlists</h3>
+  <div class="sb-section" style="display:flex;align-items:center;justify-content:space-between;padding-right:8px">
+    <h3 style="padding:14px 8px 6px">Playlists</h3>
+    <button onclick="openNewPlaylist()" title="New playlist" style="background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:4px;transition:color 0.15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'">+</button>
   </div>
-  <div id="playlist-list">
-    <div class="playlist-item active">
-      <div class="pl-art">🎵</div>
-      <div class="pl-info">
-        <div class="pl-name">All Songs</div>
-        <div class="pl-count" id="all-count">0 songs</div>
-      </div>
-    </div>
-  </div>
+  <div id="playlist-list"></div>
 </div>
 
 <!-- ════════════════════════════════════
@@ -891,9 +1063,11 @@
 
   <div id="topbar">
     <h2 id="view-title">Library</h2>
-    <button class="upload-btn" onclick="openUpload()">
-      <span>↑</span> Upload Song
-    </button>
+    <div id="topbar-actions">
+      <button class="upload-btn" id="btn-upload-main" onclick="openUpload()">
+        <span>↑</span> Upload Song
+      </button>
+    </div>
   </div>
 
   <div id="song-area">
@@ -1025,6 +1199,31 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════
+     NEW PLAYLIST MODAL
+════════════════════════════════════ -->
+<div id="new-pl-overlay">
+  <div id="new-pl-modal">
+    <h3>New Playlist</h3>
+    <input id="new-pl-input" type="text" placeholder="Playlist name…" maxlength="60" />
+    <div class="new-pl-actions">
+      <button onclick="closeNewPlaylist()">Cancel</button>
+      <button onclick="createPlaylist()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     ADD TO PLAYLIST PICKER
+════════════════════════════════════ -->
+<div id="pl-pick-overlay">
+  <div id="pl-pick-modal">
+    <h3>Add to Playlist</h3>
+    <div id="pl-pick-list"></div>
+    <button class="pl-pick-cancel" onclick="closePlaylistPicker()">Cancel</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -1060,6 +1259,7 @@ function init() {
   }
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
   loadSongs();
+  loadPlaylists();
 }
 
 function showSetupBanner() {
@@ -1117,15 +1317,20 @@ function renderSongs(list) {
         </div>
       </div>
       <div class="song-artist" style="font-size:0.78rem;color:var(--text3);padding-left:12px">${s.artist || '—'}</div>
-      <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px">
         <div class="song-duration">${fmtTime(s.duration || 0)}</div>
+        <button class="song-add-pl" data-addpl="${i}" title="Add to playlist">+</button>
         <button class="song-delete" data-idx="${i}">✕</button>
       </div>`;
     row.addEventListener('click', (e) => {
       const delBtn = e.target.closest('.song-delete');
+      const addBtn = e.target.closest('.song-add-pl');
       if (delBtn) {
         e.stopPropagation();
         deleteSong(row.dataset.songId, row.dataset.fileUrl, row.dataset.artUrl);
+      } else if (addBtn) {
+        e.stopPropagation();
+        openPlaylistPicker(s.id);
       } else {
         playSong(i);
       }
@@ -1139,12 +1344,12 @@ function updateNowPlayingUI(s) {
   document.getElementById('np-title').textContent = s.title;
   document.getElementById('np-artist').textContent = s.artist || 'Unknown Artist';
   document.getElementById('np-art').innerHTML = s.art_url ? `<img src="${s.art_url}" />` : '♪';
-  // Update fullscreen view too
   document.getElementById('fs-title').textContent = s.title;
   document.getElementById('fs-artist').textContent = s.artist || 'Unknown Artist';
   document.getElementById('fs-art').innerHTML = s.art_url ? `<img src="${s.art_url}" />` : '♪';
   document.getElementById('btn-play').textContent = '⏸';
   document.getElementById('fs-btn-play').textContent = '⏸';
+  updateMediaSession(s);
 }
 
 function playSong(idx) {
@@ -1179,6 +1384,8 @@ function nextSong() { playSong((currentIdx + 1) % songs.length); }
 function prevSong() { playSong((currentIdx - 1 + songs.length) % songs.length); }
 
 audio.addEventListener('ended', nextSong);
+audio.addEventListener('play',  () => updatePlayBtns(false));
+audio.addEventListener('pause', () => updatePlayBtns(true));
 
 audio.addEventListener('timeupdate', () => {
   const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
@@ -1357,6 +1564,185 @@ function showLibrary() { loadSongs(); }
   });
 });
 
+
+
+// ════════════════════════════════════
+// PLAYLISTS
+// ════════════════════════════════════
+let playlists = [];
+let currentPlaylistId = null; // null = library
+
+async function loadPlaylists() {
+  const { data, error } = await db.from('playlists').select('*').order('created_at', { ascending: true });
+  if (error) { console.error(error); return; }
+  playlists = data || [];
+  renderSidebar();
+}
+
+function renderSidebar() {
+  const el = document.getElementById('playlist-list');
+  el.innerHTML = '';
+
+  // All Songs entry
+  const all = document.createElement('div');
+  all.className = 'playlist-item' + (currentPlaylistId === null ? ' active' : '');
+  all.innerHTML = `<div class="pl-art">🎵</div><div class="pl-info"><div class="pl-name">All Songs</div><div class="pl-count" id="all-count">${songs.length} song${songs.length !== 1 ? 's' : ''}</div></div>`;
+  all.onclick = () => showLibrary();
+  el.appendChild(all);
+
+  playlists.forEach(pl => {
+    const item = document.createElement('div');
+    item.className = 'playlist-item' + (currentPlaylistId === pl.id ? ' active' : '');
+    item.innerHTML = `
+      <div class="pl-art">🎶</div>
+      <div class="pl-info">
+        <div class="pl-name">${pl.name}</div>
+        <div class="pl-count">Playlist</div>
+      </div>
+      <button class="pl-delete" title="Delete playlist">✕</button>`;
+    item.querySelector('.pl-delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deletePlaylist(pl.id, pl.name);
+    });
+    item.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('pl-delete')) showPlaylist(pl.id, pl.name);
+    });
+    el.appendChild(item);
+  });
+
+  // Update library btn active state
+  const libBtn = document.getElementById('sb-library-btn');
+  if (libBtn) libBtn.classList.toggle('active', currentPlaylistId === null);
+}
+
+// ── Show library ──
+function showLibrary() {
+  currentPlaylistId = null;
+  document.getElementById('view-title').textContent = 'Library';
+  document.getElementById('btn-upload-main').style.display = '';
+  renderSidebar();
+  renderSongs(songs);
+}
+
+// ── Show playlist ──
+async function showPlaylist(plId, plName) {
+  currentPlaylistId = plId;
+  document.getElementById('view-title').textContent = plName;
+  document.getElementById('btn-upload-main').style.display = 'none';
+  renderSidebar();
+
+  // Load songs in playlist via join
+  const { data, error } = await db
+    .from('playlist_songs')
+    .select('song_id, songs(*)')
+    .eq('playlist_id', plId)
+    .order('added_at', { ascending: true });
+
+  if (error) { console.error(error); return; }
+  const plSongs = (data || []).map(r => r.songs).filter(Boolean);
+  renderSongs(plSongs, true);
+}
+
+// ── Create playlist ──
+function openNewPlaylist() {
+  document.getElementById('new-pl-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('new-pl-input').focus(), 50);
+}
+
+function closeNewPlaylist() {
+  document.getElementById('new-pl-overlay').classList.remove('open');
+  document.getElementById('new-pl-input').value = '';
+}
+
+async function createPlaylist() {
+  const name = document.getElementById('new-pl-input').value.trim();
+  if (!name) return;
+  const { error } = await db.from('playlists').insert({ name });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeNewPlaylist();
+  await loadPlaylists();
+  toast('✓ Playlist "' + name + '" created');
+}
+
+// enter key in new playlist input
+document.getElementById('new-pl-input').addEventListener('keydown', e => { if (e.key === 'Enter') createPlaylist(); });
+
+// ── Delete playlist ──
+async function deletePlaylist(plId, plName) {
+  if (!confirm('Delete playlist "' + plName + '"?')) return;
+  await db.from('playlists').delete().eq('id', plId);
+  if (currentPlaylistId === plId) showLibrary();
+  await loadPlaylists();
+  toast('Playlist deleted');
+}
+
+// ── Add song to playlist picker ──
+let pickerSongId = null;
+
+function openPlaylistPicker(songId) {
+  pickerSongId = songId;
+  const list = document.getElementById('pl-pick-list');
+  list.innerHTML = '';
+  if (playlists.length === 0) {
+    list.innerHTML = '<div style="padding:16px;color:var(--text3);font-size:0.8rem;text-align:center">No playlists yet — create one first</div>';
+  } else {
+    playlists.forEach(pl => {
+      const item = document.createElement('div');
+      item.className = 'pl-pick-item';
+      item.innerHTML = `<div class="pl-pick-icon">🎶</div>${pl.name}`;
+      item.onclick = () => addSongToPlaylist(pickerSongId, pl.id, pl.name);
+      list.appendChild(item);
+    });
+  }
+  document.getElementById('pl-pick-overlay').classList.add('open');
+}
+
+function closePlaylistPicker() {
+  document.getElementById('pl-pick-overlay').classList.remove('open');
+  pickerSongId = null;
+}
+
+async function addSongToPlaylist(songId, plId, plName) {
+  // Check if already in playlist
+  const { data: existing } = await db.from('playlist_songs')
+    .select('id').eq('playlist_id', plId).eq('song_id', songId);
+  if (existing && existing.length > 0) {
+    toast('Already in "' + plName + '"');
+    closePlaylistPicker();
+    return;
+  }
+  const { error } = await db.from('playlist_songs').insert({ playlist_id: plId, song_id: songId });
+  if (error) { toast('Error: ' + error.message); return; }
+  closePlaylistPicker();
+  toast('✓ Added to "' + plName + '"');
+}
+
+// close pickers on overlay click
+document.getElementById('pl-pick-overlay').addEventListener('click', function(e) { if (e.target === this) closePlaylistPicker(); });
+document.getElementById('new-pl-overlay').addEventListener('click', function(e) { if (e.target === this) closeNewPlaylist(); });
+
+// ════════════════════════════════════
+// MEDIA SESSION API (background audio)
+// ════════════════════════════════════
+function updateMediaSession(s) {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title:  s.title,
+    artist: s.artist || 'Unknown Artist',
+    album:  'Jaouis Music',
+    artwork: s.art_url ? [{ src: s.art_url, sizes: '512x512', type: 'image/jpeg' }] : []
+  });
+  navigator.mediaSession.setActionHandler('play',         () => { audio.play(); updatePlayBtns(false); });
+  navigator.mediaSession.setActionHandler('pause',        () => { audio.pause(); updatePlayBtns(true); });
+  navigator.mediaSession.setActionHandler('nexttrack',    () => nextSong());
+  navigator.mediaSession.setActionHandler('previoustrack',() => prevSong());
+}
+
+function updatePlayBtns(paused) {
+  const icon = paused ? '▶' : '⏸';
+  document.getElementById('btn-play').textContent = icon;
+  document.getElementById('fs-btn-play').textContent = icon;
+}
 
 // ── Fullscreen now playing ──
 function openFullscreen() {

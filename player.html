@@ -1104,6 +1104,9 @@ function renderSongs(list) {
     const row = document.createElement('div');
     row.className = 'song-row' + (i === currentIdx ? ' playing' : '');
     row.style.animationDelay = `${i * 30}ms`;
+    row.dataset.songId  = s.id;
+    row.dataset.fileUrl = s.file_url;
+    row.dataset.artUrl  = s.art_url || '';
     row.innerHTML = `
       <div class="song-num">${i + 1}</div>
       <div class="song-info">
@@ -1116,9 +1119,17 @@ function renderSongs(list) {
       <div class="song-artist" style="font-size:0.78rem;color:var(--text3);padding-left:12px">${s.artist || '—'}</div>
       <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
         <div class="song-duration">${fmtTime(s.duration || 0)}</div>
-        <button class="song-delete" onclick="deleteSong(event, '${s.id}', '${s.file_url}', '${s.art_url||''}')">✕</button>
+        <button class="song-delete" data-idx="${i}">✕</button>
       </div>`;
-    row.addEventListener('click', (e) => { if (!e.target.classList.contains('song-delete')) playSong(i); });
+    row.addEventListener('click', (e) => {
+      const delBtn = e.target.closest('.song-delete');
+      if (delBtn) {
+        e.stopPropagation();
+        deleteSong(row.dataset.songId, row.dataset.fileUrl, row.dataset.artUrl);
+      } else {
+        playSong(i);
+      }
+    });
     el.appendChild(row);
   });
 }
@@ -1293,11 +1304,11 @@ async function doUpload() {
 }
 
 // ── Delete ──
-async function deleteSong(e, id, fileUrl, artUrl) {
-  e.stopPropagation();
+async function deleteSong(id, fileUrl, artUrl) {
   if (!confirm('Remove this song?')) return;
 
-  await db.from(TABLE).delete().eq('id', id);
+  const { error } = await db.from(TABLE).delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message); return; }
 
   // Try remove files from storage
   try {

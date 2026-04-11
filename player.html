@@ -810,6 +810,10 @@
 
     #fs-overlay.open { display: flex; }
 
+    /* Slide up animation */
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    #fs-overlay.open { animation: slideUp 0.25s ease; }
+
     #fs-close {
       position: absolute;
       top: 20px;
@@ -944,72 +948,118 @@
     }
 
     /* ════════════════════════════════════
-       MOBILE
+       MOBILE — YouTube Music style
     ════════════════════════════════════ */
     @media (max-width: 640px) {
-      :root { --player-h: 130px; --sidebar-w: 0px; }
+      :root { --sidebar-w: 0px; --player-h: 0px; }
 
       body {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr var(--player-h);
-        grid-template-areas:
-          "main"
-          "player";
+        grid-template-rows: 1fr;
+        grid-template-areas: "main";
+        overflow: hidden;
       }
 
+      /* Hide desktop sidebar and player bar entirely on mobile */
       #sidebar { display: none; }
+      #player   { display: none; }
 
-      #topbar { padding: 14px 16px; }
-      #topbar h2 { font-size: 1.1rem; }
-
+      /* Mobile topbar */
+      #topbar { padding: 16px 16px 10px; }
+      #topbar h2 { font-size: 1.15rem; }
       .upload-btn { padding: 7px 12px; font-size: 0.72rem; }
 
-      #song-area { padding: 0 12px 24px; }
+      /* Song list — clean full-width rows like YT Music */
+      #song-area { padding: 0 0 100px; }
 
-      /* Simplify song rows on mobile — hide artist column, show delete always */
-      .song-list-header {
-        grid-template-columns: 36px 1fr 50px;
-      }
-      .song-list-header span:nth-child(3) { display: none; }
+      .song-list-header { display: none; }
 
       .song-row {
-        grid-template-columns: 36px 1fr 50px;
-        padding: 5px 8px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 16px;
+        border-radius: 0;
+        border-bottom: 1px solid var(--border);
+        grid-template-columns: unset;
       }
 
-      /* Hide the standalone artist column cell */
+      .song-num { display: none; }
+
+      .song-info {
+        flex: 1;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .song-art {
+        width: 50px;
+        height: 50px;
+        border-radius: 6px;
+        flex-shrink: 0;
+        font-size: 1.3rem;
+      }
+
+      .song-text { flex: 1; min-width: 0; }
+      .song-title { font-size: 0.9rem; }
+      .song-artist { font-size: 0.75rem; }
+
+      /* Hide artist column & duration on mobile — info in song-text */
       .song-row > div:nth-child(3) { display: none; }
+      .song-duration { display: none; }
 
-      .song-art { width: 36px; height: 36px; }
+      /* Always show action buttons on mobile */
+      .song-add-pl  { opacity: 1; font-size: 1rem; padding: 6px 8px; }
+      .song-delete  { opacity: 1; font-size: 0.85rem; padding: 6px 8px; }
 
-      .song-delete { opacity: 1; }
-
-      /* Player bar — stack vertically on mobile */
-      #player {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
-        padding: 10px 16px 12px;
-        gap: 8px;
+      /* Fullscreen player — full YouTube Music treatment on mobile */
+      #fs-overlay {
+        padding: 0;
+        justify-content: flex-start;
+        background: #0a0a0a;
       }
 
-      /* Hide volume on mobile */
-      .vol-row { display: none; }
+      #fs-close {
+        top: env(safe-area-inset-top, 16px);
+        left: 16px;
+        font-size: 1.6rem;
+        z-index: 10;
+      }
 
-      .now-playing { gap: 10px; }
+      #fs-art {
+        width: 100vw;
+        height: 100vw;
+        max-height: 55vw;
+        border-radius: 0;
+        box-shadow: none;
+        flex-shrink: 0;
+      }
 
-      .np-art { width: 40px; height: 40px; font-size: 1.1rem; border-radius: 4px; }
-      .np-title { font-size: 0.78rem; }
-      .np-artist { font-size: 0.65rem; }
+      #fs-art img { border-radius: 0; }
 
-      .controls { width: 100%; gap: 4px; }
+      .fs-info {
+        padding: 20px 24px 0;
+        text-align: left;
+      }
 
-      .ctrl-buttons { gap: 24px; }
+      #fs-title  { font-size: 1.3rem; }
+      #fs-artist { font-size: 0.9rem; }
 
-      #btn-play { width: 38px; height: 38px; font-size: 1.1rem; }
+      .fs-controls {
+        padding: 16px 24px 40px;
+        justify-content: flex-end;
+        flex: 1;
+      }
 
-      .progress-row { gap: 8px; }
+      .fs-btns { gap: 32px; }
 
-      /* Modal full screen on mobile */
+      #fs-btn-play {
+        width: 58px;
+        height: 58px;
+        font-size: 1.4rem;
+      }
+
+      /* Modals slide up from bottom on mobile */
       #modal {
         width: 100%;
         max-width: 100%;
@@ -1020,15 +1070,24 @@
         left: 0;
         max-height: 90vh;
         overflow-y: auto;
-        padding: 24px 20px 32px;
+        padding: 24px 20px 40px;
       }
+      #modal-overlay.open { align-items: flex-end; }
 
-      #modal-overlay.open {
-        align-items: flex-end;
+      #new-pl-modal, #pl-pick-modal {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        max-height: 80vh;
       }
+      #new-pl-overlay.open, #pl-pick-overlay.open { align-items: flex-end; }
 
-      .file-drop { padding: 16px; }
-      .file-drop .drop-icon { font-size: 1.4rem; }
+      .file-drop { padding: 14px; }
+      .file-drop .drop-icon { font-size: 1.3rem; }
     }
   </style>
 </head>
@@ -1042,7 +1101,7 @@
 
   <div class="sb-section">
     <button class="sb-btn active" id="sb-library-btn" onclick="showLibrary()">
-      <span class="icon">♪</span> Library
+      <span class="icon">&#9835;</span> Library
     </button>
   </div>
 
@@ -1065,7 +1124,7 @@
     <h2 id="view-title">Library</h2>
     <div id="topbar-actions">
       <button class="upload-btn" id="btn-upload-main" onclick="openUpload()">
-        <span>↑</span> Upload Song
+        &#8679; Upload Song
       </button>
     </div>
   </div>
@@ -1075,7 +1134,7 @@
       <span>#</span>
       <span>Title</span>
       <span style="padding-left:12px">Artist</span>
-      <span style="text-align:right">⏱</span>
+      <span style="text-align:right">&#9202;</span>
     </div>
     <div id="song-list"><div class="spinner"></div></div>
   </div>
@@ -1087,7 +1146,7 @@
 <div id="player">
   <!-- Now playing -->
   <div class="now-playing" onclick="openFullscreen()" title="Open now playing">
-    <div class="np-art" id="np-art">♪</div>
+    <div class="np-art" id="np-art">&#9834;</div>
     <div class="np-text">
       <div class="np-title" id="np-title">No song playing</div>
       <div class="np-artist" id="np-artist">—</div>
@@ -1097,9 +1156,9 @@
   <!-- Controls -->
   <div class="controls">
     <div class="ctrl-buttons">
-      <button class="ctrl-btn" onclick="prevSong()" title="Previous">⏮</button>
-      <button class="ctrl-btn" id="btn-play" onclick="togglePlay()" title="Play/Pause">▶</button>
-      <button class="ctrl-btn" onclick="nextSong()" title="Next">⏭</button>
+      <button class="ctrl-btn" onclick="prevSong()" title="Previous">&#9198;</button>
+      <button class="ctrl-btn" id="btn-play" onclick="togglePlay()" title="Play/Pause">&#9654;</button>
+      <button class="ctrl-btn" onclick="nextSong()" title="Next">&#9197;</button>
     </div>
     <div class="progress-row">
       <span class="time-label" id="time-cur">0:00</span>
@@ -1112,7 +1171,7 @@
 
   <!-- Volume -->
   <div class="vol-row">
-    <span class="vol-icon">🔈</span>
+    <span class="vol-icon">&#9834;</span>
     <div id="vol-bar" onclick="setVol(event)">
       <div id="vol-fill"></div>
     </div>
@@ -1176,7 +1235,7 @@
 <div id="fs-overlay">
   <button id="fs-close" onclick="closeFullscreen()">&#8964;</button>
 
-  <div id="fs-art">♪</div>
+  <div id="fs-art">&#9834;</div>
 
   <div class="fs-info">
     <div id="fs-title">No song playing</div>
@@ -1185,9 +1244,9 @@
 
   <div class="fs-controls">
     <div class="fs-btns">
-      <button class="fs-ctrl-btn" onclick="prevSong()">⏮</button>
-      <button class="fs-ctrl-btn" id="fs-btn-play" onclick="togglePlay()">▶</button>
-      <button class="fs-ctrl-btn" onclick="nextSong()">⏭</button>
+      <button class="fs-ctrl-btn" onclick="prevSong()">&#9198;</button>
+      <button class="fs-ctrl-btn" id="fs-btn-play" onclick="togglePlay()">&#9654;</button>
+      <button class="fs-ctrl-btn" onclick="nextSong()">&#9197;</button>
     </div>
     <div class="fs-progress-row">
       <span class="fs-time" id="fs-time-cur">0:00</span>
@@ -1293,7 +1352,7 @@ function renderSongs(list) {
   if (list.length === 0) {
     el.innerHTML = `
       <div class="empty-state">
-        <div class="big-icon">🎵</div>
+        <div class="big-icon">&#9835;</div>
         <h3>No songs yet</h3>
         <p>Hit "Upload Song" to add your first track</p>
       </div>`;
@@ -1310,7 +1369,7 @@ function renderSongs(list) {
     row.innerHTML = `
       <div class="song-num">${i + 1}</div>
       <div class="song-info">
-        <div class="song-art">${s.art_url ? `<img src="${s.art_url}" />` : '🎵'}</div>
+        <div class="song-art">${s.art_url ? `<img src="${s.art_url}" />` : '&#9834;'}</div>
         <div class="song-text">
           <div class="song-title">${s.title}</div>
           <div class="song-artist">${s.artist || 'Unknown Artist'}</div>
@@ -1365,6 +1424,8 @@ function playSong(idx) {
   };
   audio.addEventListener('canplay', onReady);
   renderSongs(songs);
+  // On mobile, auto-open fullscreen player like YouTube Music
+  if (window.innerWidth <= 640) openFullscreen();
 }
 
 function togglePlay() {
@@ -1586,7 +1647,7 @@ function renderSidebar() {
   // All Songs entry
   const all = document.createElement('div');
   all.className = 'playlist-item' + (currentPlaylistId === null ? ' active' : '');
-  all.innerHTML = `<div class="pl-art">🎵</div><div class="pl-info"><div class="pl-name">All Songs</div><div class="pl-count" id="all-count">${songs.length} song${songs.length !== 1 ? 's' : ''}</div></div>`;
+  all.innerHTML = `<div class="pl-art">&#9834;</div><div class="pl-info"><div class="pl-name">All Songs</div><div class="pl-count" id="all-count">${songs.length} song${songs.length !== 1 ? 's' : ''}</div></div>`;
   all.onclick = () => showLibrary();
   el.appendChild(all);
 
@@ -1594,7 +1655,7 @@ function renderSidebar() {
     const item = document.createElement('div');
     item.className = 'playlist-item' + (currentPlaylistId === pl.id ? ' active' : '');
     item.innerHTML = `
-      <div class="pl-art">🎶</div>
+      <div class="pl-art">&#9835;</div>
       <div class="pl-info">
         <div class="pl-name">${pl.name}</div>
         <div class="pl-count">Playlist</div>

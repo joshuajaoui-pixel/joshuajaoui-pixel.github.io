@@ -1213,6 +1213,7 @@
   <!-- Controls -->
   <div class="controls">
     <div class="ctrl-buttons">
+      <button class="ctrl-btn" id="btn-shuffle" onclick="toggleShuffle()" title="Shuffle" style="font-size:0.85rem">&#8693;</button>
       <button class="ctrl-btn" onclick="prevSong()" title="Previous">&#9198;</button>
       <button class="ctrl-btn" id="btn-play" onclick="togglePlay()" title="Play/Pause">&#9654;</button>
       <button class="ctrl-btn" onclick="nextSong()" title="Next">&#9197;</button>
@@ -1301,6 +1302,7 @@
 
   <div class="fs-controls">
     <div class="fs-btns">
+      <button class="fs-ctrl-btn" id="fs-btn-shuffle" onclick="toggleShuffle()" title="Shuffle" style="font-size:1rem">&#8693;</button>
       <button class="fs-ctrl-btn" onclick="prevSong()">&#9198;</button>
       <button class="fs-ctrl-btn" id="fs-btn-play" onclick="togglePlay()">&#9654;</button>
       <button class="fs-ctrl-btn" onclick="nextSong()">&#9197;</button>
@@ -1363,6 +1365,8 @@ const { createClient } = supabase;
 let db;
 let songs = [];
 let currentIdx = -1;
+let shuffleOn = false;
+let shuffleQueue = [];
 let mp3File = null, artFile = null;
 const audio = document.getElementById('audio');
 
@@ -1396,7 +1400,7 @@ function showSetupBanner() {
 
 // ── Load songs ──
 async function loadSongs() {
-  const { data, error } = await db.from(TABLE).select('*').order('created_at', { ascending: false });
+  const { data, error } = await db.from(TABLE).select('*').order('created_at', { ascending: true });
   if (error) { console.error(error); renderSongs([]); return; }
   songs = data || [];
   renderSongs(songs);
@@ -1498,8 +1502,45 @@ function togglePlay() {
   }
 }
 
-function nextSong() { playSong((currentIdx + 1) % songs.length); }
-function prevSong() { playSong((currentIdx - 1 + songs.length) % songs.length); }
+function nextSong() {
+  if (shuffleOn && shuffleQueue.length > 0) {
+    const nextIdx = shuffleQueue.shift();
+    // Refill queue when empty
+    if (shuffleQueue.length === 0) buildShuffleQueue();
+    playSong(nextIdx);
+  } else {
+    playSong((currentIdx + 1) % songs.length);
+  }
+}
+
+function prevSong() {
+  if (shuffleOn) {
+    // On prev during shuffle just go to a random song
+    playSong(Math.floor(Math.random() * songs.length));
+  } else {
+    playSong((currentIdx - 1 + songs.length) % songs.length);
+  }
+}
+
+function buildShuffleQueue() {
+  // Fisher-Yates shuffle of all indices except current
+  const indices = songs.map((_, i) => i).filter(i => i !== currentIdx);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  shuffleQueue = indices;
+}
+
+function toggleShuffle() {
+  shuffleOn = !shuffleOn;
+  if (shuffleOn) buildShuffleQueue();
+  else shuffleQueue = [];
+  // Update both player bar and fullscreen buttons
+  const on = shuffleOn;
+  document.getElementById('btn-shuffle').style.color = on ? 'var(--accent)' : '';
+  document.getElementById('fs-btn-shuffle').style.color = on ? 'var(--accent)' : '';
+}
 
 audio.addEventListener('ended', nextSong);
 audio.addEventListener('play',  () => updatePlayBtns(false));

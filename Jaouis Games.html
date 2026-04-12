@@ -1037,6 +1037,9 @@
       volume:true, saveSavFiles:true,
     };
 
+    // Force the core to flush .sav to disk every 30s and fire saveSaveFiles event
+    window.EJS_fixedSaveInterval = 30000;
+
     // ── Remap keys: WASD = D-Pad, Space = Start, A = L, D = R ──
     // EmulatorJS key codes: use JS KeyboardEvent.code values
     window.EJS_defaultOptions = {
@@ -1079,21 +1082,57 @@
       } catch(e) { console.warn('Key remap failed:', e); }
     };
 
-    // ── EJS_onSaveFile fires whenever the game writes its .sav battery file ──
-    window.EJS_onSaveFile = async function(saveData) {
-      // saveData is a Uint8Array of the raw .sav file
-      await uploadSav(gameKey, saveData);
-    };
-
-    // Also hook save/load state buttons in toolbar
+    // ── Listen for saveSaveFiles event — fires when EJS_fixedSaveInterval flushes .sav ──
     window.EJS_onSaveState = async function(saveData) {
       await uploadSav(gameKey + '_state', saveData);
       toast('&#10003; STATE SAVED TO CLOUD');
     };
 
     window.EJS_onLoadState = async function() {
-      const data = await downloadSav(gameKey + '_state');
-      return data;
+      return await downloadSav(gameKey + '_state');
+    };
+
+    // saveSaveFiles event is fired by EJS_fixedSaveInterval — read .sav from FS
+    window.addEventListener('saveSaveFiles', async () => {
+      try {
+        const emu = window.EJS_emulator;
+        if (!emu) return;
+        const FS = emu.gameManager?.FS || emu.Module?.FS;
+        if (!FS) return;
+
+        // RetroArch saves .srm files here
+        const gameName = romFile.name.replace(/\.[^.]+$/, '');
+        const paths = [
+          `/home/web_user/retroarch/userdata/saves/${gameName}.srm`,
+          `/home/web_user/retroarch/userdata/saves/${gameName}.sav`,
+          `/data/saves/${romFile.name}`,
+          `/data/saves/${gameName}.srm`,
+        ];
+
+        let saveData = null;
+        for (const p of paths) {
+          try { saveData = FS.readFile(p); if (saveData?.length > 0) break; } catch(e) {}
+        }
+
+        if (!saveData || saveData.length === 0) return;
+
+        // Only upload if changed
+        const hash = saveData.length + '_' + saveData[0] + '_' + saveData[saveData.length - 1];
+        if (hash === window._lastSaveHash) return;
+        window._lastSaveHash = hash;
+
+        await uploadSav(gameKey, saveData);
+      } catch(e) { console.warn('saveSaveFiles handler error:', e); }
+    });
+
+    // Also call enableSaveUpdateEvent so EJS fires the event
+    window.EJS_onGameStart = async function() {
+      try {
+        if (window.EJS_emulator?.enableSaveUpdateEvent) {
+          window.EJS_emulator.enableSaveUpdateEvent();
+        }
+      } catch(e) {}
+      await loadSaveFromSupabase(gameKey);
     };
 
     const script = document.createElement('script');

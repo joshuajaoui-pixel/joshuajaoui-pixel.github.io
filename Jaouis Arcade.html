@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jaouis Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0b0b0f;--surface:#13131e;--surface2:#1c1c2a;--border:#2a2a3e;
+  --accent:#ff3d5a;--accent2:#ffcd3d;--accent3:#3dffb0;--accent4:#a78bfa;
+  --text:#f0f0f8;--text2:#9090a8;--text3:#404058;
+  --pixel:'Press Start 2P',monospace;--body:'Figtree',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:9999;}
+header{padding:32px 40px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.logo{font-family:var(--pixel);line-height:1.6;}
+.logo .l1{font-size:clamp(0.6rem,2vw,0.85rem);color:var(--accent2);}
+.logo .l2{font-size:clamp(1rem,3vw,1.5rem);color:var(--accent);}
+.blink{animation:blink 1s step-end infinite;color:var(--accent3);}
+@keyframes blink{50%{opacity:0;}}
+.game-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.game-tab{font-family:var(--pixel);font-size:0.45rem;letter-spacing:0.06em;padding:8px 14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:6px;cursor:pointer;transition:all 0.15s;}
+.game-tab:hover{border-color:var(--accent2);color:var(--accent2);}
+.game-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,61,90,0.08);}
+main{padding:32px 40px;max-width:1000px;margin:0 auto;}
+.game-screen{display:none;}
+.game-screen.active{display:block;}
+
+/* TETRIS */
+#tetris-wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
+#tetris-board{border:2px solid var(--border);border-radius:8px;background:#000;display:block;}
+.tetris-side{display:flex;flex-direction:column;gap:14px;min-width:120px;}
+.t-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.t-label{font-family:var(--pixel);font-size:0.38rem;color:var(--text3);letter-spacing:0.1em;margin-bottom:6px;}
+.t-val{font-family:var(--pixel);font-size:0.7rem;color:var(--accent2);}
+#next-canvas{display:block;background:#000;border-radius:4px;}
+.t-btn{font-family:var(--pixel);font-size:0.42rem;letter-spacing:0.06em;background:var(--accent);color:#000;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;width:100%;transition:background 0.15s;}
+.t-btn:hover{background:#ff5570;}
+.t-btn.sec{background:none;border:1px solid var(--border);color:var(--text2);}
+.t-btn.sec:hover{border-color:var(--accent);color:var(--accent);}
+.t-ctrl{font-size:0.63rem;color:var(--text3);line-height:2.2;}
+
+/* MINESWEEPER */
+#mine-wrap{display:flex;flex-direction:column;align-items:center;gap:20px;}
+.mine-top{display:flex;align-items:center;gap:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 20px;}
+.mine-stat{font-family:var(--pixel);font-size:0.5rem;color:var(--accent2);min-width:80px;}
+#mine-smiley{font-family:var(--pixel);font-size:1rem;cursor:pointer;background:none;border:2px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);transition:border-color 0.15s;}
+#mine-smiley:hover{border-color:var(--accent);}
+.mine-diff{display:flex;gap:8px;}
+.mine-diff button{font-family:var(--pixel);font-size:0.38rem;background:none;border:1px solid var(--border);color:var(--text2);padding:6px 10px;border-radius:5px;cursor:pointer;transition:all 0.15s;}
+.mine-diff button.active{border-color:var(--accent3);color:var(--accent3);}
+.mine-diff button:hover{border-color:var(--accent);color:var(--accent);}
+#mine-grid{display:grid;gap:2px;user-select:none;-webkit-user-select:none;}
+.mine-cell{width:32px;height:32px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--pixel);font-size:0.5rem;font-weight:700;transition:background 0.08s;}
+.mine-cell:hover:not(.revealed):not(.flagged){background:var(--surface);}
+.mine-cell.revealed{background:#0a0a10;border-color:#1a1a28;cursor:default;}
+.mine-cell.flagged{background:rgba(255,61,90,0.12);border-color:var(--accent);}
+.mine-cell.mine-boom{background:rgba(255,61,90,0.3);border-color:var(--accent);}
+.n1{color:#60a5fa;}.n2{color:#4ade80;}.n3{color:#f87171;}.n4{color:#a78bfa;}
+.n5{color:#f97316;}.n6{color:#22d3ee;}.n7{color:#e879f9;}.n8{color:#94a3b8;}
+
+/* COOKIE CLICKER */
+#cookie-wrap{display:grid;grid-template-columns:1fr 230px;gap:24px;}
+.cookie-left{display:flex;flex-direction:column;align-items:center;gap:16px;}
+#cookie-btn{
+  width:clamp(140px,20vw,200px);height:clamp(140px,20vw,200px);border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#c8843a,#8b5e2a);
+  border:4px solid #a06828;cursor:pointer;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 2px 8px rgba(255,255,255,0.1);
+  transition:transform 0.08s,box-shadow 0.08s;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4.5rem;position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+#cookie-btn:active{transform:scale(0.93);box-shadow:0 2px 12px rgba(0,0,0,0.5);}
+#cookie-btn::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.15),transparent 60%);}
+.c-count{font-family:var(--pixel);font-size:clamp(0.45rem,1.5vw,0.65rem);color:var(--accent2);text-align:center;}
+.c-cps{font-size:0.75rem;color:var(--text3);text-align:center;}
+.cookie-right{display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:580px;padding-right:4px;}
+.cookie-right::-webkit-scrollbar{width:4px;}
+.cookie-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.c-sec{font-family:var(--pixel);font-size:0.38rem;color:var(--text3);letter-spacing:0.1em;padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:2px;}
+.upg-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;text-align:left;width:100%;transition:border-color 0.15s,background 0.15s;position:relative;}
+.upg-btn:hover:not(:disabled){border-color:var(--accent2);background:var(--surface2);}
+.upg-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.upg-btn .un{font-size:0.78rem;font-weight:700;color:var(--text);}
+.upg-btn .ud{font-size:0.63rem;color:var(--text3);margin-top:2px;}
+.upg-btn .uc{font-family:var(--pixel);font-size:0.35rem;color:var(--accent2);margin-top:4px;}
+.upg-btn .uo{position:absolute;top:8px;right:10px;font-family:var(--pixel);font-size:0.35rem;color:var(--text3);}
+.save-st{font-family:var(--pixel);font-size:0.35rem;color:var(--text3);text-align:center;letter-spacing:0.06em;}
+.c-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:190px;}
+.c-btn{font-family:var(--pixel);font-size:0.4rem;background:none;border:1px solid var(--border);color:var(--text2);padding:8px;border-radius:6px;cursor:pointer;transition:all 0.15s;width:100%;}
+.c-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* TOAST */
+#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--pixel);font-size:0.38rem;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;z-index:9998;white-space:nowrap;letter-spacing:0.06em;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:600px){
+  header,main{padding:16px;}
+  #cookie-wrap{grid-template-columns:1fr;}
+  .cookie-right{max-height:280px;}
+  #tetris-wrap{justify-content:center;}
+  .mine-cell{width:26px;height:26px;font-size:0.38rem;}
+}
+@keyframes float{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="l1">JAOUIS</div>
+    <div class="l2">ARCADE<span class="blink">_</span></div>
+  </div>
+  <div class="game-tabs">
+    <button class="game-tab active" onclick="showGame('tetris',this)">TETRIS</button>
+    <button class="game-tab" onclick="showGame('mine',this)">MINESWEEPER</button>
+    <button class="game-tab" onclick="showGame('cookie',this)">COOKIE CLICKER</button>
+  </div>
+</header>
+
+<main>
+
+<!-- TETRIS -->
+<div id="screen-tetris" class="game-screen active">
+  <div id="tetris-wrap">
+    <canvas id="tetris-board" width="200" height="400"></canvas>
+    <div class="tetris-side">
+      <div class="t-panel"><div class="t-label">SCORE</div><div class="t-val" id="t-score">0</div></div>
+      <div class="t-panel"><div class="t-label">LEVEL</div><div class="t-val" id="t-level">1</div></div>
+      <div class="t-panel"><div class="t-label">LINES</div><div class="t-val" id="t-lines">0</div></div>
+      <div class="t-panel">
+        <div class="t-label">NEXT</div>
+        <canvas id="next-canvas" width="80" height="80"></canvas>
+      </div>
+      <button class="t-btn" id="t-start-btn" onclick="tetrisStart()">START</button>
+      <div class="t-ctrl">
+        &larr;&rarr; Move<br>
+        &uarr; Rotate<br>
+        &darr; Soft drop<br>
+        SPACE Hard drop<br>
+        P Pause
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MINESWEEPER -->
+<div id="screen-mine" class="game-screen">
+  <div id="mine-wrap">
+    <div class="mine-top">
+      <div class="mine-stat">Mines: <span id="mine-bombs">10</span></div>
+      <button id="mine-smiley" onclick="mineReset()">&#9786;</button>
+      <div class="mine-stat">Time: <span id="mine-time">0</span>s</div>
+    </div>
+    <div class="mine-diff">
+      <button class="active" onclick="mineSetDiff('easy',this)">EASY</button>
+      <button onclick="mineSetDiff('medium',this)">MEDIUM</button>
+      <button onclick="mineSetDiff('hard',this)">HARD</button>
+    </div>
+    <div id="mine-grid"></div>
+  </div>
+</div>
+
+<!-- COOKIE CLICKER -->
+<div id="screen-cookie" class="game-screen">
+  <div id="cookie-wrap">
+    <div class="cookie-left">
+      <button id="cookie-btn" onclick="cookieClick()">&#127850;</button>
+      <div class="c-count" id="cookie-count">0 cookies</div>
+      <div class="c-cps" id="cookie-cps">0 per second</div>
+      <div class="save-st" id="save-status">SAVE: --</div>
+      <div class="c-btns">
+        <button class="c-btn" onclick="cookieSave()">&#8679; SAVE NOW</button>
+        <button class="c-btn" onclick="cookieReset()">&#9632; RESET SAVE</button>
+      </div>
+    </div>
+    <div class="cookie-right" id="cookie-shop"></div>
+  </div>
+</div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ══ SUPABASE ══
+const SUPABASE_URL = 'https://qcizfkeclpehvkvhconm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjaXpma2VjbHBlaHZrdmhjb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTgyODYsImV4cCI6MjA5MTQ5NDI4Nn0.TirDraSJOTtLqssbWNvL1lVeQDI5qENTmp3evcOStzM';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ══ TOAST ══
+let _tt;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══ GAME SWITCHER ══
+function showGame(id, btn) {
+  document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════
+// TETRIS
+// ════════════════════════════════════════
+const TC = document.getElementById('tetris-board');
+const TX = TC.getContext('2d');
+const NC = document.getElementById('next-canvas');
+const NX = NC.getContext('2d');
+const COLS=10, ROWS=20, BS=20;
+
+const PIECES = [
+  {s:[[1,1,1,1]],c:'#00f0f0'},
+  {s:[[1,1],[1,1]],c:'#f0f000'},
+  {s:[[0,1,0],[1,1,1]],c:'#a000f0'},
+  {s:[[0,1,1],[1,1,0]],c:'#00f000'},
+  {s:[[1,1,0],[0,1,1]],c:'#f00000'},
+  {s:[[1,0,0],[1,1,1]],c:'#0000f0'},
+  {s:[[0,0,1],[1,1,1]],c:'#f0a000'},
+];
+
+let tB,tP,tN,tSc,tLv,tLn,tRun,tPause,tTim,tDT;
+
+function tNewBoard(){return Array.from({length:ROWS},()=>Array(COLS).fill(0));}
+function tRandPiece(){
+  const p=PIECES[Math.floor(Math.random()*PIECES.length)];
+  return {s:p.s.map(r=>[...r]),c:p.c,x:Math.floor(COLS/2)-Math.floor(p.s[0].length/2),y:0};
+}
+
+function tDraw(){
+  TX.fillStyle='#000'; TX.fillRect(0,0,TC.width,TC.height);
+  TX.strokeStyle='#111'; TX.lineWidth=0.5;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(tB[r][c]){TX.fillStyle=tB[r][c];TX.fillRect(c*BS+1,r*BS+1,BS-2,BS-2);}
+    else{TX.strokeRect(c*BS,r*BS,BS,BS);}
+  }
+  if(tP){
+    let g={...tP,s:tP.s.map(r=>[...r])};
+    while(tOk(g,0,1))g.y++;
+    tP.s.forEach((row,r)=>row.forEach((v,c)=>{if(v){TX.fillStyle='rgba(255,255,255,0.07)';TX.fillRect((g.x+c)*BS+1,(g.y+r)*BS+1,BS-2,BS-2);}}));
+    tP.s.forEach((row,r)=>row.forEach((v,c)=>{if(v){TX.fillStyle=tP.c;TX.fillRect((tP.x+c)*BS+1,(tP.y+r)*BS+1,BS-2,BS-2);}}));
+  }
+}
+
+function tDrawNext(){
+  NX.fillStyle='#000';NX.fillRect(0,0,80,80);
+  if(!tN)return;
+  tN.s.forEach((row,r)=>row.forEach((v,c)=>{if(v){NX.fillStyle=tN.c;NX.fillRect(c*BS+8,r*BS+8,BS-2,BS-2);}}));
+}
+
+function tOk(p,dx=0,dy=0,s=null){
+  s=s||p.s;
+  return s.every((row,r)=>row.every((v,c)=>{
+    if(!v)return true;
+    const nx=p.x+c+dx,ny=p.y+r+dy;
+    return nx>=0&&nx<COLS&&ny<ROWS&&!tB[ny]?.[nx];
+  }));
+}
+
+function tLock(){
+  tP.s.forEach((row,r)=>row.forEach((v,c)=>{if(v)tB[tP.y+r][tP.x+c]=tP.c;}));
+  let cl=0;
+  for(let r=ROWS-1;r>=0;r--){
+    if(tB[r].every(v=>v)){tB.splice(r,1);tB.unshift(Array(COLS).fill(0));cl++;r++;}
+  }
+  if(cl){
+    tLn+=cl; tSc+=[0,100,300,500,800][cl]*tLv;
+    tLv=Math.floor(tLn/10)+1; tDT=Math.max(80,800-(tLv-1)*70);
+    document.getElementById('t-score').textContent=tSc;
+    document.getElementById('t-level').textContent=tLv;
+    document.getElementById('t-lines').textContent=tLn;
+  }
+  tP=tN; tN=tRandPiece();
+  if(!tOk(tP)){tetrisEnd();return;}
+  tDrawNext();
+}
+
+function tDrop(){
+  if(!tRun||tPause)return;
+  if(tOk(tP,0,1))tP.y++; else tLock();
+  tDraw(); tTim=setTimeout(tDrop,tDT);
+}
+
+function tetrisStart(){
+  tB=tNewBoard();tSc=0;tLv=1;tLn=0;tDT=800;tRun=true;tPause=false;
+  document.getElementById('t-score').textContent=0;
+  document.getElementById('t-level').textContent=1;
+  document.getElementById('t-lines').textContent=0;
+  document.getElementById('t-start-btn').textContent='RESTART';
+  clearTimeout(tTim);
+  tP=tRandPiece();tN=tRandPiece();
+  tDraw();tDrawNext();tDrop();
+}
+
+function tetrisEnd(){
+  tRun=false;
+  TX.fillStyle='rgba(0,0,0,0.75)';TX.fillRect(0,0,TC.width,TC.height);
+  TX.fillStyle='#ff3d5a';TX.font='bold 14px monospace';TX.textAlign='center';
+  TX.fillText('GAME OVER',TC.width/2,TC.height/2-10);
+  TX.fillStyle='#ffcd3d';TX.font='10px monospace';
+  TX.fillText('Score: '+tSc,TC.width/2,TC.height/2+10);
+  toast('GAME OVER - Score: '+tSc);
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('screen-tetris').style.display==='none')return;
+  if(!tRun&&e.key!==' ')return;
+  if(e.key==='p'||e.key==='P'){tPause=!tPause;if(!tPause)tDrop();return;}
+  if(tPause)return;
+  if(e.key==='ArrowLeft'&&tOk(tP,-1)){tP.x--;tDraw();e.preventDefault();}
+  else if(e.key==='ArrowRight'&&tOk(tP,1)){tP.x++;tDraw();e.preventDefault();}
+  else if(e.key==='ArrowDown'){if(tOk(tP,0,1)){tP.y++;tSc++;document.getElementById('t-score').textContent=tSc;}else tLock();tDraw();e.preventDefault();}
+  else if(e.key==='ArrowUp'){
+    const rot=tP.s[0].map((_,i)=>tP.s.map(r=>r[i]).reverse());
+    if(tOk(tP,0,0,rot)){tP.s=rot;tDraw();}e.preventDefault();
+  }else if(e.key===' '){
+    while(tOk(tP,0,1)){tP.y++;tSc+=2;}
+    document.getElementById('t-score').textContent=tSc;
+    tLock();tDraw();e.preventDefault();
+  }
+});
+
+tB=tNewBoard();tDraw();
+
+// ════════════════════════════════════════
+// MINESWEEPER
+// ════════════════════════════════════════
+const MCONF={easy:{rows:9,cols:9,mines:10},medium:{rows:16,cols:16,mines:40},hard:{rows:16,cols:30,mines:99}};
+let mDiff='easy',mG=[],mRev=[],mFlag=[],mMines=[];
+let mStarted=false,mDead=false,mWon=false,mTInt,mTime=0;
+
+function mineSetDiff(d,btn){
+  mDiff=d;
+  document.querySelectorAll('.mine-diff button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  mineReset();
+}
+
+function mineReset(){
+  clearInterval(mTInt);mTime=0;mStarted=false;mDead=false;mWon=false;
+  const {rows,cols,mines}=MCONF[mDiff];
+  document.getElementById('mine-bombs').textContent=mines;
+  document.getElementById('mine-time').textContent=0;
+  document.getElementById('mine-smiley').textContent='\u263A';
+  mG=Array.from({length:rows},()=>Array(cols).fill(0));
+  mRev=Array.from({length:rows},()=>Array(cols).fill(false));
+  mFlag=Array.from({length:rows},()=>Array(cols).fill(false));
+  mMines=[];mineRender();
+}
+
+function minePlace(sr,sc){
+  const {rows,cols,mines}=MCONF[mDiff];
+  const bad=new Set();
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)bad.add((sr+dr)*cols+(sc+dc));
+  let p=0;
+  while(p<mines){
+    const r=Math.floor(Math.random()*rows),c=Math.floor(Math.random()*cols);
+    if(!mG[r][c]&&!bad.has(r*cols+c)){mG[r][c]=-1;mMines.push([r,c]);p++;}
+  }
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    if(mG[r][c]===-1)continue;
+    let n=0;
+    for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(mG[r+dr]?.[c+dc]===-1)n++;}
+    mG[r][c]=n;
+  }
+}
+
+function mineReveal(r,c){
+  const {rows,cols}=MCONF[mDiff];
+  if(r<0||r>=rows||c<0||c>=cols||mRev[r][c]||mFlag[r][c])return;
+  mRev[r][c]=true;
+  if(mG[r][c]===0)for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)mineReveal(r+dr,c+dc);
+}
+
+function mineClick(r,c){
+  if(mDead||mWon||mFlag[r][c])return;
+  if(!mStarted){
+    mStarted=true;minePlace(r,c);
+    mTInt=setInterval(()=>{mTime++;document.getElementById('mine-time').textContent=mTime;},1000);
+  }
+  if(mG[r][c]===-1){
+    mRev[r][c]=true;mDead=true;clearInterval(mTInt);
+    document.getElementById('mine-smiley').textContent='&#128565;';
+    mMines.forEach(([mr,mc])=>mRev[mr][mc]=true);
+    mineRender();toast('BOOM! Try again.');return;
+  }
+  mineReveal(r,c);
+  const {mines}=MCONF[mDiff];
+  if(mRev.flat().filter(v=>!v).length===mines){
+    mWon=true;clearInterval(mTInt);
+    document.getElementById('mine-smiley').textContent='&#128526;';
+    toast('YOU WIN! Time: '+mTime+'s');
+  }
+  mineRender();
+}
+
+function mineFlag(e,r,c){
+  e.preventDefault();
+  if(mDead||mWon||mRev[r][c])return;
+  mFlag[r][c]=!mFlag[r][c];
+  const {mines}=MCONF[mDiff];
+  document.getElementById('mine-bombs').textContent=mines-mFlag.flat().filter(v=>v).length;
+  mineRender();
+}
+
+function mineRender(){
+  const {rows,cols}=MCONF[mDiff];
+  const grid=document.getElementById('mine-grid');
+  grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  grid.innerHTML='';
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const cell=document.createElement('div');
+    cell.className='mine-cell';
+    if(mRev[r][c]){
+      cell.classList.add('revealed');
+      if(mG[r][c]===-1){cell.textContent='\uD83D\uDCA3';cell.classList.add('mine-boom');}
+      else if(mG[r][c]>0){cell.textContent=mG[r][c];cell.classList.add('n'+mG[r][c]);}
+    }else if(mFlag[r][c]){
+      cell.classList.add('flagged');cell.textContent='\uD83D\uDEA9';
+    }
+    cell.onclick=()=>mineClick(r,c);
+    cell.oncontextmenu=(e)=>mineFlag(e,r,c);
+    grid.appendChild(cell);
+  }
+}
+mineReset();
+
+// ════════════════════════════════════════
+// COOKIE CLICKER
+// ════════════════════════════════════════
+const UPGRADES=[
+  {id:'cursor',  name:'Cursor',       desc:'+0.1 cookies/sec each', baseCost:15,      baseCps:0.1   },
+  {id:'grandma', name:'Grandma',      desc:'+0.5 cookies/sec each', baseCost:100,     baseCps:0.5   },
+  {id:'farm',    name:'Farm',         desc:'+4 cookies/sec each',   baseCost:1100,    baseCps:4     },
+  {id:'mine',    name:'Mine',         desc:'+10 cookies/sec each',  baseCost:12000,   baseCps:10    },
+  {id:'factory', name:'Factory',      desc:'+40 cookies/sec each',  baseCost:130000,  baseCps:40    },
+  {id:'bank',    name:'Bank',         desc:'+100 cookies/sec each', baseCost:1400000, baseCps:100   },
+  {id:'temple',  name:'Temple',       desc:'+400 cookies/sec each', baseCost:20000000,baseCps:400   },
+  {id:'wizard',  name:'Wizard Tower', desc:'+1600/sec each',        baseCost:330000000,baseCps:1600 },
+];
+
+let cCookies=0,cCps=0,cOwned={};
+let cSaveTim;
+
+function cCost(u,n){return Math.floor(u.baseCost*Math.pow(1.15,n||0));}
+
+function cCalcCps(){cCps=0;UPGRADES.forEach(u=>{cCps+=u.baseCps*(cOwned[u.id]||0);});}
+
+function cFmt(n){
+  if(n>=1e15)return(n/1e15).toFixed(2)+' quadrillion';
+  if(n>=1e12)return(n/1e12).toFixed(2)+' trillion';
+  if(n>=1e9)return(n/1e9).toFixed(2)+' billion';
+  if(n>=1e6)return(n/1e6).toFixed(2)+' million';
+  if(n>=1e3)return(n/1e3).toFixed(1)+'K';
+  return Math.floor(n).toString();
+}
+
+function cookieClick(){
+  cCookies+=1;
+  cUpdate();
+  const btn=document.getElementById('cookie-btn');
+  const sp=document.createElement('span');
+  sp.textContent='+1';
+  sp.style.cssText='position:absolute;font-family:var(--pixel);font-size:0.45rem;color:#ffcd3d;pointer-events:none;top:'+(20+Math.random()*60)+'%;left:'+(20+Math.random()*60)+'%;animation:float 0.8s ease-out forwards;z-index:10;';
+  btn.appendChild(sp);setTimeout(()=>sp.remove(),800);
+}
+
+function cookieBuy(id){
+  const u=UPGRADES.find(u=>u.id===id);
+  const cost=cCost(u,cOwned[id]);
+  if(cCookies<cost)return;
+  cCookies-=cost;
+  cOwned[id]=(cOwned[id]||0)+1;
+  cCalcCps();cUpdate();cRenderShop();
+  clearTimeout(cSaveTim);
+  cSaveTim=setTimeout(cookieSave,15000);
+}
+
+function cUpdate(){
+  document.getElementById('cookie-count').textContent=cFmt(cCookies)+' cookies';
+  document.getElementById('cookie-cps').textContent=cFmt(cCps)+' per second';
+  document.querySelectorAll('.upg-btn').forEach(btn=>{
+    const u=UPGRADES.find(u=>u.id===btn.dataset.id);
+    const cost=cCost(u,cOwned[u.id]);
+    btn.disabled=cCookies<cost;
+    btn.querySelector('.uc').textContent=cFmt(cost)+' cookies';
+    btn.querySelector('.uo').textContent=(cOwned[u.id]||0)+' owned';
+  });
+}
+
+function cRenderShop(){
+  const shop=document.getElementById('cookie-shop');
+  shop.innerHTML='<div class="c-sec">BUILDINGS</div>';
+  UPGRADES.forEach(u=>{
+    const cost=cCost(u,cOwned[u.id]);
+    const btn=document.createElement('button');
+    btn.className='upg-btn';btn.dataset.id=u.id;
+    btn.disabled=cCookies<cost;
+    btn.innerHTML=`<div class="un">${u.name}</div><div class="ud">${u.desc}</div><div class="uc">${cFmt(cost)} cookies</div><div class="uo">${cOwned[u.id]||0} owned</div>`;
+    btn.onclick=()=>cookieBuy(u.id);
+    shop.appendChild(btn);
+  });
+}
+
+// CPS tick every 50ms
+setInterval(()=>{if(cCps>0){cCookies+=cCps/20;cUpdate();}},50);
+
+// ── SAVE / LOAD ──
+async function cookieSave(){
+  const data={cookies:cCookies,owned:cOwned,ts:Date.now()};
+  document.getElementById('save-status').textContent='SAVING...';
+  try{
+    const {error}=await db.from('arcade_saves').upsert({key:'cookie_save',value:JSON.stringify(data)},{onConflict:'key'});
+    if(error)throw error;
+    const t=new Date().toLocaleTimeString();
+    document.getElementById('save-status').textContent='SAVED '+t;
+    toast('\u2713 CLOUD SAVE DONE');
+  }catch(e){
+    localStorage.setItem('cookie_save',JSON.stringify(data));
+    document.getElementById('save-status').textContent='SAVED (LOCAL)';
+    toast('\u2713 SAVED LOCALLY');
+  }
+}
+
+async function cookieLoad(){
+  document.getElementById('save-status').textContent='LOADING...';
+  try{
+    const {data,error}=await db.from('arcade_saves').select('value').eq('key','cookie_save').single();
+    if(error||!data)throw new Error('no save');
+    const save=JSON.parse(data.value);
+    cCookies=save.cookies||0;cOwned=save.owned||{};
+    cCalcCps();cUpdate();cRenderShop();
+    document.getElementById('save-status').textContent='LOADED FROM CLOUD';
+    toast('\u2713 SAVE LOADED');
+  }catch(e){
+    const local=localStorage.getItem('cookie_save');
+    if(local){
+      try{const save=JSON.parse(local);cCookies=save.cookies||0;cOwned=save.owned||{};cCalcCps();}catch{}
+    }
+    cUpdate();cRenderShop();
+    document.getElementById('save-status').textContent=local?'LOADED (LOCAL)':'NO SAVE YET';
+  }
+}
+
+function cookieReset(){
+  if(!confirm('Reset all cookie progress? This cannot be undone.'))return;
+  cCookies=0;cOwned={};cCps=0;
+  localStorage.removeItem('cookie_save');
+  cUpdate();cRenderShop();
+  document.getElementById('save-status').textContent='RESET';
+  toast('PROGRESS RESET');
+  cookieSave();
+}
+
+// Auto-save every 60s
+setInterval(()=>{if(cCookies>0)cookieSave();},60000);
+
+cookieLoad();
+</script>
+</body>
+</html>

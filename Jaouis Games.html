@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jaouis Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #0b0b0f;
+      --surface: #12121a;
+      --surface2:#1a1a24;
+      --border:  #2a2a3a;
+      --accent:  #ff3d5a;
+      --accent2: #ffcd3d;
+      --accent3: #3dffb0;
+      --text:    #f0f0f8;
+      --text2:   #9090a8;
+      --text3:   #505068;
+      --pixel:   'Press Start 2P', monospace;
+      --body:    'Figtree', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--body); overflow-x: hidden; }
+
+    /* ── SCANLINE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 40px 40px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .logo {
+      font-family: var(--pixel);
+      font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+      line-height: 1.6;
+    }
+
+    .logo .line1 { color: var(--accent2); }
+    .logo .line2 { color: var(--accent); font-size: 1.4em; margin-top: 4px; }
+    .logo .line3 { color: var(--text3); font-size: 0.55em; margin-top: 8px; letter-spacing: 0.15em; }
+
+    /* blinking cursor */
+    .blink {
+      animation: blink 1s step-end infinite;
+      color: var(--accent3);
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SYSTEM SELECTOR ── */
+    .system-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .sys-tab {
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+    }
+
+    .sys-tab:hover { border-color: var(--accent2); color: var(--accent2); }
+    .sys-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(255,61,90,0.08); }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── DROP ZONE ── */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 56px 32px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--surface);
+      margin-bottom: 40px;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(255,61,90,0.04);
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon {
+      font-family: var(--pixel);
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: block;
+      text-shadow: 0 0 20px rgba(255,61,90,0.5);
+    }
+
+    .drop-title {
+      font-family: var(--pixel);
+      font-size: 0.65rem;
+      color: var(--text);
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+    }
+
+    .drop-sub {
+      font-size: 0.78rem;
+      color: var(--text3);
+      line-height: 1.6;
+    }
+
+    .drop-sub span {
+      color: var(--accent2);
+      font-weight: 700;
+    }
+
+    .drop-chosen {
+      margin-top: 16px;
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      color: var(--accent3);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── SYSTEM INFO CARDS ── */
+    .systems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .sys-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.12s;
+      text-align: center;
+    }
+
+    .sys-card:hover {
+      border-color: var(--accent2);
+      background: var(--surface2);
+      transform: translateY(-2px);
+    }
+
+    .sys-card.active {
+      border-color: var(--accent);
+      background: rgba(255,61,90,0.06);
+    }
+
+    .sys-card .sys-icon {
+      font-family: var(--pixel);
+      font-size: 1.2rem;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .sys-card .sys-name {
+      font-family: var(--pixel);
+      font-size: 0.45rem;
+      color: var(--text);
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .sys-card .sys-ext {
+      font-size: 0.65rem;
+      color: var(--text3);
+    }
+
+    /* ── LAUNCH BTN ── */
+    #launch-btn {
+      display: none;
+      width: 100%;
+      font-family: var(--pixel);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 4px 24px rgba(255,61,90,0.3);
+      margin-bottom: 40px;
+    }
+
+    #launch-btn:hover {
+      background: #ff5570;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(255,61,90,0.5);
+    }
+
+    #launch-btn:active { transform: translateY(1px); }
+
+    /* ── EMULATOR CONTAINER ── */
+    #emu-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #emu-wrap.visible { display: flex; }
+
+    #emu-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0 16px;
+    }
+
+    #emu-game-name {
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      color: var(--accent2);
+      letter-spacing: 0.08em;
+    }
+
+    #emu-close {
+      font-family: var(--pixel);
+      font-size: 0.45rem;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    #emu-close:hover { border-color: var(--accent); color: var(--accent); }
+
+    #emu-container {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      position: relative;
+    }
+
+    #emu-container canvas,
+    #emu-container #game { 
+      width: 100% !important; 
+      height: 100% !important; 
+    }
+
+    /* ── CONTROLS GUIDE ── */
+    .controls-guide {
+      margin-top: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+
+    .controls-guide h3 {
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      color: var(--accent2);
+      margin-bottom: 16px;
+      letter-spacing: 0.08em;
+    }
+
+    .ctrl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+    }
+
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      color: var(--text2);
+    }
+
+    .ctrl-key {
+      font-family: var(--pixel);
+      font-size: 0.4rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: var(--text);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── TIPS ── */
+    .tip-box {
+      margin-top: 16px;
+      background: rgba(255,205,61,0.06);
+      border: 1px solid rgba(255,205,61,0.2);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.75rem;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    .tip-box strong { color: var(--accent2); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px;
+      font-size: 0.68rem;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+      line-height: 1.8;
+      margin-top: 40px;
+    }
+
+
+    /* ── ROM LIBRARY ── */
+    #rom-library { margin-bottom: 40px; }
+
+    .library-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .library-header h2 {
+      font-family: var(--pixel);
+      font-size: 0.55rem;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+    }
+
+    .library-header .saveable-note {
+      font-size: 0.68rem;
+      color: var(--text3);
+    }
+
+    .rom-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .rom-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+
+    .rom-card:hover { border-color: var(--accent2); background: var(--surface2); }
+
+    .rom-card .rc-sys {
+      font-family: var(--pixel);
+      font-size: 0.38rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+
+    .rom-card .rc-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rom-card .rc-size {
+      font-size: 0.65rem;
+      color: var(--text3);
+    }
+
+    .rom-card .rc-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .rc-play {
+      flex: 1;
+      font-family: var(--pixel);
+      font-size: 0.4rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: background 0.15s;
+    }
+
+    .rc-play:hover { background: #ff5570; }
+
+    .rc-delete {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text3);
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .rc-delete:hover { border-color: #ff4444; color: #ff4444; }
+
+    .lib-empty {
+      font-family: var(--pixel);
+      font-size: 0.45rem;
+      color: var(--text3);
+      text-align: center;
+      padding: 32px;
+      letter-spacing: 0.08em;
+      line-height: 2;
+    }
+
+    /* Save to library button */
+    #save-rom-btn {
+      display: none;
+      width: 100%;
+      font-family: var(--pixel);
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      background: none;
+      color: var(--accent3);
+      border: 1px solid var(--accent3);
+      padding: 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 16px;
+    }
+
+    #save-rom-btn:hover { background: rgba(61,255,176,0.08); }
+    #save-rom-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .unsaveable-note {
+      display: none;
+      text-align: center;
+      font-size: 0.68rem;
+      color: var(--text3);
+      margin-bottom: 32px;
+      padding: 10px;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+    }
+
+    .upload-prog-wrap {
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    .upload-prog-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .upload-prog-fill {
+      height: 100%;
+      background: var(--accent3);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    .upload-prog-label {
+      font-family: var(--pixel);
+      font-size: 0.38rem;
+      color: var(--text3);
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    #toast-game {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--pixel);
+      font-size: 0.42rem;
+      padding: 12px 20px;
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+      letter-spacing: 0.06em;
+    }
+
+    #toast-game.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 600px) {
+      header { padding: 24px 20px 20px; }
+      main { padding: 24px 16px; }
+      .logo .line2 { font-size: 1.1em; }
+      .systems-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .sys-card { padding: 12px 8px; }
+      .sys-card .sys-icon { font-size: 0.9rem; }
+      #emu-container { aspect-ratio: 4/3; border-radius: 8px; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="line1">JAOUIS</div>
+    <div class="line2">GAMES<span class="blink">_</span></div>
+    <div class="line3">INSERT ROM TO PLAY</div>
+  </div>
+  <div class="system-tabs" id="sys-tabs"></div>
+</header>
+
+<main>
+
+  <!-- ROM LIBRARY -->
+  <div id="rom-library">
+    <div class="library-header">
+      <h2>&#9679; SAVED LIBRARY</h2>
+      <span class="saveable-note">Small ROMs only (SNES · GBA · GBC · GB · NES · Genesis)</span>
+    </div>
+    <div class="rom-grid" id="rom-grid">
+      <div class="lib-empty" id="lib-empty">NO ROMS SAVED YET<br>LOAD A ROM BELOW TO SAVE IT</div>
+    </div>
+  </div>
+
+  <!-- SAVE TO LIBRARY -->
+  <button id="save-rom-btn" onclick="saveRom()">&#8679; SAVE TO LIBRARY</button>
+  <div class="unsaveable-note" id="unsaveable-note">&#9888; N64 / PS1 / NDS ROMs are too large to save — load them each time</div>
+  <div class="upload-prog-wrap" id="upload-prog-wrap">
+    <div class="upload-prog-bar"><div class="upload-prog-fill" id="upload-prog-fill"></div></div>
+    <div class="upload-prog-label" id="upload-prog-label">UPLOADING...</div>
+  </div>
+
+  <!-- SYSTEM PICKER -->
+  <div class="systems-grid" id="systems-grid"></div>
+
+  <!-- ROM DROP ZONE -->
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="rom-input" accept="*/*" />
+    <span class="drop-icon">&#9654;</span>
+    <div class="drop-title">LOAD ROM</div>
+    <div class="drop-sub">Drop your ROM file here or click to browse<br><span>N64 · SNES · GBA · GBC · GB · NES · PS1 · Genesis</span></div>
+    <div class="drop-chosen" id="rom-chosen"></div>
+  </div>
+
+  <!-- LAUNCH BUTTON -->
+  <button id="launch-btn" onclick="launch()">&#9654; &nbsp; START GAME</button>
+
+  <!-- TIP -->
+  <div class="tip-box" id="tip-box">
+    <strong>&#9432; How to use:</strong> Select your console above, then drop in a ROM file. The emulator runs entirely in your browser — no data is uploaded anywhere. Use <strong>keyboard or gamepad</strong> to play. On mobile, on-screen touch controls appear automatically.
+  </div>
+
+  <!-- EMULATOR -->
+  <div id="emu-wrap">
+    <div id="emu-topbar">
+      <div id="emu-game-name"></div>
+      <button id="emu-close" onclick="closeEmu()">&#9632; STOP</button>
+    </div>
+    <div id="emu-container"></div>
+    <div class="controls-guide">
+      <h3>&#9679; CONTROLS</h3>
+      <div class="ctrl-grid" id="ctrl-grid"></div>
+    </div>
+  </div>
+
+  <div id="toast-game"></div>
+</main>
+
+<footer>
+  Powered by EmulatorJS &mdash; an open source browser emulation library.<br>
+  Only use ROM files you own. No ROMs are stored or uploaded by this page.
+</footer>
+
+<script>
+  // ══════════════════════════════════════════
+  // SUPABASE CONFIG — same as your music player
+  // ══════════════════════════════════════════
+  const SUPABASE_URL = 'https://qcizfkeclpehvkvhconm.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjaXpma2VjbHBlaHZrdmhjb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTgyODYsImV4cCI6MjA5MTQ5NDI4Nn0.TirDraSJOTtLqssbWNvL1lVeQDI5qENTmp3evcOStzM';
+  const ROM_BUCKET   = 'roms';   // create this bucket in Supabase Storage
+  const ROM_TABLE    = 'roms';   // create this table in Supabase Table Editor
+
+  // ── Systems ──
+  // saveable: true = small enough for Supabase (< ~30MB typical)
+  const SYSTEMS = [
+    { id: 'n64',      name: 'N64',        icon: '&#9649;', exts: ['.n64','.z64','.v64'],       core: 'n64',              saveable: false },
+    { id: 'snes',     name: 'SNES',       icon: '&#9651;', exts: ['.sfc','.smc'],               core: 'snes',             saveable: true  },
+    { id: 'gba',      name: 'GBA',        icon: '&#9633;', exts: ['.gba'],                      core: 'gba',              saveable: true  },
+    { id: 'gbc',      name: 'GBC',        icon: '&#9633;', exts: ['.gbc'],                      core: 'gambatte',         saveable: true  },
+    { id: 'gb',       name: 'Game Boy',   icon: '&#9633;', exts: ['.gb'],                       core: 'gambatte',         saveable: true  },
+    { id: 'nes',      name: 'NES',        icon: '&#9632;', exts: ['.nes'],                      core: 'fceumm',           saveable: true  },
+    { id: 'psx',      name: 'PS1',        icon: '&#9670;', exts: ['.bin','.cue','.img','.pbp'], core: 'pcsx_rearmed',     saveable: false },
+    { id: 'segaMD',   name: 'Genesis',    icon: '&#9661;', exts: ['.md','.gen','.smd'],         core: 'genesis_plus_gx',  saveable: true  },
+    { id: 'segaMS',   name: 'Master Sys', icon: '&#9661;', exts: ['.sms'],                      core: 'genesis_plus_gx',  saveable: true  },
+    { id: 'atari2600',name: 'Atari 2600', icon: '&#9650;', exts: ['.a26','.bin'],               core: 'stella',           saveable: true  },
+    { id: 'nds',      name: 'NDS',        icon: '&#9648;', exts: ['.nds'],                      core: 'melonds',          saveable: false },
+  ];
+
+  const CONTROLS = {
+    n64:     [['Arrow Keys','D-Pad'],['Z','Z Trigger'],['X','A Button'],['C','B Button'],['A/S','L/R Trigger'],['Enter','Start']],
+    snes:    [['Arrow Keys','D-Pad'],['Z','Y'],['X','B'],['A','A'],['S','X'],['D','L'],['C','R'],['Enter','Start'],['Shift','Select']],
+    gba:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['A','L'],['S','R'],['Enter','Start'],['Shift','Select']],
+    gbc:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['Enter','Start'],['Shift','Select']],
+    gb:      [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['Enter','Start'],['Shift','Select']],
+    nes:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['Enter','Start'],['Shift','Select']],
+    psx:     [['Arrow Keys','D-Pad'],['Z','Cross'],['X','Circle'],['A','Square'],['S','Triangle'],['D','L1'],['C','R1'],['Enter','Start']],
+    segaMD:  [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['C','C'],['Enter','Start']],
+    segaMS:  [['Arrow Keys','D-Pad'],['Z','1'],['X','2'],['Enter','Start']],
+    atari2600:[['Arrow Keys','Joystick'],['Z','Fire']],
+    nds:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['A','Y'],['S','X'],['Enter','Start'],['Shift','Select']],
+  };
+
+  let selectedSystem = SYSTEMS[0];
+  let romFile = null;
+  let db = null;
+  let savedRoms = [];
+
+  // ── Init Supabase ──
+  const { createClient } = supabase;
+  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  loadLibrary();
+
+  // ── Build system cards & tabs ──
+  function buildSystems() {
+    const grid = document.getElementById('systems-grid');
+    const tabs = document.getElementById('sys-tabs');
+    grid.innerHTML = '';
+    tabs.innerHTML = '';
+
+    SYSTEMS.forEach((sys, i) => {
+      const card = document.createElement('div');
+      card.className = 'sys-card' + (i === 0 ? ' active' : '');
+      card.innerHTML = `<span class="sys-icon">${sys.icon}</span><div class="sys-name">${sys.name}</div><div class="sys-ext">${sys.exts.join(' ')}</div>`;
+      card.onclick = () => selectSystem(sys);
+      grid.appendChild(card);
+
+      const tab = document.createElement('button');
+      tab.className = 'sys-tab' + (i === 0 ? ' active' : '');
+      tab.textContent = sys.name;
+      tab.onclick = () => selectSystem(sys);
+      tabs.appendChild(tab);
+    });
+  }
+
+  function selectSystem(sys) {
+    selectedSystem = sys;
+    document.querySelectorAll('.sys-card').forEach((c, i) => c.classList.toggle('active', SYSTEMS[i].id === sys.id));
+    document.querySelectorAll('.sys-tab').forEach((t, i)  => t.classList.toggle('active', SYSTEMS[i].id === sys.id));
+    document.getElementById('rom-input').accept = sys.exts.join(',');
+    updateSaveBtn();
+    checkReady();
+  }
+
+  // ── ROM file input ──
+  document.getElementById('rom-input').addEventListener('change', e => {
+    romFile = e.target.files[0];
+    if (romFile) {
+      document.getElementById('rom-chosen').textContent = '> ' + romFile.name;
+      const ext = '.' + romFile.name.split('.').pop().toLowerCase();
+      const match = SYSTEMS.find(s => s.exts.includes(ext));
+      if (match) selectSystem(match);
+    }
+    updateSaveBtn();
+    checkReady();
+  });
+
+  // Drag & drop
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    romFile = e.dataTransfer.files[0];
+    if (romFile) {
+      document.getElementById('rom-chosen').textContent = '> ' + romFile.name;
+      const ext = '.' + romFile.name.split('.').pop().toLowerCase();
+      const match = SYSTEMS.find(s => s.exts.includes(ext));
+      if (match) selectSystem(match);
+    }
+    updateSaveBtn();
+    checkReady();
+  });
+
+  function checkReady() {
+    document.getElementById('launch-btn').style.display = romFile ? 'block' : 'none';
+  }
+
+  function updateSaveBtn() {
+    if (!romFile) {
+      document.getElementById('save-rom-btn').style.display = 'none';
+      document.getElementById('unsaveable-note').style.display = 'none';
+      return;
+    }
+    if (selectedSystem.saveable) {
+      document.getElementById('save-rom-btn').style.display = 'block';
+      document.getElementById('unsaveable-note').style.display = 'none';
+    } else {
+      document.getElementById('save-rom-btn').style.display = 'none';
+      document.getElementById('unsaveable-note').style.display = 'block';
+    }
+  }
+
+  // ── Supabase ROM library ──
+  async function loadLibrary() {
+    try {
+      const { data, error } = await db.from(ROM_TABLE).select('*').order('created_at', { ascending: false });
+      if (error) { console.warn('ROM table not set up yet:', error.message); renderLibrary([]); return; }
+      savedRoms = data || [];
+      renderLibrary(savedRoms);
+    } catch(e) { console.warn('Library load failed:', e); renderLibrary([]); }
+  }
+
+  function renderLibrary(roms) {
+    const grid = document.getElementById('rom-grid');
+    const empty = document.getElementById('lib-empty');
+    grid.querySelectorAll('.rom-card').forEach(c => c.remove());
+
+    if (roms.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    roms.forEach(rom => {
+      const sys = SYSTEMS.find(s => s.id === rom.system_id) || { name: rom.system_id, icon: '&#9632;' };
+      const card = document.createElement('div');
+      card.className = 'rom-card';
+      card.innerHTML = `
+        <div class="rc-sys">${sys.icon} ${sys.name}</div>
+        <div class="rc-name">${rom.name}</div>
+        <div class="rc-size">${(rom.size_bytes / 1024 / 1024).toFixed(1)} MB</div>
+        <div class="rc-actions">
+          <button class="rc-play">&#9654; PLAY</button>
+          <button class="rc-delete">&#10005;</button>
+        </div>`;
+      card.querySelector('.rc-play').onclick = () => launchFromLibrary(rom, sys);
+      card.querySelector('.rc-delete').onclick = () => deleteRom(rom);
+      grid.insertBefore(card, empty);
+    });
+  }
+
+  async function saveRom() {
+    if (!romFile || !selectedSystem.saveable) return;
+
+    // Check if already saved
+    const already = savedRoms.find(r => r.name === romFile.name.replace(/\.[^/.]+$/,'') && r.system_id === selectedSystem.id);
+    if (already) { toast('Already saved!'); return; }
+
+    const btn = document.getElementById('save-rom-btn');
+    const progWrap = document.getElementById('upload-prog-wrap');
+    const progFill = document.getElementById('upload-prog-fill');
+    const progLbl  = document.getElementById('upload-prog-label');
+
+    btn.disabled = true;
+    progWrap.style.display = 'block';
+    progFill.style.width = '20%';
+    progLbl.textContent = 'UPLOADING ROM...';
+
+    const uid = Date.now();
+    const path = `${selectedSystem.id}/${uid}_${romFile.name.replace(/\s/g,'_')}`;
+
+    const { error: upErr } = await db.storage.from(ROM_BUCKET).upload(path, romFile, { upsert: true });
+    if (upErr) { toast('Upload failed: ' + upErr.message); btn.disabled = false; progWrap.style.display = 'none'; return; }
+
+    progFill.style.width = '80%';
+    progLbl.textContent = 'SAVING...';
+
+    const { data: urlData } = db.storage.from(ROM_BUCKET).getPublicUrl(path);
+    const romUrl = urlData.publicUrl;
+    const name = romFile.name.replace(/\.[^/.]+$/, '');
+
+    const { error: dbErr } = await db.from(ROM_TABLE).insert({
+      name,
+      system_id: selectedSystem.id,
+      rom_url: romUrl,
+      size_bytes: romFile.size,
+    });
+
+    if (dbErr) { toast('Save failed: ' + dbErr.message); btn.disabled = false; progWrap.style.display = 'none'; return; }
+
+    progFill.style.width = '100%';
+    progLbl.textContent = 'SAVED!';
+    setTimeout(() => { progWrap.style.display = 'none'; btn.disabled = false; }, 800);
+
+    await loadLibrary();
+    toast('&#10003; ' + name + ' saved to library!');
+  }
+
+  async function deleteRom(rom) {
+    if (!confirm('Remove "' + rom.name + '" from library?')) return;
+    await db.from(ROM_TABLE).delete().eq('id', rom.id);
+    try {
+      const path = rom.rom_url.split('/object/public/' + ROM_BUCKET + '/')[1];
+      if (path) await db.storage.from(ROM_BUCKET).remove([decodeURIComponent(path)]);
+    } catch {}
+    await loadLibrary();
+    toast('Removed from library');
+  }
+
+  // ── Launch from library (fetch ROM as blob) ──
+  async function launchFromLibrary(rom, sys) {
+    toast('LOADING ROM...');
+    try {
+      const resp = await fetch(rom.rom_url);
+      const blob = await resp.blob();
+      // Find the original extension from saved systems
+      const extMap = { n64:'.z64', snes:'.sfc', gba:'.gba', gbc:'.gbc', gb:'.gb', nes:'.nes', segaMD:'.md', segaMS:'.sms', atari2600:'.a26' };
+      const ext = extMap[rom.system_id] || '.rom';
+      romFile = new File([blob], rom.name + ext, { type: 'application/octet-stream' });
+      selectSystem(sys);
+      launch();
+    } catch(e) {
+      toast('Failed to load ROM');
+      console.error(e);
+    }
+  }
+
+  // ── Launch emulator ──
+  function launch() {
+    if (!romFile) return;
+
+    document.getElementById('drop-zone').style.display = 'none';
+    document.getElementById('launch-btn').style.display = 'none';
+    document.getElementById('tip-box').style.display = 'none';
+    document.getElementById('systems-grid').style.display = 'none';
+    document.getElementById('sys-tabs').style.display = 'none';
+    document.getElementById('save-rom-btn').style.display = 'none';
+    document.getElementById('unsaveable-note').style.display = 'none';
+    document.getElementById('rom-library').style.display = 'none';
+
+    const wrap = document.getElementById('emu-wrap');
+    wrap.classList.add('visible');
+    document.getElementById('emu-game-name').textContent = romFile.name.replace(/\.[^/.]+$/, '').toUpperCase();
+
+    const ctrlGrid = document.getElementById('ctrl-grid');
+    ctrlGrid.innerHTML = '';
+    const ctrls = CONTROLS[selectedSystem.id] || CONTROLS.snes;
+    ctrls.forEach(([key, action]) => {
+      const row = document.createElement('div');
+      row.className = 'ctrl-row';
+      row.innerHTML = `<span class="ctrl-key">${key}</span><span>${action}</span>`;
+      ctrlGrid.appendChild(row);
+    });
+
+    const romUrl = URL.createObjectURL(romFile);
+    window.EJS_player        = '#emu-container';
+    window.EJS_core          = selectedSystem.core;
+    window.EJS_gameUrl       = romUrl;
+    window.EJS_pathtodata    = 'https://cdn.emulatorjs.org/stable/data/';
+    window.EJS_startOnLoaded = true;
+    window.EJS_color         = '#ff3d5a';
+    window.EJS_backgroundBlur = false;
+    window.EJS_Buttons = {
+      playPause:true, restart:true, mute:true, settings:true,
+      fullscreen:true, saveState:true, loadState:true,
+      screenRecord:false, gamepad:true, cheat:false,
+      volume:true, saveSavFiles:true,
+    };
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+    document.body.appendChild(script);
+  }
+
+  function closeEmu() { window.location.reload(); }
+
+  // ── Toast ──
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toast-game');
+    t.innerHTML = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  buildSystems();
+</script>
+
+</body>
+</html>

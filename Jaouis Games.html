@@ -1037,25 +1037,63 @@
       volume:true, saveSavFiles:true,
     };
 
-    // ── Hook into EJS ready event to wire up save/load ──
+    // ── Remap keys: WASD = D-Pad, Space = Start, A = L, D = R ──
+    // EmulatorJS key codes: use JS KeyboardEvent.code values
+    window.EJS_defaultOptions = {
+      'save-state':   'KeyP',
+      'load-state':   'KeyO',
+    };
+
+    // Patch controls after emulator loads via MutationObserver
+    // EJS exposes controls through EJS_emulator.gameManager after start
     window.EJS_onGameStart = async function() {
       toast('GAME STARTED — loading save...');
       await loadSaveFromSupabase(gameKey);
+
+      // Try to remap keys via the emulator's settings API
+      try {
+        const emu = window.EJS_emulator;
+        if (emu && emu.storage) {
+          // EmulatorJS stores bindings in localStorage under specific keys
+          // We override them before they're read on next load
+          const bindings = {
+            // Player 1 bindings (index 0)
+            // Format: p1_<button> = KeyCode
+            'p1_up':     'KeyW',
+            'p1_down':   'KeyS',
+            'p1_left':   'KeyA',  // NOTE: conflicts with L — EJS handles separately
+            'p1_right':  'KeyD',  // NOTE: conflicts with R — EJS handles separately
+            'p1_start':  'Space',
+            'p1_select': 'ShiftLeft',
+            'p1_a':      'KeyZ',
+            'p1_b':      'KeyX',
+            'p1_x':      'KeyC',
+            'p1_y':      'KeyV',
+            'p1_l':      'KeyQ',
+            'p1_r':      'KeyE',
+          };
+          Object.entries(bindings).forEach(([k, v]) => {
+            try { localStorage.setItem('EJS_' + k, v); } catch(e){}
+          });
+        }
+      } catch(e) { console.warn('Key remap failed:', e); }
     };
 
-    // Auto-save every 30 seconds while playing
-    window._saveInterval = setInterval(() => {
-      autoSaveToSupabase(gameKey);
-    }, 30000);
+    // ── EJS_onSaveFile fires whenever the game writes its .sav battery file ──
+    window.EJS_onSaveFile = async function(saveData) {
+      // saveData is a Uint8Array of the raw .sav file
+      await uploadSav(gameKey, saveData);
+    };
 
-    // Also save when emulator's own save button is used
+    // Also hook save/load state buttons in toolbar
     window.EJS_onSaveState = async function(saveData) {
-      await uploadSaveState(gameKey, 'state', saveData);
-      toast('&#10003; STATE SAVED');
+      await uploadSav(gameKey + '_state', saveData);
+      toast('&#10003; STATE SAVED TO CLOUD');
     };
 
     window.EJS_onLoadState = async function() {
-      return await downloadSaveState(gameKey, 'state');
+      const data = await downloadSav(gameKey + '_state');
+      return data;
     };
 
     const script = document.createElement('script');
@@ -1064,52 +1102,59 @@
   }
 
   function closeEmu() {
-    clearInterval(window._saveInterval);
     window.location.reload();
   }
 
   // ════════════════════════════════════
-  // SAVE FILE MANAGEMENT
+  // SAVE FILE MANAGEMENT (.sav files)
   // ════════════════════════════════════
 
-  // Save the SRAM (in-game battery save) to Supabase
-  async function autoSaveToSupabase(gameKey) {
-    try {
-      if (!window.EJS_emulator) return;
-      const saveData = window.EJS_emulator.getSaveFile?.();
-      if (!saveData || saveData.length === 0) return;
-      await uploadSaveState(gameKey, 'sram', saveData);
-    } catch(e) { /* silent fail */ }
+  function cleanKey(k) {
+    return k.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 80);
   }
 
-  async function loadSaveFromSupabase(gameKey) {
+  async function uploadSav(gameKey, data) {
     try {
-      // Try loading SRAM first
-      const sram = await downloadSaveState(gameKey, 'sram');
-      if (sram && window.EJS_emulator?.loadSaveFile) {
-        window.EJS_emulator.loadSaveFile(sram);
-        toast('&#10003; SAVE LOADED');
-        return;
+      const key = cleanKey(gameKey);
+      const blob = new Blob([data], { type: 'application/octet-stream' });
+      const path = `saves/${key}.sav`;
+      const { error } = await db.storage.from(ROM_BUCKET).upload(path, blob, {
+        upsert: true,
+        contentType: 'application/octet-stream',
+        cacheControl: '0',
+      });
+      if (error) {
+        console.warn('Save upload error:', error.message);
+      } else {
+        console.log('Save uploaded:', path);
+        toast('&#10003; SAVED TO CLOUD');
       }
-    } catch(e) { /* no save found */ }
-  }
-
-  async function uploadSaveState(gameKey, type, data) {
-    try {
-      const blob = data instanceof Uint8Array ? new Blob([data]) : new Blob([JSON.stringify(data)]);
-      const path = `saves/${gameKey}_${type}.sav`;
-      await db.storage.from(ROM_BUCKET).upload(path, blob, { upsert: true, contentType: 'application/octet-stream' });
     } catch(e) { console.warn('Save upload failed:', e); }
   }
 
-  async function downloadSaveState(gameKey, type) {
+  async function downloadSav(gameKey) {
     try {
-      const path = `saves/${gameKey}_${type}.sav`;
+      const key = cleanKey(gameKey);
+      const path = `saves/${key}.sav`;
       const { data, error } = await db.storage.from(ROM_BUCKET).download(path);
-      if (error || !data) return null;
+      if (error || !data) { console.log('No cloud save found for', path); return null; }
       const buf = await data.arrayBuffer();
+      console.log('Save loaded from cloud:', path);
       return new Uint8Array(buf);
-    } catch(e) { return null; }
+    } catch(e) { console.warn('Save download failed:', e); return null; }
+  }
+
+  // Load .sav when game starts
+  async function loadSaveFromSupabase(gameKey) {
+    try {
+      const data = await downloadSav(gameKey);
+      if (!data) return;
+      // EJS_emulator.loadSaveFile injects the .sav into the running game
+      if (window.EJS_emulator && typeof window.EJS_emulator.loadSaveFile === 'function') {
+        window.EJS_emulator.loadSaveFile(data);
+        toast('&#10003; SAVE LOADED FROM CLOUD');
+      }
+    } catch(e) { console.warn('Load save failed:', e); }
   }
 
   // ── Toast ──

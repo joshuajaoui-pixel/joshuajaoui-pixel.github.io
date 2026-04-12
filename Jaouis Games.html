@@ -193,12 +193,21 @@
     }
 
     .sys-card .sys-icon {
-      font-family: var(--pixel);
-      font-size: 1.2rem;
       color: var(--accent2);
       margin-bottom: 10px;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    .sys-card .sys-icon svg {
+      width: 36px;
+      height: 36px;
+      color: var(--accent2);
+      stroke: currentColor;
+    }
+
+    .sys-card.active .sys-icon svg { color: var(--accent); }
 
     .sys-card .sys-name {
       font-family: var(--pixel);
@@ -262,7 +271,7 @@
       letter-spacing: 0.08em;
     }
 
-    #emu-close {
+    #emu-close, #emu-home {
       font-family: var(--pixel);
       font-size: 0.45rem;
       background: none;
@@ -272,9 +281,14 @@
       border-radius: 6px;
       cursor: pointer;
       transition: border-color 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     #emu-close:hover { border-color: var(--accent); color: var(--accent); }
+    #emu-home { border-color: var(--accent3); color: var(--accent3); }
+    #emu-home:hover { background: rgba(61,255,176,0.08); }
 
     #emu-container {
       width: 100%;
@@ -619,7 +633,16 @@
   <div id="emu-wrap">
     <div id="emu-topbar">
       <div id="emu-game-name"></div>
-      <button id="emu-close" onclick="closeEmu()">&#9632; STOP</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="emu-home" onclick="closeEmu()" title="Back to library">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <path d="M3 12L12 3L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 10V20a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          HOME
+        </button>
+        <button id="emu-close" onclick="closeEmu()">&#9632; STOP</button>
+      </div>
     </div>
     <div id="emu-container"></div>
     <div class="controls-guide">
@@ -647,32 +670,122 @@
 
   // ── Systems ──
   // saveable: true = small enough for Supabase (< ~30MB typical)
+  const ICONS = {
+    n64: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="10" width="24" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="10" cy="17" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="22" cy="17" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="14" y="8" width="4" height="5" rx="1" fill="currentColor"/>
+      <line x1="16" y1="10" x2="16" y2="24" stroke="currentColor" stroke-width="1.5"/>
+    </svg>`,
+    snes: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="9" width="26" height="16" rx="4" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="22" cy="17" r="2" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="26" cy="13" r="1.2" fill="currentColor"/>
+      <circle cx="26" cy="21" r="1.2" fill="currentColor"/>
+      <rect x="13" y="14" width="3" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="7" y="14" width="3" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+    </svg>`,
+    gba: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="5" width="20" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="9" y="8" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="22" cy="22" r="2" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="17" cy="24" r="2" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="13" y="21" width="1.5" height="4" rx="0.5" fill="currentColor"/>
+      <rect x="11" y="23" width="4" height="1.5" rx="0.5" fill="currentColor"/>
+    </svg>`,
+    gbc: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 5h16v20a4 4 0 01-4 4H12a4 4 0 01-4-4V5z" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="10" y="7" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="21" cy="21" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="17" cy="23" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="13" y="20" width="1.5" height="4" rx="0.5" fill="currentColor"/>
+      <rect x="11" y="22" width="4" height="1.5" rx="0.5" fill="currentColor"/>
+    </svg>`,
+    gb: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 4h14v22a3 3 0 01-3 3H12a3 3 0 01-3-3V4z" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="11" y="6" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="20" cy="20" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="16" cy="22" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="13" y="19" width="1.2" height="4" rx="0.4" fill="currentColor"/>
+      <rect x="11" y="21" width="4" height="1.2" rx="0.4" fill="currentColor"/>
+    </svg>`,
+    nes: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="10" width="28" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="4" y="13" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="23" cy="18" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="27" cy="14" r="1.2" fill="currentColor"/>
+      <circle cx="27" cy="22" r="1.2" fill="currentColor"/>
+    </svg>`,
+    psx: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="10" width="28" height="16" rx="4" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="24" cy="15" r="1.2" fill="currentColor"/>
+      <circle cx="27" cy="18" r="1.2" fill="currentColor"/>
+      <circle cx="24" cy="21" r="1.2" fill="currentColor"/>
+      <circle cx="21" cy="18" r="1.2" fill="currentColor"/>
+      <rect x="13" y="15" width="1.5" height="5" rx="0.5" fill="currentColor"/>
+      <rect x="11" y="17" width="5" height="1.5" rx="0.5" fill="currentColor"/>
+      <path d="M5 14 Q6 10 8 10 L8 26 Q6 26 5 22 Z" stroke="currentColor" stroke-width="1" fill="none"/>
+    </svg>`,
+    segaMD: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="11" width="28" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="12" y="8" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="8" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="22" cy="15" r="1.2" fill="currentColor"/>
+      <circle cx="26" cy="18" r="1.2" fill="currentColor"/>
+      <circle cx="22" cy="21" r="1.2" fill="currentColor"/>
+    </svg>`,
+    segaMS: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="12" width="28" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="4" y="15" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="24" cy="18" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="19" y="15" width="1.5" height="1.5" fill="currentColor"/>
+    </svg>`,
+    atari2600: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="8" width="26" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="16" y1="8" x2="16" y2="26" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="13" y="11" width="1.5" height="8" rx="0.5" fill="currentColor"/>
+      <rect x="17" y="12" width="1.5" height="6" rx="0.5" fill="currentColor"/>
+      <rect x="21" y="13" width="1.5" height="4" rx="0.5" fill="currentColor"/>
+      <rect x="8"  y="13" width="1.5" height="4" rx="0.5" fill="currentColor"/>
+    </svg>`,
+    nds: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="3" width="24" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="4" y="17" width="24" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="6" y="5" width="20" height="8" rx="1" stroke="currentColor" stroke-width="1"/>
+      <rect x="13" y="20" width="1.5" height="4" rx="0.5" fill="currentColor"/>
+      <rect x="11" y="22" width="4" height="1.5" rx="0.5" fill="currentColor"/>
+      <circle cx="23" cy="22" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="20" cy="25" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+    </svg>`,
+  };
+
   const SYSTEMS = [
-    { id: 'n64',      name: 'N64',        icon: '&#9649;', exts: ['.n64','.z64','.v64'],       core: 'n64',              saveable: false },
-    { id: 'snes',     name: 'SNES',       icon: '&#9651;', exts: ['.sfc','.smc'],               core: 'snes',             saveable: true  },
-    { id: 'gba',      name: 'GBA',        icon: '&#9633;', exts: ['.gba'],                      core: 'gba',              saveable: true  },
-    { id: 'gbc',      name: 'GBC',        icon: '&#9633;', exts: ['.gbc'],                      core: 'gambatte',         saveable: true  },
-    { id: 'gb',       name: 'Game Boy',   icon: '&#9633;', exts: ['.gb'],                       core: 'gambatte',         saveable: true  },
-    { id: 'nes',      name: 'NES',        icon: '&#9632;', exts: ['.nes'],                      core: 'fceumm',           saveable: true  },
-    { id: 'psx',      name: 'PS1',        icon: '&#9670;', exts: ['.bin','.cue','.img','.pbp'], core: 'pcsx_rearmed',     saveable: false },
-    { id: 'segaMD',   name: 'Genesis',    icon: '&#9661;', exts: ['.md','.gen','.smd'],         core: 'genesis_plus_gx',  saveable: true  },
-    { id: 'segaMS',   name: 'Master Sys', icon: '&#9661;', exts: ['.sms'],                      core: 'genesis_plus_gx',  saveable: true  },
-    { id: 'atari2600',name: 'Atari 2600', icon: '&#9650;', exts: ['.a26','.bin'],               core: 'stella',           saveable: true  },
-    { id: 'nds',      name: 'NDS',        icon: '&#9648;', exts: ['.nds'],                      core: 'melonds',          saveable: false },
+    { id: 'n64',      name: 'N64',        exts: ['.n64','.z64','.v64'],       core: 'n64',              saveable: false },
+    { id: 'snes',     name: 'SNES',       exts: ['.sfc','.smc'],               core: 'snes',             saveable: true  },
+    { id: 'gba',      name: 'GBA',        exts: ['.gba'],                      core: 'gba',              saveable: true  },
+    { id: 'gbc',      name: 'GBC',        exts: ['.gbc'],                      core: 'gambatte',         saveable: true  },
+    { id: 'gb',       name: 'Game Boy',   exts: ['.gb'],                       core: 'gambatte',         saveable: true  },
+    { id: 'nes',      name: 'NES',        exts: ['.nes'],                      core: 'fceumm',           saveable: true  },
+    { id: 'psx',      name: 'PS1',        exts: ['.bin','.cue','.img','.pbp'], core: 'pcsx_rearmed',     saveable: false },
+    { id: 'segaMD',   name: 'Genesis',    exts: ['.md','.gen','.smd'],         core: 'genesis_plus_gx',  saveable: true  },
+    { id: 'segaMS',   name: 'Master Sys', exts: ['.sms'],                      core: 'genesis_plus_gx',  saveable: true  },
+    { id: 'atari2600',name: 'Atari 2600', exts: ['.a26','.bin'],               core: 'stella',           saveable: true  },
+    { id: 'nds',      name: 'NDS',        exts: ['.nds'],                      core: 'melonds',          saveable: false },
   ];
 
   const CONTROLS = {
-    n64:     [['Arrow Keys','D-Pad'],['Z','Z Trigger'],['X','A Button'],['C','B Button'],['A/S','L/R Trigger'],['Enter','Start']],
-    snes:    [['Arrow Keys','D-Pad'],['Z','Y'],['X','B'],['A','A'],['S','X'],['D','L'],['C','R'],['Enter','Start'],['Shift','Select']],
-    gba:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['A','L'],['S','R'],['Enter','Start'],['Shift','Select']],
-    gbc:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['Enter','Start'],['Shift','Select']],
-    gb:      [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['Enter','Start'],['Shift','Select']],
-    nes:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['Enter','Start'],['Shift','Select']],
-    psx:     [['Arrow Keys','D-Pad'],['Z','Cross'],['X','Circle'],['A','Square'],['S','Triangle'],['D','L1'],['C','R1'],['Enter','Start']],
-    segaMD:  [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['C','C'],['Enter','Start']],
-    segaMS:  [['Arrow Keys','D-Pad'],['Z','1'],['X','2'],['Enter','Start']],
-    atari2600:[['Arrow Keys','Joystick'],['Z','Fire']],
-    nds:     [['Arrow Keys','D-Pad'],['Z','A'],['X','B'],['A','Y'],['S','X'],['Enter','Start'],['Shift','Select']],
+    n64:     [['WASD','D-Pad'],['Z','Z Trigger'],['X','A Button'],['C','B Button'],['A','L Trigger'],['D','R Trigger'],['Space','Start']],
+    snes:    [['WASD','D-Pad'],['Z','Y'],['X','B'],['C','A'],['V','X'],['A','L'],['D','R'],['Space','Start'],['Shift','Select']],
+    gba:     [['WASD','D-Pad'],['Z','A'],['X','B'],['A','L'],['D','R'],['Space','Start'],['Shift','Select']],
+    gbc:     [['WASD','D-Pad'],['Z','A'],['X','B'],['Space','Start'],['Shift','Select']],
+    gb:      [['WASD','D-Pad'],['Z','A'],['X','B'],['Space','Start'],['Shift','Select']],
+    nes:     [['WASD','D-Pad'],['Z','A'],['X','B'],['Space','Start'],['Shift','Select']],
+    psx:     [['WASD','D-Pad'],['Z','Cross'],['X','Circle'],['C','Square'],['V','Triangle'],['A','L1'],['D','R1'],['Space','Start']],
+    segaMD:  [['WASD','D-Pad'],['Z','A'],['X','B'],['C','C'],['Space','Start']],
+    segaMS:  [['WASD','D-Pad'],['Z','1'],['X','2'],['Space','Start']],
+    atari2600:[['WASD','Joystick'],['Z','Fire']],
+    nds:     [['WASD','D-Pad'],['Z','A'],['X','B'],['C','Y'],['V','X'],['Space','Start'],['Shift','Select']],
   };
 
   let selectedSystem = SYSTEMS[0];
@@ -695,7 +808,7 @@
     SYSTEMS.forEach((sys, i) => {
       const card = document.createElement('div');
       card.className = 'sys-card' + (i === 0 ? ' active' : '');
-      card.innerHTML = `<span class="sys-icon">${sys.icon}</span><div class="sys-name">${sys.name}</div><div class="sys-ext">${sys.exts.join(' ')}</div>`;
+      card.innerHTML = `<span class="sys-icon">${ICONS[sys.id] || ''}</span><div class="sys-name">${sys.name}</div><div class="sys-ext">${sys.exts.join(' ')}</div>`;
       card.onclick = () => selectSystem(sys);
       grid.appendChild(card);
 
@@ -787,11 +900,11 @@
     empty.style.display = 'none';
 
     roms.forEach(rom => {
-      const sys = SYSTEMS.find(s => s.id === rom.system_id) || { name: rom.system_id, icon: '&#9632;' };
+      const sys = SYSTEMS.find(s => s.id === rom.system_id) || { id: rom.system_id, name: rom.system_id };
       const card = document.createElement('div');
       card.className = 'rom-card';
       card.innerHTML = `
-        <div class="rc-sys">${sys.icon} ${sys.name}</div>
+        <div class="rc-sys"><span style="display:inline-block;width:16px;height:16px;vertical-align:middle;margin-right:4px">${ICONS[sys.id]||''}</span>${sys.name}</div>
         <div class="rc-name">${rom.name}</div>
         <div class="rc-size">${(rom.size_bytes / 1024 / 1024).toFixed(1)} MB</div>
         <div class="rc-actions">
@@ -908,6 +1021,8 @@
     });
 
     const romUrl = URL.createObjectURL(romFile);
+    const gameKey = selectedSystem.id + '_' + romFile.name.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9_\-]/gi, '_');
+
     window.EJS_player        = '#emu-container';
     window.EJS_core          = selectedSystem.core;
     window.EJS_gameUrl       = romUrl;
@@ -922,12 +1037,80 @@
       volume:true, saveSavFiles:true,
     };
 
+    // ── Hook into EJS ready event to wire up save/load ──
+    window.EJS_onGameStart = async function() {
+      toast('GAME STARTED — loading save...');
+      await loadSaveFromSupabase(gameKey);
+    };
+
+    // Auto-save every 30 seconds while playing
+    window._saveInterval = setInterval(() => {
+      autoSaveToSupabase(gameKey);
+    }, 30000);
+
+    // Also save when emulator's own save button is used
+    window.EJS_onSaveState = async function(saveData) {
+      await uploadSaveState(gameKey, 'state', saveData);
+      toast('&#10003; STATE SAVED');
+    };
+
+    window.EJS_onLoadState = async function() {
+      return await downloadSaveState(gameKey, 'state');
+    };
+
     const script = document.createElement('script');
     script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
     document.body.appendChild(script);
   }
 
-  function closeEmu() { window.location.reload(); }
+  function closeEmu() {
+    clearInterval(window._saveInterval);
+    window.location.reload();
+  }
+
+  // ════════════════════════════════════
+  // SAVE FILE MANAGEMENT
+  // ════════════════════════════════════
+
+  // Save the SRAM (in-game battery save) to Supabase
+  async function autoSaveToSupabase(gameKey) {
+    try {
+      if (!window.EJS_emulator) return;
+      const saveData = window.EJS_emulator.getSaveFile?.();
+      if (!saveData || saveData.length === 0) return;
+      await uploadSaveState(gameKey, 'sram', saveData);
+    } catch(e) { /* silent fail */ }
+  }
+
+  async function loadSaveFromSupabase(gameKey) {
+    try {
+      // Try loading SRAM first
+      const sram = await downloadSaveState(gameKey, 'sram');
+      if (sram && window.EJS_emulator?.loadSaveFile) {
+        window.EJS_emulator.loadSaveFile(sram);
+        toast('&#10003; SAVE LOADED');
+        return;
+      }
+    } catch(e) { /* no save found */ }
+  }
+
+  async function uploadSaveState(gameKey, type, data) {
+    try {
+      const blob = data instanceof Uint8Array ? new Blob([data]) : new Blob([JSON.stringify(data)]);
+      const path = `saves/${gameKey}_${type}.sav`;
+      await db.storage.from(ROM_BUCKET).upload(path, blob, { upsert: true, contentType: 'application/octet-stream' });
+    } catch(e) { console.warn('Save upload failed:', e); }
+  }
+
+  async function downloadSaveState(gameKey, type) {
+    try {
+      const path = `saves/${gameKey}_${type}.sav`;
+      const { data, error } = await db.storage.from(ROM_BUCKET).download(path);
+      if (error || !data) return null;
+      const buf = await data.arrayBuffer();
+      return new Uint8Array(buf);
+    } catch(e) { return null; }
+  }
 
   // ── Toast ──
   let toastTimer;

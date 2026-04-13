@@ -1565,9 +1565,27 @@ function toggleShuffle() {
   document.getElementById('fs-btn-shuffle').style.color = on ? 'var(--accent)' : '';
 }
 
-audio.addEventListener('ended', nextSong);
-audio.addEventListener('play',  () => updatePlayBtns(false));
-audio.addEventListener('pause', () => updatePlayBtns(true));
+audio.addEventListener('ended', () => {
+  // Update media session state so OS knows to allow next track
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'none';
+  }
+  nextSong();
+});
+
+audio.addEventListener('play', () => {
+  updatePlayBtns(false);
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'playing';
+  }
+});
+
+audio.addEventListener('pause', () => {
+  updatePlayBtns(true);
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'paused';
+  }
+});
 
 audio.addEventListener('timeupdate', () => {
   const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
@@ -1577,6 +1595,16 @@ audio.addEventListener('timeupdate', () => {
   document.getElementById('time-total').textContent = fmtTime(audio.duration || 0);
   document.getElementById('fs-time-cur').textContent = fmtTime(audio.currentTime);
   document.getElementById('fs-time-total').textContent = fmtTime(audio.duration || 0);
+  // Report position to OS so lock screen progress bar works
+  if ('mediaSession' in navigator && audio.duration) {
+    try {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime,
+      });
+    } catch(e) {}
+  }
 });
 
 function seek(e) {
@@ -1973,6 +2001,12 @@ function updateMediaSession(s) {
   navigator.mediaSession.setActionHandler('pause',        () => { audio.pause(); updatePlayBtns(true); });
   navigator.mediaSession.setActionHandler('nexttrack',    () => nextSong());
   navigator.mediaSession.setActionHandler('previoustrack',() => prevSong());
+  navigator.mediaSession.setActionHandler('seekto', (details) => {
+    if (details.seekTime && audio.duration) {
+      audio.currentTime = details.seekTime;
+    }
+  });
+  navigator.mediaSession.playbackState = 'playing';
 }
 
 function updatePlayBtns(paused) {

@@ -1570,7 +1570,9 @@ audio.addEventListener('ended', () => {
   if ('mediaSession' in navigator) {
     navigator.mediaSession.playbackState = 'none';
   }
-  nextSong();
+  if (audio.ended || audio.currentTime >= audio.duration - 0.25) {
+    nextSong();
+  }
 });
 
 audio.addEventListener('play', () => {

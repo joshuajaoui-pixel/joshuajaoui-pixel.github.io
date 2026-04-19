@@ -1,0 +1,513 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,sans-serif)}
+#game{display:flex;height:620px;gap:0;border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+#sidebar{width:200px;min-width:200px;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;background:var(--color-background-secondary)}
+#sidebar h3{padding:12px 14px 8px;font-size:13px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+#atom-list{flex:1;overflow-y:auto;padding:8px}
+#atom-list::-webkit-scrollbar{width:4px}
+#atom-list::-webkit-scrollbar-thumb{background:var(--color-border-secondary);border-radius:2px}
+.atom-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;margin-bottom:4px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:grab;font-size:12px;font-weight:500;color:var(--color-text-primary);transition:all .15s;user-select:none}
+.atom-btn:hover{background:var(--color-background-tertiary);border-color:var(--color-border-secondary);transform:translateX(2px)}
+.atom-btn:active{cursor:grabbing;transform:scale(0.97)}
+.atom-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+#canvas-area{flex:1;position:relative;overflow:hidden;background:var(--color-background-primary)}
+#canvas-area svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#canvas-area canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.placed-atom{position:absolute;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;cursor:grab;user-select:none;transition:box-shadow .15s,transform .15s;border:2px solid rgba(255,255,255,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.placed-atom:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:100}
+.placed-atom:active{cursor:grabbing;transform:scale(1.05)}
+.placed-atom.selected{box-shadow:0 0 0 3px var(--color-background-primary),0 0 0 5px #378ADD;z-index:200}
+.placed-atom.merging{animation:pulse .3s ease-in-out 3;z-index:300}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+.merge-flash{position:absolute;border-radius:50%;pointer-events:none;animation:flashOut .5s ease-out forwards;z-index:400}
+@keyframes flashOut{0%{opacity:1;transform:scale(0.5)}60%{opacity:0.8;transform:scale(2)}100%{opacity:0;transform:scale(2.5)}}
+#result-panel{position:absolute;bottom:0;left:0;right:0;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);padding:10px 14px;display:none;animation:slideUp .25s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+#result-panel.visible{display:flex;align-items:center;gap:12px}
+#result-icon{font-size:24px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#result-text h4{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+#result-text p{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+#close-result{margin-left:auto;padding:4px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:transparent;font-size:12px;cursor:pointer;color:var(--color-text-secondary)}
+#close-result:hover{background:var(--color-background-secondary)}
+#top-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);z-index:50}
+#top-bar h2{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-right:auto}
+.tb-btn{padding:4px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:transparent;font-size:12px;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.tb-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+#score-badge{background:var(--color-background-info,#e6f1fb);color:var(--color-text-info,#185fa5);border-radius:var(--border-radius-md);padding:3px 10px;font-size:12px;font-weight:500}
+#workspace{position:absolute;top:41px;left:0;right:0;bottom:0}
+#instructions{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;opacity:.4}
+#instructions p{font-size:13px;color:var(--color-text-secondary);line-height:1.8}
+#discovery-log{width:200px;min-width:200px;border-left:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;background:var(--color-background-secondary)}
+#discovery-log h3{padding:12px 14px 8px;font-size:13px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+#discoveries{flex:1;overflow-y:auto;padding:8px}
+#discoveries::-webkit-scrollbar{width:4px}
+#discoveries::-webkit-scrollbar-thumb{background:var(--color-border-secondary);border-radius:2px}
+.discovery-item{padding:7px 10px;margin-bottom:4px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.discovery-item .di-formula{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.discovery-item .di-name{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.discovery-count{font-size:11px;color:var(--color-text-tertiary);padding:4px 10px;text-align:center}
+#tooltip{position:fixed;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;font-size:12px;color:var(--color-text-primary);pointer-events:none;z-index:9999;opacity:0;transition:opacity .15s;max-width:180px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.atom-group-label{font-size:10px;color:var(--color-text-tertiary);padding:8px 10px 3px;font-weight:500;letter-spacing:.5px}
+.compound-atom{position:absolute;border-radius:12px;display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;font-weight:500;cursor:grab;user-select:none;border:2px solid rgba(255,255,255,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:10}
+.compound-atom:hover{transform:scale(1.04);box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:100}
+.loading-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(var(--color-background-primary-rgb,255,255,255),.85);z-index:500;border-radius:inherit}
+.spinner{width:24px;height:24px;border:2px solid var(--color-border-tertiary);border-top-color:var(--color-text-secondary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<div id="game">
+  <div id="sidebar">
+    <h3>Periodic Table</h3>
+    <div id="atom-list"></div>
+  </div>
+  <div id="canvas-area">
+    <div id="top-bar">
+      <h2>Atom Combiner</h2>
+      <span id="score-badge">0 discovered</span>
+      <button class="tb-btn" id="btn-clear">Clear all</button>
+      <button class="tb-btn" id="btn-hint">Hint ✦</button>
+    </div>
+    <div id="workspace"></div>
+    <div id="instructions">
+      <p>Drag atoms from the left panel<br>onto the workspace<br><br>Drag atoms onto each other<br>to combine them</p>
+    </div>
+    <div id="result-panel">
+      <div id="result-icon"></div>
+      <div id="result-text"><h4></h4><p></p></div>
+      <button id="close-result">×</button>
+    </div>
+  </div>
+  <div id="discovery-log">
+    <h3>Discoveries</h3>
+    <div id="discoveries"><div class="discovery-count">None yet — start combining!</div></div>
+  </div>
+</div>
+<div id="tooltip"></div>
+
+<script>
+const ATOMS = [
+  {sym:'H',name:'Hydrogen',color:'#5B8DEF',mass:1,group:'Nonmetal'},
+  {sym:'He',name:'Helium',color:'#A78BFA',mass:4,group:'Noble Gas'},
+  {sym:'Li',name:'Lithium',color:'#F59E0B',mass:7,group:'Alkali Metal'},
+  {sym:'Be',name:'Beryllium',color:'#10B981',mass:9,group:'Alkaline Earth'},
+  {sym:'B',name:'Boron',color:'#6366F1',mass:11,group:'Metalloid'},
+  {sym:'C',name:'Carbon',color:'#6B7280',mass:12,group:'Nonmetal'},
+  {sym:'N',name:'Nitrogen',color:'#3B82F6',mass:14,group:'Nonmetal'},
+  {sym:'O',name:'Oxygen',color:'#EF4444',mass:16,group:'Nonmetal'},
+  {sym:'F',name:'Fluorine',color:'#EC4899',mass:19,group:'Halogen'},
+  {sym:'Ne',name:'Neon',color:'#F97316',mass:20,group:'Noble Gas'},
+  {sym:'Na',name:'Sodium',color:'#F59E0B',mass:23,group:'Alkali Metal'},
+  {sym:'Mg',name:'Magnesium',color:'#10B981',mass:24,group:'Alkaline Earth'},
+  {sym:'Al',name:'Aluminum',color:'#9CA3AF',mass:27,group:'Post-Trans'},
+  {sym:'Si',name:'Silicon',color:'#8B5CF6',mass:28,group:'Metalloid'},
+  {sym:'P',name:'Phosphorus',color:'#F97316',mass:31,group:'Nonmetal'},
+  {sym:'S',name:'Sulfur',color:'#EAB308',mass:32,group:'Nonmetal'},
+  {sym:'Cl',name:'Chlorine',color:'#22C55E',mass:35,group:'Halogen'},
+  {sym:'Ar',name:'Argon',color:'#A78BFA',mass:40,group:'Noble Gas'},
+  {sym:'K',name:'Potassium',color:'#F59E0B',mass:39,group:'Alkali Metal'},
+  {sym:'Ca',name:'Calcium',color:'#10B981',mass:40,group:'Alkaline Earth'},
+  {sym:'Fe',name:'Iron',color:'#DC2626',mass:56,group:'Trans Metal'},
+  {sym:'Cu',name:'Copper',color:'#B45309',mass:64,group:'Trans Metal'},
+  {sym:'Zn',name:'Zinc',color:'#0891B2',mass:65,group:'Trans Metal'},
+  {sym:'Br',name:'Bromine',color:'#92400E',mass:80,group:'Halogen'},
+  {sym:'Ag',name:'Silver',color:'#9CA3AF',mass:108,group:'Trans Metal'},
+  {sym:'I',name:'Iodine',color:'#7C3AED',mass:127,group:'Halogen'},
+  {sym:'Au',name:'Gold',color:'#D97706',mass:197,group:'Trans Metal'},
+  {sym:'Pb',name:'Lead',color:'#64748B',mass:207,group:'Post-Trans'},
+  {sym:'Hg',name:'Mercury',color:'#06B6D4',mass:200,group:'Trans Metal'},
+];
+
+const KNOWN = {
+  'H2O':{name:'Water',desc:'Essential for life. Two hydrogen atoms bonded to one oxygen.',emoji:'💧',color:'#3B82F6'},
+  'CO2':{name:'Carbon Dioxide',desc:'Greenhouse gas. Product of respiration and combustion.',emoji:'🌫️',color:'#6B7280'},
+  'NaCl':{name:'Table Salt',desc:'Sodium chloride — the salt you put on food.',emoji:'🧂',color:'#E5E7EB'},
+  'HCl':{name:'Hydrochloric Acid',desc:'Strong acid found in stomach acid.',emoji:'⚗️',color:'#22C55E'},
+  'NH3':{name:'Ammonia',desc:'Pungent gas used in fertilizers and cleaning products.',emoji:'💨',color:'#A78BFA'},
+  'H2SO4':{name:'Sulfuric Acid',desc:'The most widely produced industrial chemical in the world.',emoji:'⚗️',color:'#EAB308'},
+  'HNO3':{name:'Nitric Acid',desc:'Corrosive acid used in making fertilizers and explosives.',emoji:'⚗️',color:'#EF4444'},
+  'CH4':{name:'Methane',desc:'Main component of natural gas. Powerful greenhouse gas.',emoji:'🔥',color:'#F97316'},
+  'C2H6':{name:'Ethane',desc:'Simple hydrocarbon found in natural gas.',emoji:'⛽',color:'#F97316'},
+  'C3H8':{name:'Propane',desc:'Used in camping stoves and outdoor grills.',emoji:'🔥',color:'#F97316'},
+  'C2H4':{name:'Ethylene',desc:'Plant hormone that ripens fruit. Also used to make plastic.',emoji:'🌿',color:'#22C55E'},
+  'C2H2':{name:'Acetylene',desc:'Used in welding torches. Burns extremely hot.',emoji:'🔧',color:'#F97316'},
+  'C6H6':{name:'Benzene',desc:'Ring-shaped hydrocarbon. Important in organic chemistry.',emoji:'⚗️',color:'#8B5CF6'},
+  'H2O2':{name:'Hydrogen Peroxide',desc:'Used as bleach and antiseptic. Decomposes into water and oxygen.',emoji:'🧴',color:'#E0F2FE'},
+  'N2O':{name:'Nitrous Oxide',desc:'Laughing gas. Used as anesthesia and whipped cream propellant.',emoji:'😂',color:'#A78BFA'},
+  'NO2':{name:'Nitrogen Dioxide',desc:'Reddish-brown toxic gas. A major air pollutant.',emoji:'🏭',color:'#DC2626'},
+  'SO2':{name:'Sulfur Dioxide',desc:'Causes acid rain. Released by volcanoes and burning coal.',emoji:'🌋',color:'#EAB308'},
+  'SO3':{name:'Sulfur Trioxide',desc:'Reacts with water to form sulfuric acid.',emoji:'⚗️',color:'#CA8A04'},
+  'CO':{name:'Carbon Monoxide',desc:'Colorless, odorless, deadly gas. Produced by incomplete combustion.',emoji:'☠️',color:'#374151'},
+  'P2O5':{name:'Phosphorus Pentoxide',desc:'Powerful desiccant (drying agent) used in labs.',emoji:'🔬',color:'#F97316'},
+  'SiO2':{name:'Silicon Dioxide',desc:'Main component of sand and quartz. Used to make glass.',emoji:'🏖️',color:'#D1D5DB'},
+  'CaO':{name:'Calcium Oxide',desc:'Quicklime — used in cement and steel production.',emoji:'🏗️',color:'#10B981'},
+  'MgO':{name:'Magnesium Oxide',desc:'Used in antacids, refractory materials, and insulation.',emoji:'💊',color:'#6EE7B7'},
+  'Al2O3':{name:'Aluminum Oxide',desc:'Corundum — one of the hardest materials. Rubies are Al₂O₃!',emoji:'💎',color:'#9CA3AF'},
+  'Fe2O3':{name:'Iron(III) Oxide',desc:'Rust! Forms when iron reacts with oxygen and water.',emoji:'🦀',color:'#DC2626'},
+  'CaCO3':{name:'Calcium Carbonate',desc:'Main component of limestone, marble, and chalk.',emoji:'🪨',color:'#D1D5DB'},
+  'NaOH':{name:'Sodium Hydroxide',desc:'Lye — used in soapmaking and drain cleaners.',emoji:'🧼',color:'#F59E0B'},
+  'KOH':{name:'Potassium Hydroxide',desc:'Caustic potash — used in making soft soaps.',emoji:'🧴',color:'#F59E0B'},
+  'Ca(OH)2':{name:'Calcium Hydroxide',desc:'Slaked lime — used in cement and water treatment.',emoji:'🏗️',color:'#10B981'},
+  'CuSO4':{name:'Copper Sulfate',desc:'Blue crystals used as fungicide and in electroplating.',emoji:'💙',color:'#0891B2'},
+  'AgNO3':{name:'Silver Nitrate',desc:'Used in photography and antiseptics. Stains skin black.',emoji:'📸',color:'#9CA3AF'},
+  'KCl':{name:'Potassium Chloride',desc:'Salt substitute. Used in fertilizers and lethal injections.',emoji:'🧂',color:'#F59E0B'},
+  'FeS2':{name:'Iron Pyrite',desc:"Fool's gold — shiny mineral that fooled prospectors.",emoji:'✨',color:'#CA8A04'},
+  'NaHCO3':{name:'Baking Soda',desc:'Sodium bicarbonate — makes baked goods rise.',emoji:'🥐',color:'#F59E0B'},
+  'C12H22O11':{name:'Sucrose',desc:'Table sugar — the sweet stuff in your coffee.',emoji:'🍬',color:'#FDE68A'},
+  'C6H12O6':{name:'Glucose',desc:'Simple sugar — primary energy source for cells.',emoji:'⚡',color:'#FDE68A'},
+  'HBr':{name:'Hydrobromic Acid',desc:'Strong acid formed from hydrogen and bromine.',emoji:'⚗️',color:'#92400E'},
+  'HI':{name:'Hydroiodic Acid',desc:'Strong acid formed from hydrogen and iodine.',emoji:'⚗️',color:'#7C3AED'},
+  'HF':{name:'Hydrofluoric Acid',desc:'Extremely dangerous acid that dissolves glass.',emoji:'☠️',color:'#EC4899'},
+  'H2S':{name:'Hydrogen Sulfide',desc:'Rotten egg gas. Toxic and flammable.',emoji:'🥚',color:'#EAB308'},
+  'PH3':{name:'Phosphine',desc:'Extremely toxic gas. Found in swamps. Used as fumigant.',emoji:'☠️',color:'#F97316'},
+  'AuCl3':{name:'Gold Chloride',desc:'Used in photography and glass tinting.',emoji:'🥇',color:'#D97706'},
+  'HgO':{name:'Mercury Oxide',desc:'Red powder used in batteries. Toxic.',emoji:'⚗️',color:'#06B6D4'},
+  'PbO':{name:'Lead Oxide',desc:'Used in glass making and lead-acid batteries.',emoji:'🔋',color:'#64748B'},
+  'ZnO':{name:'Zinc Oxide',desc:'Used in sunscreen and rubber manufacturing.',emoji:'☀️',color:'#0891B2'},
+  'BF3':{name:'Boron Trifluoride',desc:'Toxic gas used as a catalyst in organic chemistry.',emoji:'⚗️',color:'#6366F1'},
+  'SiF4':{name:'Silicon Tetrafluoride',desc:'Toxic gas used in semiconductor manufacturing.',emoji:'💻',color:'#8B5CF6'},
+  'NaI':{name:'Sodium Iodide',desc:'Used in medical imaging (radioactive form) and as dietary supplement.',emoji:'🏥',color:'#7C3AED'},
+  'NaBr':{name:'Sodium Bromide',desc:'Used as a sedative and in photography.',emoji:'📸',color:'#92400E'},
+  'KI':{name:'Potassium Iodide',desc:'Used in nuclear emergency kits and as dietary supplement.',emoji:'💊',color:'#7C3AED'},
+  'CaF2':{name:'Calcium Fluoride',desc:'Fluorite mineral — used in optics and toothpaste.',emoji:'💎',color:'#EC4899'},
+  'Li2O':{name:'Lithium Oxide',desc:'Used in ceramics and glass to lower melting point.',emoji:'⚗️',color:'#F59E0B'},
+  'BeO':{name:'Beryllium Oxide',desc:'Excellent thermal conductor. Used in electronics.',emoji:'💻',color:'#10B981'},
+  'B2O3':{name:'Boron Trioxide',desc:'Used in glass making and ceramics.',emoji:'🏺',color:'#6366F1'},
+  'NO':{name:'Nitric Oxide',desc:'Signaling molecule in blood vessels. Also air pollutant.',emoji:'❤️',color:'#3B82F6'},
+  'OF2':{name:'Oxygen Difluoride',desc:'Extremely toxic and reactive gas.',emoji:'☠️',color:'#EC4899'},
+  'N2H4':{name:'Hydrazine',desc:'Rocket fuel component. Highly toxic.',emoji:'🚀',color:'#A78BFA'},
+  'C2H5OH':{name:'Ethanol',desc:'Drinking alcohol! Also used as fuel and solvent.',emoji:'🍺',color:'#F59E0B'},
+  'CH3OH':{name:'Methanol',desc:'Wood alcohol — poisonous even in small amounts.',emoji:'☠️',color:'#F97316'},
+  'FeO':{name:'Iron(II) Oxide',desc:'Black iron oxide found in magnetite.',emoji:'🧲',color:'#DC2626'},
+  'Fe3O4':{name:'Magnetite',desc:'Natural magnet — the magnetic iron oxide mineral.',emoji:'🧲',color:'#374151'},
+  'CuO':{name:'Copper Oxide',desc:'Black powder used as pigment and catalyst.',emoji:'⚗️',color:'#B45309'},
+  'Cu2O':{name:'Copper(I) Oxide',desc:'Red copper oxide — gives some glass its red color.',emoji:'🔴',color:'#DC2626'},
+  'ZnS':{name:'Zinc Sulfide',desc:'Glows under UV light! Used in phosphorescent materials.',emoji:'✨',color:'#0891B2'},
+  'PbS':{name:'Lead Sulfide',desc:'Galena mineral — major ore of lead.',emoji:'🪨',color:'#64748B'},
+  'FeS':{name:'Iron Sulfide',desc:'Troilite mineral found in meteorites.',emoji:'☄️',color:'#DC2626'},
+  'CuS':{name:'Copper Sulfide',desc:'Covellite mineral — deep blue iridescent crystals.',emoji:'💙',color:'#0891B2'},
+  'AgCl':{name:'Silver Chloride',desc:'Light-sensitive — used in old photographic film.',emoji:'📷',color:'#9CA3AF'},
+  'AgBr':{name:'Silver Bromide',desc:'Key component of black-and-white photographic film.',emoji:'📷',color:'#92400E'},
+  'AgI':{name:'Silver Iodide',desc:'Used for cloud seeding to make it rain.',emoji:'🌧️',color:'#7C3AED'},
+};
+
+const HINTS = [
+  'Try H + H + O → Water!',
+  'C + O + O → Carbon Dioxide',
+  'Na + Cl → Table Salt',
+  'H + H + S → Hydrogen Sulfide (rotten egg!)',
+  'Fe + O + O + O → Rust (Fe₂O₃)',
+  'C + H + H + H + H → Methane (natural gas)',
+  'N + H + H + H → Ammonia',
+  'Ca + C + O + O + O → Limestone!',
+];
+
+let placedAtoms = [];
+let selectedAtom = null;
+let discoveries = new Set();
+let dragState = null;
+let loadingCombine = false;
+let hintIdx = 0;
+
+const workspace = document.getElementById('workspace');
+const resultPanel = document.getElementById('result-panel');
+const discoveriesEl = document.getElementById('discoveries');
+const scoreBadge = document.getElementById('score-badge');
+const tooltip = document.getElementById('tooltip');
+const instructionsEl = document.getElementById('instructions');
+
+function colorWithOpacity(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function getTextColor(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return (r*299+g*587+b*114)/1000 > 128 ? '#1a1a1a' : '#ffffff';
+}
+
+function buildAtomList() {
+  const list = document.getElementById('atom-list');
+  const groups = {};
+  ATOMS.forEach(a => { if(!groups[a.group]) groups[a.group]=[]; groups[a.group].push(a); });
+  Object.entries(groups).forEach(([g, atoms]) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'atom-group-label';
+    lbl.textContent = g.toUpperCase();
+    list.appendChild(lbl);
+    atoms.forEach(a => {
+      const btn = document.createElement('div');
+      btn.className = 'atom-btn';
+      btn.innerHTML = `<div class="atom-dot" style="background:${a.color};color:${getTextColor(a.color)}">${a.sym}</div><span>${a.name}</span>`;
+      btn.draggable = true;
+      btn.addEventListener('mouseenter', e => showTooltip(e, `${a.name} (${a.sym})\nMass: ${a.mass} u\n${a.group}`));
+      btn.addEventListener('mouseleave', hideTooltip);
+      btn.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('atom', a.sym);
+        dragState = {type:'new', sym:a.sym};
+      });
+      btn.addEventListener('click', () => spawnAtomAt(a.sym, 80+Math.random()*200, 80+Math.random()*200));
+      list.appendChild(btn);
+    });
+  });
+}
+
+function getAtomData(sym) { return ATOMS.find(a=>a.sym===sym); }
+
+function spawnAtomAt(sym, x, y, id) {
+  const a = getAtomData(sym);
+  if(!a) return null;
+  const el = document.createElement('div');
+  el.className = 'placed-atom';
+  el.style.cssText = `left:${x-26}px;top:${y-26}px;background:${a.color};color:${getTextColor(a.color)}`;
+  el.textContent = sym;
+  el.dataset.sym = sym;
+  const uid = id || (Date.now()+Math.random()).toString(36);
+  el.dataset.id = uid;
+  makeDraggable(el);
+  el.addEventListener('click', e => { e.stopPropagation(); toggleSelect(uid); });
+  el.addEventListener('mouseenter', e => showTooltip(e, `${a.name} (${a.sym})\nMass: ${a.mass} u`));
+  el.addEventListener('mouseleave', hideTooltip);
+  workspace.appendChild(el);
+  const rec = {id:uid, sym, el, x, y};
+  placedAtoms.push(rec);
+  updateInstructions();
+  return rec;
+}
+
+function makeDraggable(el) {
+  let ox, oy, startX, startY, moving=false;
+  el.addEventListener('mousedown', e => {
+    if(e.button!==0) return;
+    e.preventDefault(); e.stopPropagation();
+    const r = workspace.getBoundingClientRect();
+    const pr = el.getBoundingClientRect();
+    ox = e.clientX - pr.left - (pr.width/2);
+    oy = e.clientY - pr.top - (pr.height/2);
+    startX = e.clientX; startY = e.clientY;
+    moving = false;
+    const move = me => {
+      if(!moving && Math.hypot(me.clientX-startX,me.clientY-startY)>4) moving=true;
+      if(!moving) return;
+      hideTooltip();
+      const nx = me.clientX - r.left - ox;
+      const ny = me.clientY - r.top - oy;
+      const rec = placedAtoms.find(a=>a.id===el.dataset.id);
+      if(rec){ rec.x=nx+26; rec.y=ny+26; }
+      el.style.left=(nx)+'px'; el.style.top=(ny)+'px';
+      el.style.zIndex=200;
+    };
+    const up = ue => {
+      document.removeEventListener('mousemove',move);
+      document.removeEventListener('mouseup',up);
+      el.style.zIndex='';
+      if(moving) checkCollision(el.dataset.id);
+    };
+    document.addEventListener('mousemove',move);
+    document.addEventListener('mouseup',up);
+  });
+}
+
+function toggleSelect(id) {
+  if(loadingCombine) return;
+  const prev = selectedAtom;
+  placedAtoms.forEach(a => a.el.classList.remove('selected'));
+  if(prev && prev.id!==id) {
+    const a1 = prev, a2 = placedAtoms.find(a=>a.id===id);
+    if(a1 && a2 && a1.id!==a2.id) { selectedAtom=null; combineAtoms([a1.id,a2.id]); return; }
+  }
+  const rec = placedAtoms.find(a=>a.id===id);
+  if(rec && (!prev || prev.id!==id)) { rec.el.classList.add('selected'); selectedAtom=rec; }
+  else selectedAtom=null;
+}
+
+workspace.addEventListener('dragover', e => e.preventDefault());
+workspace.addEventListener('drop', e => {
+  e.preventDefault();
+  const sym = e.dataTransfer.getData('atom');
+  if(!sym) return;
+  const r = workspace.getBoundingClientRect();
+  spawnAtomAt(sym, e.clientX-r.left, e.clientY-r.top);
+});
+
+function checkCollision(id) {
+  const me = placedAtoms.find(a=>a.id===id);
+  if(!me) return;
+  for(const other of placedAtoms) {
+    if(other.id===id) continue;
+    const dist = Math.hypot(me.x-other.x, me.y-other.y);
+    if(dist < 52) { combineAtoms([id, other.id]); return; }
+  }
+}
+
+function buildFormula(syms) {
+  const counts = {};
+  syms.forEach(s => counts[s]=(counts[s]||0)+1);
+  const order = ['C','H','O','N','S','P','F','Cl','Br','I','Na','K','Ca','Mg','Fe','Cu','Zn','Al','Si','B','Li','Be','Ag','Au','Pb','Hg','He','Ne','Ar'];
+  let formula = '';
+  const used = new Set();
+  order.forEach(e => { if(counts[e]){formula+=e+(counts[e]>1?counts[e]:'');used.add(e);} });
+  Object.keys(counts).forEach(e => { if(!used.has(e)){formula+=e+(counts[e]>1?counts[e]:'');} });
+  return formula;
+}
+
+async function combineAtoms(ids) {
+  if(loadingCombine) return;
+  const targets = ids.map(id=>placedAtoms.find(a=>a.id===id)).filter(Boolean);
+  if(targets.length<2) return;
+  loadingCombine = true;
+  targets.forEach(t => t.el.classList.add('merging'));
+  await sleep(350);
+  const syms = targets.map(t=>t.sym);
+  const formula = buildFormula(syms);
+  let result = null;
+  if(KNOWN[formula]) {
+    result = {formula, ...KNOWN[formula], known:true};
+  } else {
+    result = await askClaude(syms, formula);
+  }
+  if(result) {
+    const cx = targets.reduce((s,t)=>s+t.x,0)/targets.length;
+    const cy = targets.reduce((s,t)=>s+t.y,0)/targets.length;
+    showMergeFlash(cx, cy, result.color||'#6366F1');
+    targets.forEach(t => { t.el.remove(); placedAtoms = placedAtoms.filter(a=>a.id!==t.id); });
+    selectedAtom = null;
+    showResult(result);
+    if(!discoveries.has(formula)) {
+      discoveries.add(formula);
+      addDiscovery(result);
+      scoreBadge.textContent = `${discoveries.size} discovered`;
+    }
+    spawnCompound(result, cx, cy);
+  } else {
+    targets.forEach(t => { t.el.classList.remove('merging'); });
+    showResult({formula, name:'No reaction', desc:'These atoms don\'t typically combine this way. Try a different combination!', emoji:'🤷', color:'#9CA3AF', known:false});
+  }
+  loadingCombine = false;
+  updateInstructions();
+}
+
+async function askClaude(syms, formula) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:`I combined these atoms: ${syms.join(' + ')} forming formula ${formula}. Is this a real chemical compound? If yes, reply ONLY with JSON: {"name":"compound name","desc":"1-2 sentence fun description","emoji":"single relevant emoji","color":"hex color representing the compound","valid":true}. If no real compound results, reply ONLY: {"valid":false}. No other text.`}]
+      })
+    });
+    const d = await res.json();
+    const txt = d.content?.find(c=>c.type==='text')?.text||'';
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    if(parsed.valid===false) return null;
+    return {formula, ...parsed, known:false};
+  } catch(e) { return null; }
+}
+
+function spawnCompound(result, x, y) {
+  const el = document.createElement('div');
+  el.className = 'compound-atom';
+  const col = result.color||'#6366F1';
+  el.style.cssText = `left:${x-60}px;top:${y-22}px;background:${col};color:${getTextColor(col)}`;
+  el.innerHTML = `<span style="font-size:16px">${result.emoji||'⚗️'}</span><span>${result.formula}</span>`;
+  el.dataset.id = (Date.now()+Math.random()).toString(36);
+  el.dataset.sym = result.formula;
+  el.dataset.isCompound = '1';
+  el.title = result.name;
+  el.addEventListener('mouseenter', e => showTooltip(e, `${result.name}\n${result.formula}`));
+  el.addEventListener('mouseleave', hideTooltip);
+  let ox2, oy2, moving2=false, sx, sy;
+  el.addEventListener('mousedown', e => {
+    if(e.button!==0)return;
+    e.preventDefault(); e.stopPropagation();
+    const r = workspace.getBoundingClientRect();
+    const pr = el.getBoundingClientRect();
+    ox2 = e.clientX - pr.left - pr.width/2;
+    oy2 = e.clientY - pr.top - pr.height/2;
+    sx=e.clientX; sy=e.clientY; moving2=false;
+    const mv = me => {
+      if(!moving2 && Math.hypot(me.clientX-sx,me.clientY-sy)>4) moving2=true;
+      if(!moving2)return;
+      hideTooltip();
+      el.style.left=(me.clientX-r.left-ox2)+'px';
+      el.style.top=(me.clientY-r.top-oy2)+'px';
+    };
+    const up = () => { document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); };
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',up);
+  });
+  el.addEventListener('dblclick', () => el.remove());
+  workspace.appendChild(el);
+}
+
+function showMergeFlash(x, y, color) {
+  const f = document.createElement('div');
+  f.className = 'merge-flash';
+  f.style.cssText = `left:${x-30}px;top:${y-30}px;width:60px;height:60px;background:${colorWithOpacity(color,.5)};border:2px solid ${color}`;
+  workspace.appendChild(f);
+  setTimeout(()=>f.remove(), 600);
+}
+
+function showResult(result) {
+  const panel = resultPanel;
+  const icon = document.getElementById('result-icon');
+  const h4 = panel.querySelector('h4');
+  const p = panel.querySelector('p');
+  icon.textContent = result.emoji||'⚗️';
+  icon.style.background = colorWithOpacity(result.color||'#6366F1', 0.15);
+  h4.textContent = `${result.formula} — ${result.name}`;
+  p.textContent = result.desc;
+  panel.classList.add('visible');
+  clearTimeout(panel._timer);
+  panel._timer = setTimeout(()=>panel.classList.remove('visible'), 6000);
+}
+
+document.getElementById('close-result').addEventListener('click',()=>resultPanel.classList.remove('visible'));
+
+function addDiscovery(result) {
+  const el = document.createElement('div');
+  el.className = 'discovery-item';
+  el.innerHTML = `<div class="di-formula">${result.emoji||''} ${result.formula}</div><div class="di-name">${result.name}</div>`;
+  const cnt = discoveriesEl.querySelector('.discovery-count');
+  if(cnt) cnt.remove();
+  discoveriesEl.insertBefore(el, discoveriesEl.firstChild);
+}
+
+function updateInstructions() {
+  instructionsEl.style.display = placedAtoms.length===0 ? 'block':'none';
+}
+
+document.getElementById('btn-clear').addEventListener('click',()=>{
+  workspace.querySelectorAll('.placed-atom,.compound-atom').forEach(e=>e.remove());
+  placedAtoms=[];selectedAtom=null;
+  resultPanel.classList.remove('visible');
+  updateInstructions();
+});
+
+document.getElementById('btn-hint').addEventListener('click',()=>{
+  const h = HINTS[hintIdx%HINTS.length];
+  hintIdx++;
+  showResult({formula:'Hint',name:'Try this!',desc:h,emoji:'💡',color:'#F59E0B'});
+});
+
+workspace.addEventListener('click', ()=>{ placedAtoms.forEach(a=>a.el.classList.remove('selected')); selectedAtom=null; });
+
+function showTooltip(e, text) {
+  tooltip.innerHTML = text.replace(/\n/g,'<br>');
+  tooltip.style.opacity='1';
+  posTooltip(e);
+}
+function hideTooltip(){ tooltip.style.opacity='0'; }
+function posTooltip(e){ tooltip.style.left=(e.clientX+14)+'px'; tooltip.style.top=(e.clientY-8)+'px'; }
+document.addEventListener('mousemove', e=>{ if(tooltip.style.opacity==='1') posTooltip(e); });
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+buildAtomList();
+updateInstructions();
+</script>

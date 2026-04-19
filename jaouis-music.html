@@ -1348,7 +1348,7 @@
 <div id="toast"></div>
 
 <!-- AUDIO -->
-<audio id="audio"></audio>
+<audio id="audio" preload="auto"></audio>
 
 <!-- ════════════════════════════════════
      JAVASCRIPT
@@ -1484,17 +1484,16 @@ function playSongFromList(idx) {
   const s = list[idx];
   updateNowPlayingUI(s);
   audio.src = s.file_url;
-  audio.load();
-  const onReady = () => {
-    audio.play().catch(err => console.warn('Play error:', err));
-    audio.removeEventListener('canplay', onReady);
-  };
-  audio.addEventListener('canplay', onReady);
+  audio.play().catch(() => {
+    // Fallback: wait for canplay then try again
+    const onReady = () => { audio.play().catch(e => console.warn(e)); audio.removeEventListener('canplay', onReady); };
+    audio.addEventListener('canplay', onReady);
+  });
   renderSongs(list);
   if (window.innerWidth <= 640) openFullscreen();
 }
 
-// Legacy playSong — plays from library songs array (used by next/prev/shuffle)
+// playSong — plays from currentList (used by next/prev/shuffle)
 function playSong(idx) {
   const list = currentList.length > 0 ? currentList : songs;
   if (idx < 0 || idx >= list.length) return;
@@ -1502,12 +1501,10 @@ function playSong(idx) {
   const s = list[idx];
   updateNowPlayingUI(s);
   audio.src = s.file_url;
-  audio.load();
-  const onReady = () => {
-    audio.play().catch(err => console.warn('Play error:', err));
-    audio.removeEventListener('canplay', onReady);
-  };
-  audio.addEventListener('canplay', onReady);
+  audio.play().catch(() => {
+    const onReady = () => { audio.play().catch(e => console.warn(e)); audio.removeEventListener('canplay', onReady); };
+    audio.addEventListener('canplay', onReady);
+  });
   renderSongs(list);
   if (window.innerWidth <= 640) openFullscreen();
 }
@@ -1566,13 +1563,11 @@ function toggleShuffle() {
 }
 
 audio.addEventListener('ended', () => {
-  // Update media session state so OS knows to allow next track
   if ('mediaSession' in navigator) {
     navigator.mediaSession.playbackState = 'none';
   }
-  if (audio.ended || audio.currentTime >= audio.duration - 0.25) {
-    nextSong();
-  }
+  // Small delay helps Android/iOS settle before loading next track
+  setTimeout(() => nextSong(), 100);
 });
 
 audio.addEventListener('play', () => {
@@ -2036,6 +2031,13 @@ function fsSeek(e) {
 // Close fullscreen on song row click (open fullscreen instead when a song is clicked while one is playing)
 
 init();
+
+// Register service worker for background audio
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {
+    // sw.js not found — background auto-next may not work when tab is hidden
+  });
+}
 </script>
 </body>
 </html>

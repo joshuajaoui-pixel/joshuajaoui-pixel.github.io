@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Molecule Lab</title>
+<title>Jaouis Atom</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -17,7 +17,6 @@
   --amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#412402;
   --teal:#1D9E75;--teal-bg:#E1F5EE;--teal-text:#085041;
   --r:11px;--safe-bottom:env(safe-area-inset-bottom,0px);
-  --palette-h:220px;--toolbar-h:52px;
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#1c1c1a;--bg2:#272725;--bg3:#323230;
@@ -32,29 +31,23 @@
 }}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);touch-action:none;user-select:none;-webkit-user-select:none}
-
-/* ── DESKTOP LAYOUT ── */
 #app{display:grid;grid-template-columns:190px 1fr 260px;grid-template-rows:100vh;height:100vh}
 #left-panel{grid-column:1;display:flex;flex-direction:column;border-right:0.5px solid var(--border);overflow:hidden}
 #center-panel{grid-column:2;display:flex;flex-direction:column;overflow:hidden;position:relative}
 #right-panel{grid-column:3;display:flex;flex-direction:column;border-left:0.5px solid var(--border);overflow:hidden}
-
-/* ── LEFT: element palette ── */
 .panel-head{padding:12px 12px 8px;flex-shrink:0}
 .panel-head h1{font-size:15px;font-weight:500;margin-bottom:8px}
 .search-inp{width:100%;padding:7px 10px;font-size:13px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);outline:none}
 .search-inp:focus{border-color:var(--border2)}
-.section-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 12px 4px;flex-shrink:0}
+.section-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 12px;flex-shrink:0}
 #atom-list{overflow-y:auto;flex:1;padding:2px 6px 8px}
 #atom-list::-webkit-scrollbar{width:3px}
 #atom-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .atom-btn{display:flex;align-items:center;gap:8px;padding:7px 7px;border-radius:9px;border:none;background:transparent;cursor:pointer;width:100%;text-align:left;color:var(--text);transition:background .1s}
 .atom-btn:hover,.atom-btn:active{background:var(--bg2)}
-.asym{font-size:12px;font-weight:700;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;flex-shrink:0;letter-spacing:-.02em}
+.asym{font-size:12px;font-weight:700;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;flex-shrink:0}
 .alabel .aname{font-size:12px;font-weight:500}
 .alabel .asub{font-size:10px;color:var(--text3)}
-
-/* ── CENTER: toolbar + canvas ── */
 #toolbar{display:flex;align-items:center;gap:5px;padding:7px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #toolbar::-webkit-scrollbar{display:none}
 .tbtn{padding:6px 12px;font-size:12px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .1s;font-family:inherit;white-space:nowrap;flex-shrink:0;min-height:34px}
@@ -66,8 +59,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 #mol-canvas{display:block;width:100%;height:100%;touch-action:none}
 #formula-bar{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:14px;font-weight:600;color:var(--text);background:var(--bg);padding:5px 16px;border-radius:20px;border:0.5px solid var(--border);pointer-events:none;min-width:44px;text-align:center;letter-spacing:.01em;white-space:nowrap}
 #hint-bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--text3);background:var(--bg2);padding:5px 14px;border-radius:20px;border:0.5px solid var(--border);pointer-events:none;white-space:nowrap;transition:opacity .3s}
-
-/* ── RIGHT: results + discoveries ── */
 #result-area{padding:14px;border-bottom:0.5px solid var(--border);flex-shrink:0}
 .sec-lbl{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 #result-box{min-height:72px}
@@ -85,11 +76,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 .tag-useful{background:var(--green-bg);color:var(--green-text)}
 .tag-hazardous{background:var(--red-bg);color:var(--red-text)}
 .tag-cat{background:var(--purple-bg);color:var(--purple-text)}
-.tag-ai{background:var(--amber-bg);color:var(--amber-text)}
 #fun-box{font-size:11px;color:var(--amber-text);background:var(--amber-bg);border-radius:8px;padding:8px 10px;margin-top:8px;line-height:1.55;display:none}
 #id-btn{width:100%;margin-top:10px;padding:9px;font-size:13px;font-weight:500;border-radius:var(--r);border:0.5px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer;font-family:inherit;transition:background .1s;min-height:40px}
 #id-btn:active{background:var(--purple-bg)}
-#id-btn:disabled{opacity:.45}
 #disco-area{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:12px}
 #disco-head{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
 .badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--purple-bg);color:var(--purple-text)}
@@ -101,132 +90,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 .disco-key{font-family:monospace;color:var(--text3);font-size:10px;flex-shrink:0}
 @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
 .new-disco{animation:slideIn .25s ease}
-
-/* ── TOAST ── */
 #toast{position:fixed;bottom:calc(20px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);padding:8px 18px;font-size:13px;color:var(--text);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:9999;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ══════════════════════════════════════
-   MOBILE LAYOUT  (≤ 700px)
-══════════════════════════════════════ */
+/* ── MOBILE ── */
 @media(max-width:700px){
   #app{display:flex;flex-direction:column;height:100dvh;height:100vh}
-  #left-panel{display:none} /* hidden – replaced by bottom sheet */
-  #right-panel{display:none} /* hidden – replaced by result drawer */
+  #left-panel{display:none}
+  #right-panel{display:none}
   #center-panel{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
   #canvas-wrap{flex:1;min-height:0}
-
-  /* mobile toolbar */
   #toolbar{padding:6px 8px;gap:4px}
   .tbtn{padding:6px 10px;font-size:12px;min-height:36px}
   #bond-sel{font-size:12px;padding:5px 6px;min-height:36px}
-
-  /* ── bottom result bar (tappable pill) ── */
-  #mobile-result-bar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 14px;border-top:0.5px solid var(--border);
-    background:var(--bg);flex-shrink:0;gap:10px;
-    padding-bottom:calc(10px + var(--safe-bottom));
-  }
+  #mobile-result-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px calc(10px + var(--safe-bottom));border-top:0.5px solid var(--border);background:var(--bg);flex-shrink:0;gap:10px}
   #mobile-formula{font-size:16px;font-weight:600;color:var(--text);min-width:44px}
   #mobile-id-btn{padding:8px 16px;font-size:13px;font-weight:500;border-radius:20px;border:0.5px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer;font-family:inherit;white-space:nowrap;min-height:38px}
   #mobile-id-btn:active{background:var(--purple-bg)}
-  #mobile-id-btn:disabled{opacity:.45}
-
-  /* ── bottom sheet: element palette ── */
-  #palette-sheet{
-    position:fixed;bottom:0;left:0;right:0;
-    background:var(--bg);
-    border-top:0.5px solid var(--border);
-    border-radius:18px 18px 0 0;
-    z-index:200;
-    transform:translateY(calc(100% - 56px));
-    transition:transform .32s cubic-bezier(.4,0,.2,1);
-    max-height:75dvh;max-height:75vh;
-    display:flex;flex-direction:column;
-    padding-bottom:var(--safe-bottom);
-  }
+  #palette-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);border-radius:18px 18px 0 0;z-index:200;transform:translateY(calc(100% - 56px));transition:transform .32s cubic-bezier(.4,0,.2,1);max-height:75dvh;max-height:75vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom)}
   #palette-sheet.open{transform:translateY(0)}
-  #sheet-handle-row{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 16px 8px;flex-shrink:0;cursor:pointer
-  }
+  #sheet-handle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;flex-shrink:0;cursor:pointer}
   #sheet-handle{width:36px;height:4px;background:var(--bg3);border-radius:2px;margin:0 auto}
   #sheet-handle-row span{font-size:13px;font-weight:500;color:var(--text)}
   #sheet-search-wrap{padding:0 12px 8px;flex-shrink:0}
-  #sheet-search{width:100%;padding:9px 12px;font-size:14px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);outline:none}
-  #sheet-search:focus{border-color:var(--border2)}
   #sheet-atom-list{overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 10px 12px;-webkit-overflow-scrolling:touch}
-  .sheet-atom-btn{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:3px;padding:10px 4px;border-radius:10px;border:none;
-    background:var(--bg2);cursor:pointer;transition:background .12s;
-    font-family:inherit;color:var(--text)
-  }
+  .sheet-atom-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;transition:background .12s;font-family:inherit;color:var(--text)}
   .sheet-atom-btn:active{background:var(--bg3);transform:scale(.95)}
   .sheet-asym{font-size:15px;font-weight:700;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px}
   .sheet-aname{font-size:9px;color:var(--text3);text-align:center;line-height:1.2}
-
-  /* ── result drawer ── */
-  #result-drawer{
-    position:fixed;bottom:0;left:0;right:0;
-    background:var(--bg);border-top:0.5px solid var(--border);
-    border-radius:18px 18px 0 0;
-    z-index:300;
-    transform:translateY(100%);
-    transition:transform .32s cubic-bezier(.4,0,.2,1);
-    max-height:80dvh;max-height:80vh;
-    display:flex;flex-direction:column;
-    padding-bottom:var(--safe-bottom);
-  }
+  #result-drawer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);border-radius:18px 18px 0 0;z-index:300;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);max-height:80dvh;max-height:80vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom)}
   #result-drawer.open{transform:translateY(0)}
-  #drawer-handle-row{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 16px 8px;cursor:pointer;flex-shrink:0
-  }
-  #drawer-close{font-size:20px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0 4px;color:var(--text2)}
+  #drawer-handle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;cursor:pointer;flex-shrink:0}
+  #drawer-close{font-size:22px;color:var(--text2);background:none;border:none;cursor:pointer;padding:0 4px;line-height:1}
   #drawer-body{overflow-y:auto;padding:0 16px 16px;flex:1;-webkit-overflow-scrolling:touch}
-
-  /* hide desktop-only elements */
   #hint-bar{display:none}
-  #formula-bar{font-size:13px;top:8px}
 }
-/* hide mobile elements on desktop */
 #mobile-result-bar,#palette-sheet,#result-drawer{display:none}
-@media(max-width:700px){
-  #mobile-result-bar{display:flex}
-  #palette-sheet,#result-drawer{display:flex}
-  #result-area,#disco-area{/* keep in DOM, used by drawer */}
-}
+@media(max-width:700px){#mobile-result-bar{display:flex}#palette-sheet,#result-drawer{display:flex}}
 </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- ══ LEFT: desktop element palette ══ -->
   <div id="left-panel">
     <div class="panel-head">
-      <h1>⚗️ Molecule Lab</h1>
+      <h1>⚗️ Jaouis Atom</h1>
       <input class="search-inp" id="atom-search" placeholder="Search elements…" autocomplete="off"/>
     </div>
     <div class="section-label">Drag onto canvas</div>
     <div id="atom-list"></div>
   </div>
-
-  <!-- ══ CENTER: canvas ══ -->
   <div id="center-panel">
     <div id="toolbar">
       <button class="tbtn active" id="tool-select" onclick="setTool('select')">Select</button>
       <button class="tbtn" id="tool-bond" onclick="setTool('bond')">Bond</button>
       <button class="tbtn" id="tool-erase" onclick="setTool('erase')">Erase</button>
       <div class="tsep"></div>
-      <select id="bond-sel">
-        <option value="1">Single —</option>
-        <option value="2">Double =</option>
-        <option value="3">Triple ≡</option>
-      </select>
+      <select id="bond-sel"><option value="1">Single —</option><option value="2">Double =</option><option value="3">Triple ≡</option></select>
       <div class="tsep"></div>
       <button class="tbtn" onclick="clearCanvas()">Clear</button>
       <button class="tbtn" onclick="surpriseMe()">Surprise me</button>
@@ -234,9 +154,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
     <div id="canvas-wrap">
       <canvas id="mol-canvas"></canvas>
       <div id="formula-bar">—</div>
-      <div id="hint-bar">Drag elements here · Bond mode: tap atom → tap another</div>
+      <div id="hint-bar">Drag elements here · Bond mode: tap atom → tap another · Double-click bond to cycle order</div>
     </div>
-    <!-- mobile bottom bar -->
     <div id="mobile-result-bar">
       <span id="mobile-formula">—</span>
       <div style="display:flex;gap:8px;align-items:center">
@@ -245,8 +164,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
       </div>
     </div>
   </div>
-
-  <!-- ══ RIGHT: desktop results + discoveries ══ -->
   <div id="right-panel">
     <div id="result-area">
       <div class="sec-lbl">Result</div>
@@ -255,29 +172,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
       <button id="id-btn" onclick="identify()">Identify Molecule ✦</button>
     </div>
     <div id="disco-area">
-      <div id="disco-head">
-        Discoveries <span id="disco-count" class="badge">0</span>
-        <button class="clr-btn" onclick="clearDiscos()">clear</button>
-      </div>
+      <div id="disco-head">Discoveries <span id="disco-count" class="badge">0</span><button class="clr-btn" onclick="clearDiscos()">clear</button></div>
       <div id="disco-list"><p style="font-size:11px;color:var(--text3)">None yet!</p></div>
     </div>
   </div>
 </div>
 
-<!-- ══ MOBILE: element palette bottom sheet ══ -->
 <div id="palette-sheet">
   <div id="sheet-handle-row" onclick="toggleSheet()">
-    <span>Elements</span>
+    <span>⚗️ Jaouis Atom — Elements</span>
     <div id="sheet-handle"></div>
     <span id="sheet-mode-lbl" style="font-size:12px;color:var(--text3)">tap to add</span>
   </div>
-  <div id="sheet-search-wrap">
-    <input class="search-inp" id="sheet-search" placeholder="Search elements…" autocomplete="off"/>
-  </div>
+  <div id="sheet-search-wrap"><input class="search-inp" id="sheet-search" placeholder="Search elements…" autocomplete="off"/></div>
   <div id="sheet-atom-list"></div>
 </div>
 
-<!-- ══ MOBILE: result drawer ══ -->
 <div id="result-drawer">
   <div id="drawer-handle-row">
     <span style="font-size:14px;font-weight:500" id="drawer-title">Result</span>
@@ -287,14 +197,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
     <div id="drawer-result-box"></div>
     <div id="drawer-fun-box" style="font-size:11px;color:var(--amber-text);background:var(--amber-bg);border-radius:8px;padding:8px 10px;margin-top:10px;line-height:1.55;display:none"></div>
     <div id="drawer-disco" style="margin-top:16px">
-      <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-        Discoveries <span id="drawer-disco-count" class="badge">0</span>
-      </div>
+      <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">Discoveries <span id="drawer-disco-count" class="badge">0</span></div>
       <div id="drawer-disco-list"><p style="font-size:12px;color:var(--text3)">None yet!</p></div>
     </div>
   </div>
 </div>
-
 <div id="toast"></div>
 
 <script>
@@ -319,92 +226,321 @@ const ELEMENTS=[
   {sym:'Ar',name:'Argon',num:18,cat:'noble gas',col:'#9FE1CB',tc:'#04342C'},
   {sym:'K',name:'Potassium',num:19,cat:'alkali',col:'#FAC775',tc:'#412402'},
   {sym:'Ca',name:'Calcium',num:20,cat:'alk. earth',col:'#C0DD97',tc:'#173404'},
+  {sym:'Sc',name:'Scandium',num:21,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'Ti',name:'Titanium',num:22,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'V',name:'Vanadium',num:23,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'Cr',name:'Chromium',num:24,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
   {sym:'Mn',name:'Manganese',num:25,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
   {sym:'Fe',name:'Iron',num:26,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'Co',name:'Cobalt',num:27,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'Ni',name:'Nickel',num:28,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
   {sym:'Cu',name:'Copper',num:29,cat:'transition',col:'#F5C4B3',tc:'#4A1B0C'},
   {sym:'Zn',name:'Zinc',num:30,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'Ga',name:'Gallium',num:31,cat:'post-trans.',col:'#B4B2A9',tc:'#2C2C2A'},
+  {sym:'Ge',name:'Germanium',num:32,cat:'metalloid',col:'#D3D1C7',tc:'#2C2C2A'},
+  {sym:'As',name:'Arsenic',num:33,cat:'metalloid',col:'#D3D1C7',tc:'#2C2C2A'},
+  {sym:'Se',name:'Selenium',num:34,cat:'nonmetal',col:'#F0997B',tc:'#4A1B0C'},
+  {sym:'Br',name:'Bromine',num:35,cat:'halogen',col:'#F5C4B3',tc:'#4A1B0C'},
+  {sym:'Kr',name:'Krypton',num:36,cat:'noble gas',col:'#9FE1CB',tc:'#04342C'},
+  {sym:'Rb',name:'Rubidium',num:37,cat:'alkali',col:'#FAC775',tc:'#412402'},
+  {sym:'Sr',name:'Strontium',num:38,cat:'alk. earth',col:'#C0DD97',tc:'#173404'},
   {sym:'Ag',name:'Silver',num:47,cat:'transition',col:'#D3D1C7',tc:'#2C2C2A'},
+  {sym:'Sn',name:'Tin',num:50,cat:'post-trans.',col:'#B4B2A9',tc:'#2C2C2A'},
+  {sym:'Sb',name:'Antimony',num:51,cat:'metalloid',col:'#D3D1C7',tc:'#2C2C2A'},
   {sym:'I',name:'Iodine',num:53,cat:'halogen',col:'#CECBF6',tc:'#26215C'},
+  {sym:'Xe',name:'Xenon',num:54,cat:'noble gas',col:'#9FE1CB',tc:'#04342C'},
+  {sym:'Cs',name:'Caesium',num:55,cat:'alkali',col:'#FAC775',tc:'#412402'},
   {sym:'Ba',name:'Barium',num:56,cat:'alk. earth',col:'#C0DD97',tc:'#173404'},
+  {sym:'W',name:'Tungsten',num:74,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
+  {sym:'Pt',name:'Platinum',num:78,cat:'transition',col:'#D3D1C7',tc:'#2C2C2A'},
   {sym:'Au',name:'Gold',num:79,cat:'transition',col:'#FAC775',tc:'#412402'},
   {sym:'Hg',name:'Mercury',num:80,cat:'transition',col:'#AFA9EC',tc:'#26215C'},
   {sym:'Pb',name:'Lead',num:82,cat:'post-trans.',col:'#888780',tc:'#F1EFE8'},
+  {sym:'Bi',name:'Bismuth',num:83,cat:'post-trans.',col:'#CECBF6',tc:'#26215C'},
+  {sym:'Ra',name:'Radium',num:88,cat:'alk. earth',col:'#C0DD97',tc:'#173404'},
   {sym:'U',name:'Uranium',num:92,cat:'actinide',col:'#97C459',tc:'#173404'},
+  {sym:'Pu',name:'Plutonium',num:94,cat:'actinide',col:'#97C459',tc:'#173404'},
 ];
 
+// ─────────────────────────────────────────────────────────────────
+//  OFFLINE DATABASE  — 400+ compounds, no AI required
+// ─────────────────────────────────────────────────────────────────
 const DB={
-  'H2O':{name:'Water',desc:'The most essential molecule for life — a polar solvent covering 71% of Earth and ~60% of your body.',state:'liquid',useful:true,cat:'essential',fun:'Water is the only natural substance that occurs in all three states at temperatures found naturally on Earth.'},
-  'CO2':{name:'Carbon Dioxide',desc:'A greenhouse gas produced by respiration and combustion. Plants absorb it during photosynthesis.',state:'gas',cat:'atmospheric',fun:'CO₂ makes up just 0.04% of the atmosphere yet drives significant climate change.'},
-  'O2':{name:'Oxygen Gas',desc:'Diatomic oxygen — 21% of Earth\'s atmosphere, essential for aerobic respiration.',state:'gas',useful:true,fun:'A single large tree produces enough oxygen per day for about 2 people to breathe.'},
-  'H2':{name:'Hydrogen Gas',desc:'The lightest element. Burns cleanly to produce only water — a promising clean fuel.',state:'gas',cat:'fuel',fun:'75% of the entire mass of the universe is hydrogen.'},
-  'N2':{name:'Nitrogen Gas',desc:'Makes up 78% of our atmosphere. Inert at room temperature; used in food packaging and cryogenics.',state:'gas',fun:'Liquid nitrogen boils at −196°C — cold enough to shatter a rubber ball instantly.'},
-  'NaCl':{name:'Table Salt',desc:'Sodium chloride — essential for life and once so valuable it was used as currency.',state:'solid',useful:true,cat:'food',fun:'The word "salary" comes from the Latin "salarium" — Roman soldiers were partly paid in salt.'},
-  'HCl':{name:'Hydrochloric Acid',desc:'A strong acid found in stomach acid. Used industrially in metal cleaning and PVC production.',state:'liquid',hazardous:true,cat:'acid',fun:'Your stomach produces about 1.5 litres of hydrochloric acid every single day.'},
-  'H2SO4':{name:'Sulfuric Acid',desc:'The world\'s most produced industrial chemical. Extremely corrosive and violent with water.',state:'liquid',hazardous:true,cat:'acid',fun:'Over 200 million tonnes of sulfuric acid are produced globally per year.'},
-  'HNO3':{name:'Nitric Acid',desc:'A highly corrosive strong acid used in fertiliser and explosives manufacturing.',state:'liquid',hazardous:true,cat:'acid'},
-  'NH3':{name:'Ammonia',desc:'A pungent gas used in fertilisers. Synthesised from N₂ and H₂ via the Haber process.',state:'gas',cat:'industrial',fun:'The Haber process feeds roughly half the world\'s current population.'},
-  'CH4':{name:'Methane',desc:'The primary component of natural gas. 80× more warming than CO₂ over 20 years.',state:'gas',cat:'fuel',fun:'Methane has been detected on Mars, fuelling debate about possible microbial life.'},
-  'C3H8':{name:'Propane',desc:'Liquefied petroleum gas used in heating and cooking — stored as liquid under pressure.',state:'gas',cat:'fuel'},
-  'C6H12O6':{name:'Glucose',desc:'The primary energy currency of life — produced by plants via photosynthesis.',state:'solid',useful:true,cat:'organic',fun:'Your brain alone consumes about 120g of glucose per day.'},
-  'C12H22O11':{name:'Sucrose',desc:'Common table sugar — a disaccharide of glucose and fructose.',state:'solid',useful:true,cat:'food'},
-  'CO':{name:'Carbon Monoxide',desc:'An odourless, invisible, extremely toxic gas from incomplete combustion.',state:'gas',hazardous:true,cat:'toxic',fun:'CO binds to haemoglobin 200× more strongly than oxygen, making it especially deadly.'},
-  'SO2':{name:'Sulphur Dioxide',desc:'Produced by volcanoes and fossil fuels. A major cause of acid rain.',state:'gas',cat:'pollutant'},
-  'NO2':{name:'Nitrogen Dioxide',desc:'Reddish-brown toxic gas — the characteristic haze over polluted cities.',state:'gas',hazardous:true,cat:'pollutant'},
-  'CaCO3':{name:'Calcium Carbonate',desc:'Found in limestone, chalk, marble, and shells. Used in cement and antacids.',state:'solid',useful:true,cat:'mineral',fun:'The White Cliffs of Dover are almost entirely calcium carbonate — compressed shells of tiny sea creatures.'},
-  'NaOH':{name:'Sodium Hydroxide',desc:'Lye or caustic soda — a strong base in soap-making, paper production, and drain cleaners.',state:'solid',hazardous:true,cat:'base',fun:'Traditional pretzels get their shiny crust from being dipped in lye solution before baking.'},
-  'SiO2':{name:'Silicon Dioxide',desc:'Quartz — one of Earth\'s most abundant minerals. Used to make glass, optical fibres, and chips.',state:'solid',useful:true,cat:'mineral'},
-  'Fe2O3':{name:'Iron(III) Oxide',desc:'The most common form of rust. Gives Mars its red colour.',state:'solid',cat:'mineral',fun:'Mars is red because its surface is coated in iron(III) oxide — a planet-wide layer of rust.'},
-  'Fe3O4':{name:'Magnetite',desc:'The most magnetic naturally occurring mineral — used as a compass by ancient navigators.',state:'solid',cat:'mineral'},
-  'ZnO':{name:'Zinc Oxide',desc:'Used in sunscreen (UV blocker), rubber vulcanisation, and as a mild antiseptic.',state:'solid',useful:true,cat:'mineral'},
-  'H2O2':{name:'Hydrogen Peroxide',desc:'Used as a bleach and antiseptic. Slowly decomposes into water and oxygen.',state:'liquid',useful:true,cat:'oxidiser'},
-  'N2O':{name:'Nitrous Oxide',desc:'Laughing gas — a dental anaesthetic and greenhouse gas 300× more potent than CO₂.',state:'gas',cat:'medical',fun:'Nitrous oxide was synthesised in 1772 and became popular at "laughing gas parties" in the early 1800s.'},
-  'C2H5OH':{name:'Ethanol',desc:'The alcohol in drinks. Also used as a fuel additive, solvent, and 70% antiseptic.',state:'liquid',useful:true,cat:'organic'},
-  'CH3OH':{name:'Methanol',desc:'The simplest alcohol — extremely toxic. Even small amounts can cause blindness or death.',state:'liquid',hazardous:true,cat:'toxic'},
-  'NaHCO3':{name:'Baking Soda',desc:'Reacts with acids to release CO₂ — a leavening agent in baking and a gentle antacid.',state:'solid',useful:true,cat:'food'},
-  'Na2CO3':{name:'Washing Soda',desc:'Sodium carbonate — a water softener used in cleaning and glass manufacturing.',state:'solid',cat:'useful'},
-  'MgSO4':{name:'Epsom Salt',desc:'Magnesium sulphate — bath salts, laxative, and agricultural supplement.',state:'solid',useful:true,cat:'medical'},
-  'I2':{name:'Iodine',desc:'A purple-black solid that sublimes to violet gas. Essential for thyroid hormone production.',state:'solid',cat:'elemental'},
-  'Cl2':{name:'Chlorine Gas',desc:'Yellow-green toxic gas used to purify water. Used as a chemical weapon in WWI.',state:'gas',hazardous:true,cat:'toxic'},
-  'FeS2':{name:"Fool's Gold",desc:"Iron pyrite — famous for deceiving gold prospectors. Used in batteries and semiconductors today.",state:'solid',cat:'mineral'},
-  'UO2':{name:'Uranium Dioxide',desc:'The primary nuclear reactor fuel — small ceramic pellets that power cities for years.',state:'solid',hazardous:true,cat:'nuclear'},
-  'KNO3':{name:'Potassium Nitrate',desc:'Saltpetre — a key component of gunpowder. Also used in fertilisers and food preservation.',state:'solid',cat:'historical',fun:'Medieval gunpowder was ~75% KNO₃, 15% charcoal, and 10% sulphur.'},
-  'CuSO4':{name:'Copper Sulphate',desc:'Bright blue crystals used as a fungicide, in electroplating, and in chemistry labs.',state:'solid',useful:true,cat:'chemical'},
-  'KMnO4':{name:'Potassium Permanganate',desc:'Deep purple crystals — a powerful oxidiser used to disinfect and treat wounds.',state:'solid',useful:true,cat:'oxidiser'},
-  'AgNO3':{name:'Silver Nitrate',desc:'Used in photography and to detect chloride ions. Stains skin black permanently.',state:'solid',cat:'chemical'},
-  'HF':{name:'Hydrofluoric Acid',desc:'Extremely dangerous — penetrates skin silently, disrupts calcium levels, and etches glass.',state:'liquid',hazardous:true,cat:'acid'},
-  'BaSO4':{name:'Barium Sulphate',desc:'Contrast agent for X-ray digestive imaging (barium meal). Also a white pigment.',state:'solid',useful:true,cat:'medical'},
-  'CaCl2':{name:'Calcium Chloride',desc:'Used to de-ice roads, preserve food, and accelerate concrete hardening.',state:'solid',cat:'industrial'},
-  'MgO':{name:'Magnesium Oxide',desc:'Used as a furnace lining, antacid, and laxative.',state:'solid',cat:'mineral'},
-  'Al2O3':{name:'Corundum',desc:'One of the hardest minerals. Rubies and sapphires are gem forms coloured by trace impurities.',state:'solid',cat:'mineral',fun:'Rubies and sapphires are both Al₂O₃ — the colour comes from just a few trace atoms.'},
-  'FeCl3':{name:'Iron(III) Chloride',desc:'Used in water treatment and to etch copper circuit boards.',state:'solid',useful:true,cat:'industrial'},
-  'NaI':{name:'Sodium Iodide',desc:'Used for thyroid imaging and in radiation scintillation detectors.',state:'solid',cat:'medical'},
-  'KI':{name:'Potassium Iodide',desc:'Added to salt to prevent iodine deficiency. Distributed near nuclear plants for protection.',state:'solid',useful:true,cat:'medical'},
-  'SiC':{name:'Silicon Carbide',desc:'Extremely hard ceramic — used in cutting tools, armour, brake discs, and LEDs.',state:'solid',useful:true,cat:'industrial'},
-  'C6H6':{name:'Benzene',desc:'The simplest aromatic hydrocarbon — sweet-smelling and a known carcinogen.',state:'liquid',hazardous:true,cat:'organic'},
-  'CH2O':{name:'Formaldehyde',desc:'Pungent toxic gas used to preserve biological specimens and make resins.',state:'gas',hazardous:true,cat:'toxic'},
-  'NO':{name:'Nitric Oxide',desc:'A signalling molecule controlling blood vessel dilation. Also produced by lightning.',state:'gas',cat:'signalling'},
-  'C2H2':{name:'Acetylene',desc:'Burns at 3500°C with oxygen — used in welding and cutting torches.',state:'gas',cat:'fuel'},
-  'H3PO4':{name:'Phosphoric Acid',desc:'Used in fertilisers and as a flavouring in cola drinks — that signature tangy bite.',state:'liquid',cat:'acid',fun:'Phosphoric acid gives Coca-Cola its tang — the drink has a pH of about 2.3.'},
-  'SO3':{name:'Sulphur Trioxide',desc:'Reacts with water instantly to form sulfuric acid. A major contributor to acid rain.',state:'gas',cat:'acid'},
-  'KCl':{name:'Potassium Chloride',desc:'Used as a salt substitute, in fertilisers, and in IV solutions.',state:'solid',cat:'mineral'},
-  'CaO':{name:'Quicklime',desc:'Made by heating limestone. Reacts violently with water, releasing intense heat.',state:'solid',cat:'industrial'},
-  'Cu2O':{name:'Copper(I) Oxide',desc:'A red solid used as a pigment, antifouling agent, and in solar cells.',state:'solid',cat:'mineral'},
-  'CuO':{name:'Copper(II) Oxide',desc:'A black semiconductor. Reacts with acids to form blue-green copper salts.',state:'solid',cat:'mineral'},
-  'MgCl2':{name:'Magnesium Chloride',desc:'Found in seawater and salt lakes. Used for de-icing and in tofu-making.',state:'solid',cat:'mineral'},
-  'FeO':{name:'Iron(II) Oxide',desc:'A black magnetic mineral (wüstite). Used in pigments and ceramics.',state:'solid',cat:'mineral'},
-  'Na2SO4':{name:'Sodium Sulphate',desc:'Used in detergents, glass production, and the Kraft paper process.',state:'solid',cat:'industrial'},
-  'AgCl':{name:'Silver Chloride',desc:'A light-sensitive white precipitate — the principle behind traditional photographic film.',state:'solid',cat:'chemical'},
-  'PbO':{name:'Lead Oxide',desc:'Used in batteries and glass. Highly toxic — its use is now heavily restricted.',state:'solid',hazardous:true,cat:'toxic'},
-  'N2O5':{name:'Dinitrogen Pentoxide',desc:'The anhydride of nitric acid. A powerful oxidiser used in rocket propellants.',state:'solid',cat:'reactive'},
-  'BaCl2':{name:'Barium Chloride',desc:'Used in fireworks for vivid green colour. Toxic — very different from safe BaSO₄.',state:'solid',hazardous:true,cat:'toxic'},
-  'C2H6':{name:'Ethane',desc:'A simple alkane in natural gas. Feedstock for ethylene production.',state:'gas'},
-  'C2H4':{name:'Ethylene',desc:'The simplest alkene — a plant hormone that triggers fruit ripening, and basis for polyethylene.',state:'gas',cat:'industrial'},
-  'CH3COOH':{name:'Acetic Acid',desc:'The acid in vinegar — responsible for its pungent smell and sour taste.',state:'liquid',useful:true,cat:'organic',fun:'Vinegar is typically 4–8% acetic acid in water. Pure acetic acid is called "glacial" acetic acid.'},
-  'ZnSO4':{name:'Zinc Sulphate',desc:'Used as a fertiliser, dietary supplement, and in rayon production.',state:'solid',cat:'mineral'},
-  'MnO2':{name:'Manganese Dioxide',desc:'Used in dry-cell batteries, as a pigment, and as a catalyst.',state:'solid',cat:'industrial'},
-  'KOH':{name:'Potassium Hydroxide',desc:'A strong base used in soap-making, batteries, and as a food additive.',state:'solid',hazardous:true,cat:'base'},
-  'Fe2S3':{name:'Iron(III) Sulphide',desc:'An unstable dark solid. Readily decomposes to iron and sulphur.',state:'solid',cat:'mineral'},
-  'HgO':{name:'Mercury(II) Oxide',desc:'A toxic red solid. Lavoisier used its decomposition to discover the role of oxygen.',state:'solid',hazardous:true,cat:'toxic'},
+// ── WATER & HYDROGEN ──
+'H2O':{name:'Water',desc:'The most essential molecule for life — a polar solvent that covers 71% of Earth\'s surface and makes up ~60% of the human body.',state:'liquid',useful:true,cat:'essential',fun:'Water expands when it freezes — one of only a handful of substances that does this, which is why ice floats.'},
+'H2':{name:'Hydrogen Gas',desc:'The lightest and most abundant element in the universe. Burns cleanly to produce only water — a promising clean fuel for the future.',state:'gas',cat:'fuel',fun:'75% of the entire mass of the observable universe is hydrogen.'},
+'H2O2':{name:'Hydrogen Peroxide',desc:'A pale blue liquid used as a bleach and antiseptic. Slowly decomposes into water and oxygen, especially in light.',state:'liquid',useful:true,cat:'oxidiser',fun:'Pure 100% hydrogen peroxide was once tested as a monopropellant rocket fuel.'},
+'H2S':{name:'Hydrogen Sulphide',desc:'A colourless, extremely toxic gas with the distinctive smell of rotten eggs. Found in volcanic gases and swamps.',state:'gas',hazardous:true,cat:'toxic',fun:'Your nose can detect H₂S at concentrations as low as 0.5 ppb — but prolonged exposure deadens the sense of smell.'},
+'HF':{name:'Hydrofluoric Acid',desc:'An exceptionally dangerous acid that penetrates skin silently without causing immediate pain, disrupts calcium metabolism, and can etch glass.',state:'liquid',hazardous:true,cat:'acid'},
+'HCl':{name:'Hydrochloric Acid',desc:'A strong acid found in stomach acid (pH 1–2). Used industrially in metal cleaning, food processing, and PVC production.',state:'liquid',hazardous:true,cat:'acid',fun:'Your stomach makes about 1.5 litres of hydrochloric acid every single day.'},
+'HBr':{name:'Hydrobromic Acid',desc:'A strong acid formed by dissolving hydrogen bromide in water. Used in organic synthesis and to make bromine compounds.',state:'liquid',hazardous:true,cat:'acid'},
+'HI':{name:'Hydroiodic Acid',desc:'A strong acid and powerful reducing agent. Used in organic synthesis and pharmaceutical manufacturing.',state:'liquid',hazardous:true,cat:'acid'},
+'HNO3':{name:'Nitric Acid',desc:'A highly corrosive strong acid used in fertiliser production, explosives manufacturing, and as a chemical reagent.',state:'liquid',hazardous:true,cat:'acid'},
+'H2SO4':{name:'Sulfuric Acid',desc:'The world\'s most produced industrial chemical. Extremely corrosive — reacts violently with water, releasing intense heat.',state:'liquid',hazardous:true,cat:'acid',fun:'Over 200 million tonnes of sulfuric acid are produced globally each year — more than any other chemical.'},
+'H3PO4':{name:'Phosphoric Acid',desc:'A mild acid used in fertilisers and as a flavouring in cola drinks — responsible for that characteristic tangy bite.',state:'liquid',cat:'acid',fun:'Phosphoric acid gives Coca-Cola its tang. The drink has a pH of about 2.3.'},
+'H2CO3':{name:'Carbonic Acid',desc:'A weak acid formed when CO₂ dissolves in water. Responsible for the fizz in carbonated drinks and the mild acidity of rain.',state:'liquid',cat:'acid'},
+'HClO4':{name:'Perchloric Acid',desc:'The strongest common acid known. Extremely corrosive and a powerful oxidiser — its salts can be explosive.',state:'liquid',hazardous:true,cat:'acid'},
+'HClO':{name:'Hypochlorous Acid',desc:'A weak acid used as a disinfectant and bleaching agent. The active component of chlorine-based sanitisers.',state:'liquid',useful:true,cat:'disinfectant'},
+'HCN':{name:'Hydrogen Cyanide',desc:'One of the most rapidly acting poisons known. A colourless gas or liquid with a faint almond smell. Used in fumigation.',state:'gas',hazardous:true,cat:'toxic',fun:'The smell of bitter almonds often cited for cyanide comes from benzaldehyde, not HCN itself — only ~40% of people can detect the odour.'},
+
+// ── OXYGEN & OZONE ──
+'O2':{name:'Oxygen Gas',desc:'Diatomic oxygen — makes up 21% of Earth\'s atmosphere. Essential for aerobic respiration in almost all complex life.',state:'gas',useful:true,fun:'A single large tree produces enough oxygen per day for roughly two people to breathe.'},
+'O3':{name:'Ozone',desc:'A pale blue gas formed from three oxygen atoms. In the stratosphere it shields Earth from UV radiation; at ground level it is an air pollutant.',state:'gas',cat:'atmospheric',fun:'The distinctive smell after thunderstorms is partly ozone, produced by lightning splitting and recombining oxygen molecules.'},
+
+// ── NITROGEN COMPOUNDS ──
+'N2':{name:'Nitrogen Gas',desc:'Makes up 78% of Earth\'s atmosphere. Relatively inert at room temperature — used in food packaging and cryogenic cooling.',state:'gas',fun:'Liquid nitrogen boils at −196°C — cold enough to shatter a rubber ball, a flower, or a banana instantly.'},
+'NH3':{name:'Ammonia',desc:'A pungent, toxic gas used as a fertiliser precursor and in cleaning products. Synthesised industrially via the Haber-Bosch process.',state:'gas',cat:'industrial',fun:'The Haber-Bosch process for making ammonia is credited with feeding roughly half the world\'s current population.'},
+'NO':{name:'Nitric Oxide',desc:'A colourless gas that acts as a signalling molecule in the body, controlling blood vessel dilation. Also produced by lightning.',state:'gas',cat:'signalling'},
+'NO2':{name:'Nitrogen Dioxide',desc:'A reddish-brown toxic gas and major air pollutant. The characteristic smoggy haze over polluted cities is largely NO₂.',state:'gas',hazardous:true,cat:'pollutant'},
+'N2O':{name:'Nitrous Oxide',desc:'Laughing gas — used as a dental anaesthetic and in whipped cream dispensers. A potent greenhouse gas, 300× more warming than CO₂.',state:'gas',cat:'medical',fun:'Nitrous oxide was first synthesised in 1772 and became popular at "laughing gas parties" in the early 1800s before its anaesthetic use was recognised.'},
+'N2O4':{name:'Dinitrogen Tetroxide',desc:'A brown toxic gas used as a hypergolic rocket oxidiser — it ignites spontaneously on contact with certain fuels. No spark needed.',state:'liquid',hazardous:true,cat:'industrial'},
+'N2O5':{name:'Dinitrogen Pentoxide',desc:'The anhydride of nitric acid. A powerful oxidiser used in some explosive compositions and rocket propellants.',state:'solid',cat:'reactive'},
+'NH4Cl':{name:'Ammonium Chloride',desc:'A white salt used in dry-cell batteries, as a soldering flux, and in cough medicines. Gives a slightly salty, cooling taste.',state:'solid',useful:true,cat:'chemical'},
+'NH4NO3':{name:'Ammonium Nitrate',desc:'A powerful fertiliser that is also a component of ANFO explosives. Its storage and transport are heavily regulated.',state:'solid',hazardous:true,cat:'industrial',fun:'The 1947 Texas City Disaster — one of history\'s worst industrial accidents — was caused by ammonium nitrate igniting aboard a ship.'},
+'NH4OH':{name:'Ammonium Hydroxide',desc:'A solution of ammonia in water — the common household cleaner "ammonia solution". A mild base used in cleaning products.',state:'liquid',cat:'base'},
+'HNO2':{name:'Nitrous Acid',desc:'A weak, unstable acid that only exists in solution. Important in organic synthesis for producing diazonium compounds.',state:'liquid',cat:'acid'},
+
+// ── CARBON COMPOUNDS ──
+'CO':{name:'Carbon Monoxide',desc:'An odourless, colourless, extremely toxic gas produced by incomplete combustion. Binds to haemoglobin 200× more strongly than oxygen.',state:'gas',hazardous:true,cat:'toxic',fun:'CO is nicknamed the "silent killer" because it is completely undetectable to human senses without a detector.'},
+'CO2':{name:'Carbon Dioxide',desc:'A greenhouse gas produced by respiration and combustion. Plants use it in photosynthesis to produce glucose and oxygen.',state:'gas',cat:'atmospheric',fun:'CO₂ makes up only 0.04% of the atmosphere, yet this tiny fraction has an outsized effect on global climate.'},
+'CS2':{name:'Carbon Disulfide',desc:'A colourless, toxic, highly flammable liquid with a sweet smell. Used as a solvent and in the production of rayon.',state:'liquid',hazardous:true,cat:'solvent'},
+'CCl4':{name:'Carbon Tetrachloride',desc:'A colourless, toxic liquid once used as a dry-cleaning solvent and fire extinguisher. Now banned in many countries due to ozone depletion.',state:'liquid',hazardous:true,cat:'solvent',fun:'CCl₄ fire extinguishers were withdrawn after it was found the heat of a fire converts it to phosgene — a far more toxic gas.'},
+'CH4':{name:'Methane',desc:'The primary component of natural gas and a potent greenhouse gas — 80× more warming than CO₂ over 20 years.',state:'gas',cat:'fuel',fun:'Methane has been detected on Mars, fuelling debate about possible past or present microbial life.'},
+'C2H2':{name:'Acetylene',desc:'A colourless gas that burns at up to 3500°C when mixed with oxygen — used in oxy-acetylene welding and cutting torches.',state:'gas',cat:'fuel'},
+'C2H4':{name:'Ethylene',desc:'The simplest alkene and a natural plant hormone that triggers fruit ripening. Also the world\'s most produced organic chemical — the basis for polyethylene plastic.',state:'gas',cat:'industrial'},
+'C2H6':{name:'Ethane',desc:'A simple alkane found in natural gas. Primarily used as feedstock to crack into ethylene for plastic production.',state:'gas'},
+'C3H8':{name:'Propane',desc:'A liquefied petroleum gas used in heating, cooking, and as a vehicle fuel. Stored as a liquid under pressure.',state:'gas',cat:'fuel'},
+'C4H10':{name:'Butane',desc:'A liquefied gas used in cigarette lighters, camping stoves, and as a propellant in aerosol sprays.',state:'gas',cat:'fuel'},
+'C5H12':{name:'Pentane',desc:'A highly volatile alkane used as a blowing agent in Styrofoam production and as a laboratory solvent.',state:'liquid',cat:'solvent'},
+'C6H14':{name:'Hexane',desc:'A common laboratory solvent used to extract fats and oils. A significant component of petrol.',state:'liquid',cat:'solvent'},
+'C8H18':{name:'Octane',desc:'One of the key components of petrol. The "octane rating" of fuel is named after it — a measure of resistance to knocking.',state:'liquid',cat:'fuel',fun:'A higher octane rating doesn\'t mean more energy — it means the fuel is more resistant to detonating before the spark plug fires.'},
+'CH2O':{name:'Formaldehyde',desc:'A pungent toxic gas used to preserve biological specimens in formalin solution, and as a raw material for resins and adhesives.',state:'gas',hazardous:true,cat:'toxic'},
+'CH3CHO':{name:'Acetaldehyde',desc:'A volatile liquid with a fruity smell. Produced when the body metabolises alcohol — partly responsible for hangovers.',state:'liquid',hazardous:true,cat:'organic'},
+'CH2O2':{name:'Formic Acid',desc:'The simplest carboxylic acid — the chemical responsible for the sting of ant bites. Also used in leather tanning.',state:'liquid',cat:'acid',fun:'The name comes from the Latin "formica" meaning ant — it was first isolated by distilling large numbers of ants.'},
+'CH3COOH':{name:'Acetic Acid',desc:'The acid in vinegar — responsible for its pungent smell and sour taste. Pure acetic acid is called glacial acetic acid.',state:'liquid',useful:true,cat:'organic',fun:'Vinegar is 4–8% acetic acid in water. Pure acetic acid freezes at 16.6°C — easy to achieve in a cold lab.'},
+'C3H6O':{name:'Acetone',desc:'The simplest ketone — a colourless, highly volatile solvent with a sweet smell. The active ingredient in most nail polish removers.',state:'liquid',useful:true,cat:'solvent',fun:'Your body naturally produces small amounts of acetone during ketosis — which is why people on strict low-carb diets can have sweet-smelling breath.'},
+'C2H5OH':{name:'Ethanol',desc:'The alcohol in drinks. Also a widely used fuel additive, solvent, and antiseptic at 70% concentration.',state:'liquid',useful:true,cat:'organic'},
+'CH3OH':{name:'Methanol',desc:'The simplest alcohol — extremely toxic if ingested. Even small amounts can cause permanent blindness or death. Used industrially as a solvent.',state:'liquid',hazardous:true,cat:'toxic'},
+'C3H7OH':{name:'Isopropanol',desc:'Rubbing alcohol — a common antiseptic and disinfectant. Evaporates quickly and is used in hand sanitisers.',state:'liquid',useful:true,cat:'solvent'},
+'C6H5OH':{name:'Phenol',desc:'A mildly acidic aromatic compound. Once used as the first surgical antiseptic by Joseph Lister; now used in plastics and pharmaceuticals.',state:'solid',hazardous:true,cat:'organic',fun:'Joseph Lister\'s use of dilute phenol (carbolic acid) in surgery in 1867 dramatically reduced post-operative deaths.'},
+'C6H6':{name:'Benzene',desc:'The simplest aromatic hydrocarbon — a sweet-smelling liquid and known human carcinogen. The basis of aromatic chemistry.',state:'liquid',hazardous:true,cat:'organic',fun:'August Kekulé famously claimed to have dreamt of a snake eating its own tail, inspiring him to propose benzene\'s ring structure in 1865.'},
+'C7H8':{name:'Toluene',desc:'An aromatic solvent with a sweet smell, similar to benzene but less toxic. Used in paints, glues, and as an octane booster.',state:'liquid',hazardous:true,cat:'solvent'},
+'C6H12O6':{name:'Glucose',desc:'The primary energy currency of living organisms. Produced by plants through photosynthesis; broken down in cells via respiration.',state:'solid',useful:true,cat:'organic',fun:'Your brain consumes about 120g of glucose per day — roughly 60% of the body\'s entire glucose use at rest.'},
+'C12H22O11':{name:'Sucrose',desc:'Common table sugar — a disaccharide formed from glucose and fructose. Found abundantly in sugar cane and sugar beet.',state:'solid',useful:true,cat:'food'},
+'C6H12O6_fruct':{name:'Fructose',desc:'Fruit sugar — the sweetest naturally occurring sugar. Found in fruits, honey, and high-fructose corn syrup.',state:'solid',useful:true,cat:'food'},
+'C5H5N':{name:'Pyridine',desc:'A basic aromatic compound with a distinctive unpleasant smell. The core structure of many vitamins, drugs, and agrochemicals.',state:'liquid',hazardous:true,cat:'organic'},
+'CH3COCH3':{name:'Propanone / Acetone',desc:'The simplest ketone — a colourless volatile solvent with a sweet smell. The active ingredient in nail polish remover.',state:'liquid',useful:true,cat:'solvent'},
+'C2H4O2':{name:'Glycolaldehyde',desc:'The simplest sugar — a two-carbon monosaccharide. Has been detected in gas clouds near the centre of the Milky Way.',state:'solid',cat:'organic',fun:'Glycolaldehyde has been detected in interstellar space — raising interesting questions about the origins of life\'s building blocks.'},
+'C3H4O3':{name:'Pyruvic Acid',desc:'A key molecule in cellular respiration — the end product of glycolysis. Links sugar metabolism to the citric acid cycle.',state:'liquid',cat:'organic'},
+'NaHCO3':{name:'Baking Soda',desc:'Sodium bicarbonate — reacts with acids to produce CO₂ gas, making it a leavening agent in baking. Also used as an antacid.',state:'solid',useful:true,cat:'food'},
+'Na2CO3':{name:'Washing Soda',desc:'Sodium carbonate — a water softener used in cleaning, glass manufacturing, and as a food additive.',state:'solid',useful:true,cat:'useful'},
+'Ca3C2O6':{name:'Calcium Oxalate',desc:'Found in kidney stones and in the cells of many plants. The toxicity of raw rhubarb leaves is partly due to oxalates.',state:'solid',cat:'biological'},
+
+// ── SODIUM COMPOUNDS ──
+'NaCl':{name:'Table Salt',desc:'Sodium chloride — essential for life, and once so valuable it was used as currency. Essential for nerve signal transmission.',state:'solid',useful:true,cat:'food',fun:'The word "salary" comes from the Latin "salarium" — Roman soldiers were partly paid in salt.'},
+'NaOH':{name:'Sodium Hydroxide',desc:'Lye or caustic soda — a strong base used in soap-making, paper production, drain cleaners, and food processing (pretzels!)',state:'solid',hazardous:true,cat:'base',fun:'Traditional pretzels get their distinctive shiny brown crust from being dipped in a lye solution before baking.'},
+'Na2SO4':{name:'Sodium Sulphate',desc:'Used in detergents, glass manufacturing, and the Kraft pulp process. In its hydrated form it\'s called Glauber\'s salt.',state:'solid',cat:'industrial'},
+'NaNO3':{name:'Sodium Nitrate',desc:'Chilean saltpetre — a natural fertiliser and food preservative. Also used in explosives and in heat storage systems.',state:'solid',cat:'industrial'},
+'NaNO2':{name:'Sodium Nitrite',desc:'A food preservative that prevents botulism in cured meats. Also gives cured meats like ham their pink colour.',state:'solid',cat:'food'},
+'Na2SO3':{name:'Sodium Sulphite',desc:'A preservative and antioxidant used in food, photography, and wine-making to prevent spoilage.',state:'solid',useful:true,cat:'food'},
+'Na3PO4':{name:'Trisodium Phosphate',desc:'A powerful industrial cleaner and food additive (E339). Also used as a paint preparation, leaving a surface ready for painting.',state:'solid',cat:'industrial'},
+'Na2O':{name:'Sodium Oxide',desc:'A strongly alkaline solid that reacts violently with water to form sodium hydroxide. Used in glass manufacturing.',state:'solid',cat:'industrial'},
+'NaI':{name:'Sodium Iodide',desc:'Used in medicine for thyroid imaging with radioactive I-131, and in scintillation detectors for measuring radiation.',state:'solid',cat:'medical'},
+'NaF':{name:'Sodium Fluoride',desc:'Added to drinking water and toothpaste to prevent tooth decay. Highly toxic in large doses.',state:'solid',useful:true,cat:'medical'},
+'NaBr':{name:'Sodium Bromide',desc:'Used in photography, as a sedative, and in drilling fluids for oil wells.',state:'solid',cat:'chemical'},
+'NaCN':{name:'Sodium Cyanide',desc:'An extremely toxic white solid used in gold and silver mining to extract metals from ores. One of the most acutely lethal substances.',state:'solid',hazardous:true,cat:'toxic'},
+'Na2O2':{name:'Sodium Peroxide',desc:'A yellowish solid used as a bleach and source of oxygen in emergency breathing apparatus.',state:'solid',hazardous:true,cat:'industrial'},
+
+// ── POTASSIUM COMPOUNDS ──
+'KCl':{name:'Potassium Chloride',desc:'Used as a salt substitute, in fertilisers, and medically in IV solutions. Also used (controversially) in lethal injections.',state:'solid',cat:'mineral'},
+'KOH':{name:'Potassium Hydroxide',desc:'A strong base used in soap-making (soft soaps), biodiesel production, and alkaline batteries.',state:'solid',hazardous:true,cat:'base'},
+'KNO3':{name:'Potassium Nitrate',desc:'Saltpetre — a key ingredient in gunpowder (with charcoal and sulphur). Also used in fertilisers and food preservation.',state:'solid',cat:'historical',fun:'Medieval gunpowder was roughly 75% KNO₃, 15% charcoal, and 10% sulphur.'},
+'K2SO4':{name:'Potassium Sulphate',desc:'A fertiliser providing both potassium and sulphur. Preferred over potassium chloride for chloride-sensitive crops.',state:'solid',cat:'agricultural'},
+'KMnO4':{name:'Potassium Permanganate',desc:'Deep purple crystals — a powerful oxidiser used to disinfect wounds, purify water, and treat some skin conditions.',state:'solid',useful:true,cat:'oxidiser'},
+'KI':{name:'Potassium Iodide',desc:'Added to table salt to prevent iodine deficiency and goitre. Distributed near nuclear plants as a radiation-protection measure.',state:'solid',useful:true,cat:'medical'},
+'KBr':{name:'Potassium Bromide',desc:'A sedative once widely prescribed for epilepsy and anxiety. Still used in veterinary medicine and photography.',state:'solid',cat:'medical'},
+'K2CO3':{name:'Potassium Carbonate',desc:'Potash — used in glass-making, soap production, and as a food additive. Wood ash is a natural source.',state:'solid',cat:'industrial'},
+'KF':{name:'Potassium Fluoride',desc:'Used in organic synthesis as a fluorinating agent and as a dental treatment agent. Highly toxic.',state:'solid',hazardous:true,cat:'chemical'},
+'KCN':{name:'Potassium Cyanide',desc:'An extremely toxic white solid used in gold mining, electroplating, and as a reagent. Has a faint almond smell.',state:'solid',hazardous:true,cat:'toxic'},
+'K2O':{name:'Potassium Oxide',desc:'A strongly alkaline solid that reacts rapidly with water to form potassium hydroxide. Used in the glass industry.',state:'solid',cat:'industrial'},
+
+// ── CALCIUM COMPOUNDS ──
+'CaCO3':{name:'Calcium Carbonate',desc:'Found in limestone, chalk, marble, and seashells. Used in cement production, as an antacid, and as a calcium supplement.',state:'solid',useful:true,cat:'mineral',fun:'The White Cliffs of Dover are made almost entirely of calcium carbonate — the compressed shells of tiny marine organisms.'},
+'CaO':{name:'Quicklime',desc:'Calcium oxide — made by strongly heating limestone. Reacts violently with water to form slaked lime, releasing enormous heat.',state:'solid',cat:'industrial'},
+'CaOH2':{name:'Slaked Lime',desc:'Calcium hydroxide — formed when quicklime reacts with water. Used in construction (mortars), water treatment, and papermaking.',state:'solid',cat:'industrial'},
+'CaCl2':{name:'Calcium Chloride',desc:'Used to de-ice roads (less corrosive than NaCl), preserve food, and accelerate concrete hardening. Absorbs moisture from air so readily it can dissolve in it.',state:'solid',useful:true,cat:'industrial'},
+'CaSO4':{name:'Calcium Sulphate',desc:'Found naturally as gypsum (hydrated) and anhydrite (anhydrous). Used in plaster of Paris, cement, and as a food additive.',state:'solid',useful:true,cat:'mineral'},
+'Ca3PO42':{name:'Calcium Phosphate',desc:'The main mineral in bones and teeth. Used in fertilisers, food supplements, and as a dental abrasive in toothpaste.',state:'solid',useful:true,cat:'biological'},
+'CaF2':{name:'Calcium Fluoride',desc:'Fluorite — a colourful mineral used in making hydrofluoric acid, as a flux in steelmaking, and as a lens material for UV optics.',state:'solid',cat:'mineral'},
+'CaC2':{name:'Calcium Carbide',desc:'Reacts with water to produce acetylene gas. Historically used in carbide lamps and still used to ripen fruit commercially.',state:'solid',cat:'industrial'},
+
+// ── MAGNESIUM ──
+'MgO':{name:'Magnesium Oxide',desc:'A white solid used as a refractory material in furnace linings, as an antacid (milk of magnesia), and as a laxative.',state:'solid',useful:true,cat:'mineral'},
+'MgCl2':{name:'Magnesium Chloride',desc:'Found naturally in seawater and salt lakes. Used for de-icing roads, in tofu-making, and as a dietary supplement.',state:'solid',useful:true,cat:'mineral'},
+'MgSO4':{name:'Epsom Salt',desc:'Magnesium sulphate — used in bath salts for muscle soreness, as a laxative, and to correct magnesium deficiency in plants.',state:'solid',useful:true,cat:'medical'},
+'MgCO3':{name:'Magnesium Carbonate',desc:'Used as a drying agent on gymnasts\' and rock climbers\' hands. Also an antacid and a component of some cements.',state:'solid',useful:true,cat:'mineral'},
+'Mg3N2':{name:'Magnesium Nitride',desc:'Formed when magnesium burns in air (alongside MgO). Reacts with water to produce ammonia.',state:'solid',cat:'chemical'},
+'MgBr2':{name:'Magnesium Bromide',desc:'Used in organic synthesis as a Lewis acid catalyst and as a mild sedative in medicine.',state:'solid',cat:'chemical'},
+
+// ── ALUMINIUM ──
+'Al2O3':{name:'Corundum',desc:'One of the hardest minerals (9 on Mohs scale). Rubies and sapphires are gem forms coloured by trace impurities.',state:'solid',cat:'mineral',fun:'Rubies and sapphires are both Al₂O₃ — the red colour of rubies comes from trace chromium, the blue of sapphires from titanium and iron.'},
+'AlCl3':{name:'Aluminium Chloride',desc:'A powerful Lewis acid catalyst used in the Friedel-Crafts reactions in organic chemistry and in the production of dyes.',state:'solid',cat:'chemical'},
+'Al2SO43':{name:'Aluminium Sulphate',desc:'Used in water purification as a flocculant to make suspended particles clump together. Also used in paper-making.',state:'solid',useful:true,cat:'industrial'},
+'AlOH3':{name:'Aluminium Hydroxide',desc:'Used as an antacid to neutralise stomach acid, in water purification, and as a fire retardant in plastics.',state:'solid',useful:true,cat:'medical'},
+
+// ── SILICON ──
+'SiO2':{name:'Silicon Dioxide',desc:'Quartz or silica — one of the most abundant minerals in Earth\'s crust. Used to make glass, optical fibres, and semiconductor substrates.',state:'solid',useful:true,cat:'mineral',fun:'Ordinary window glass is made by melting SiO₂ with sodium carbonate and calcium carbonate at over 1700°C.'},
+'SiC':{name:'Silicon Carbide',desc:'An extremely hard ceramic (9.5 on Mohs scale) used in cutting tools, armour, brake discs, and blue LEDs.',state:'solid',useful:true,cat:'industrial'},
+'Si3N4':{name:'Silicon Nitride',desc:'A very hard ceramic used in bearings, cutting tools, and engine parts. Excellent performance at high temperatures.',state:'solid',cat:'industrial'},
+'SiCl4':{name:'Silicon Tetrachloride',desc:'A colourless fuming liquid used to produce pure silicon for semiconductors and in smoke screens.',state:'liquid',hazardous:true,cat:'chemical'},
+'SiH4':{name:'Silane',desc:'The silicon analogue of methane. Used as a source of pure silicon in semiconductor manufacturing.',state:'gas',hazardous:true,cat:'industrial'},
+
+// ── PHOSPHORUS & SULPHUR ──
+'P4O10':{name:'Phosphorus Pentoxide',desc:'An extremely powerful desiccant (drying agent). Reacts violently with water and is used to dry gases and organic solvents.',state:'solid',cat:'desiccant'},
+'PCl3':{name:'Phosphorus Trichloride',desc:'A reactive liquid used in making phosphoric acid and organophosphate pesticides and nerve agents.',state:'liquid',hazardous:true,cat:'chemical'},
+'PCl5':{name:'Phosphorus Pentachloride',desc:'A chlorinating agent used in organic synthesis. Decomposes in water to produce HCl and phosphoric acid.',state:'solid',hazardous:true,cat:'chemical'},
+'SO2':{name:'Sulphur Dioxide',desc:'A pungent gas produced by volcanic eruptions and burning fossil fuels. A major cause of acid rain when dissolved in rainwater.',state:'gas',cat:'pollutant'},
+'SO3':{name:'Sulphur Trioxide',desc:'Reacts with water to form sulfuric acid instantly. A major industrial intermediate and contributor to acid rain.',state:'gas',cat:'acid'},
+'SF6':{name:'Sulphur Hexafluoride',desc:'An extremely stable, dense, non-toxic gas used as an electrical insulator in high-voltage equipment. Also a potent greenhouse gas.',state:'gas',cat:'industrial',fun:'SF₆ is so dense that breathing a small amount makes your voice sound much deeper — the opposite of helium.'},
+'H2SO3':{name:'Sulphurous Acid',desc:'A weak acid formed when SO₂ dissolves in water. Found in acid rain and used as a food preservative and bleaching agent.',state:'liquid',cat:'acid'},
+
+// ── IRON COMPOUNDS ──
+'Fe2O3':{name:'Iron(III) Oxide / Rust',desc:'The most common form of iron oxide. Gives the planet Mars its distinctive red colour. Used as a red pigment in paints and ceramics.',state:'solid',cat:'mineral',fun:'Mars is red because its surface is coated in iron(III) oxide — effectively a planet-wide layer of rust.'},
+'Fe3O4':{name:'Magnetite',desc:'A natural magnet — the most magnetic of all naturally occurring minerals. Ancient navigators used it as a compass needle.',state:'solid',cat:'mineral'},
+'FeO':{name:'Iron(II) Oxide',desc:'A black magnetic mineral found naturally as wüstite. Used in pigments, ceramics, and as a starting material in steelmaking.',state:'solid',cat:'mineral'},
+'FeCl2':{name:'Iron(II) Chloride',desc:'A pale yellowish-green solid used in sewage treatment and as a reducing agent in organic synthesis.',state:'solid',cat:'chemical'},
+'FeCl3':{name:'Iron(III) Chloride',desc:'Used as a coagulant in water treatment, to etch copper circuit boards, and as a catalyst. Forms a brown solution in water.',state:'solid',useful:true,cat:'industrial'},
+'FeSO4':{name:'Iron(II) Sulphate',desc:'Green vitriol — used as a fertiliser, in water treatment, and to treat iron-deficiency anaemia.',state:'solid',useful:true,cat:'medical'},
+'FeS2':{name:"Fool's Gold",desc:"Iron pyrite — famous for deceiving gold prospectors during the Gold Rush. Despite its appearance, it's now used in batteries and semiconductors.",state:'solid',cat:'mineral',fun:"The name 'pyrite' comes from the Greek for fire — it was used to start fires by striking it against flint."},
+'FeS':{name:'Iron(II) Sulphide',desc:'A dark solid formed by reacting iron with sulphur. Reacts with acid to produce hydrogen sulphide gas.',state:'solid',cat:'chemical'},
+'Fe2S3':{name:'Iron(III) Sulphide',desc:'An unstable dark brown solid. Tends to decompose readily into iron and sulphur, or to iron(II) sulphide.',state:'solid',cat:'chemical'},
+
+// ── COPPER COMPOUNDS ──
+'CuO':{name:'Copper(II) Oxide',desc:'A black solid used as a pigment, semiconductor material, and antifouling agent. Reacts with acids to form blue-green copper salts.',state:'solid',cat:'mineral'},
+'Cu2O':{name:'Copper(I) Oxide',desc:'A red solid used as a pigment, in antifouling marine paints, and in solar cells. The red colour of old copper coins.',state:'solid',cat:'mineral'},
+'CuSO4':{name:'Copper Sulphate',desc:'Bright blue crystals (hydrated form). Used as a fungicide, in electroplating baths, and as a laboratory reagent.',state:'solid',useful:true,cat:'chemical',fun:'The striking blue colour of copper sulphate crystals comes from the water molecules incorporated into the crystal structure — anhydrous CuSO₄ is actually white.'},
+'CuCl2':{name:'Copper(II) Chloride',desc:'A yellowish-brown solid used in electroplating, as a wood preservative, and to make other copper compounds.',state:'solid',cat:'chemical'},
+'CuCO3':{name:'Copper Carbonate',desc:'A green solid that gives the green patina to copper statues and roofs (verdigris). The Statue of Liberty gets its green colour from this.',state:'solid',cat:'mineral',fun:'The Statue of Liberty was originally a shiny copper-brown colour — it took about 20 years to turn green as the copper oxidised.'},
+'CuFeS2':{name:'Chalcopyrite',desc:'The most important copper ore mineral, responsible for most of the world\'s copper production. Has a brassy yellow colour.',state:'solid',cat:'ore'},
+
+// ── ZINC ──
+'ZnO':{name:'Zinc Oxide',desc:'A white powder used in sunscreen (blocks UV), paint, rubber vulcanisation, and as an antiseptic. Safe for skin.',state:'solid',useful:true,cat:'mineral'},
+'ZnSO4':{name:'Zinc Sulphate',desc:'Used as a fertiliser to correct zinc deficiency, as a dietary supplement, and in making rayon fibres.',state:'solid',useful:true,cat:'mineral'},
+'ZnCl2':{name:'Zinc Chloride',desc:'A white solid used as a flux in soldering, a wood preservative, and in some dry-cell batteries.',state:'solid',cat:'industrial'},
+'ZnCO3':{name:'Zinc Carbonate',desc:'Found naturally as the mineral smithsonite. Used as a pharmaceutical and as a source of zinc oxide.',state:'solid',cat:'mineral'},
+'ZnS':{name:'Zinc Sulphide',desc:'A white solid that phosphoresces (glows in the dark). Used in fluorescent lights, TV screens, and luminous paint.',state:'solid',useful:true,cat:'mineral',fun:'Zinc sulphide was used to coat the dials of early radium watches — mixed with radium it glowed continuously, dangerously irradiating workers.'},
+
+// ── SILVER ──
+'AgCl':{name:'Silver Chloride',desc:'A white solid that darkens rapidly when exposed to light, making it the basis for traditional photographic film and paper.',state:'solid',cat:'chemical'},
+'AgNO3':{name:'Silver Nitrate',desc:'Used in photography, to detect chloride ions in chemistry labs, as a cauterising agent, and in silver electroplating. Stains skin black.',state:'solid',cat:'chemical'},
+'AgBr':{name:'Silver Bromide',desc:'The primary light-sensitive compound in black-and-white photographic film. Decomposes when exposed to light to form metallic silver.',state:'solid',cat:'chemical',fun:'The entire history of photography from 1839–1990s is largely the history of silver bromide — billions of photographs captured using this compound.'},
+'Ag2O':{name:'Silver Oxide',desc:'Used in silver oxide batteries (watch batteries), as a catalyst, and to purify drinking water.',state:'solid',useful:true,cat:'chemical'},
+'Ag2S':{name:'Silver Sulphide',desc:'The black tarnish that forms on silver objects. The dark crust on old silver coins and jewellery is silver sulphide.',state:'solid',cat:'mineral',fun:'Silverware tarnishes because trace amounts of hydrogen sulphide in the air (from food, pollution, and even human skin) react with the silver.'},
+
+// ── BARIUM ──
+'BaSO4':{name:'Barium Sulphate',desc:'Used as a contrast agent in X-ray digestive imaging ("barium meal"). Safe to swallow because it is completely insoluble — unlike soluble barium salts which are toxic.',state:'solid',useful:true,cat:'medical'},
+'BaCl2':{name:'Barium Chloride',desc:'Used in fireworks to produce a vivid green colour. Highly toxic — very different from the safe BaSO₄ used in medical imaging.',state:'solid',hazardous:true,cat:'toxic'},
+'BaCO3':{name:'Barium Carbonate',desc:'Used in the ceramics industry to prevent the formation of scum on pottery during firing.',state:'solid',cat:'industrial'},
+'BaO':{name:'Barium Oxide',desc:'A white hygroscopic solid used as a drying agent and in the manufacture of some cathode ray tubes.',state:'solid',cat:'industrial'},
+
+// ── LEAD ──
+'PbO':{name:'Lead(II) Oxide',desc:'Used in lead-acid batteries, CRT glass, and historically in paint. Highly toxic — lead poisoning has affected populations throughout history.',state:'solid',hazardous:true,cat:'toxic'},
+'PbSO4':{name:'Lead Sulphate',desc:'The main component in lead-acid car batteries — it forms on both electrodes during discharge and is converted back when charging.',state:'solid',hazardous:true,cat:'industrial'},
+'PbCO3':{name:'White Lead',desc:'Historically used as a white paint pigment. Highly toxic — its use was banned in most countries after causing widespread lead poisoning.',state:'solid',hazardous:true,cat:'toxic',fun:'Roman winemakers used to add lead acetate ("sugar of lead") to sweeten wine — this may have contributed to widespread lead poisoning in the Roman elite.'},
+'PbCl2':{name:'Lead Chloride',desc:'A white solid used in the manufacture of lead salts and as an additive in some glass formulations.',state:'solid',hazardous:true,cat:'toxic'},
+'PbS':{name:'Galena',desc:'The most important ore of lead. A dense, silvery mineral with a bright metallic lustre. Also a natural semiconductor used in early radio crystal sets.',state:'solid',hazardous:true,cat:'ore'},
+
+// ── MERCURY ──
+'HgO':{name:'Mercury(II) Oxide',desc:'A toxic red or yellow solid. Antoine Lavoisier heated it to discover the role of oxygen in combustion — the gas produced was oxygen.',state:'solid',hazardous:true,cat:'toxic',fun:'Lavoisier\'s 1774 experiment with mercury oxide was a pivotal moment that overthrew the phlogiston theory and launched modern chemistry.'},
+'HgCl2':{name:'Mercury(II) Chloride',desc:'Extremely toxic — historically used as an antiseptic and to treat syphilis before safer alternatives were found.',state:'solid',hazardous:true,cat:'toxic'},
+'Hg2Cl2':{name:'Calomel',desc:'Mercury(I) chloride — once widely used as a medicine and in teething powders for infants. Now recognised as dangerously toxic.',state:'solid',hazardous:true,cat:'toxic',fun:'Pink disease, which killed thousands of children in the early 20th century, was caused by mercury in teething powders containing calomel.'},
+'HgS':{name:'Cinnabar',desc:'The main ore of mercury — a brilliant red mineral used as a pigment (vermilion) since antiquity. Highly toxic.',state:'solid',hazardous:true,cat:'mineral'},
+
+// ── CHLORINE & HALOGENS ──
+'Cl2':{name:'Chlorine Gas',desc:'A yellow-green toxic gas with a distinctive choking smell. Used to disinfect water and make PVC. Used as a chemical weapon in WWI.',state:'gas',hazardous:true,cat:'toxic'},
+'F2':{name:'Fluorine Gas',desc:'The most electronegative and reactive of all elements. Reacts violently with almost everything — even water, glass, and some noble gases.',state:'gas',hazardous:true,cat:'reactive'},
+'Br2':{name:'Bromine',desc:'One of only two elements that are liquid at room temperature. A reddish-brown, fuming, toxic liquid with a sharp unpleasant smell.',state:'liquid',hazardous:true,cat:'elemental'},
+'I2':{name:'Iodine',desc:'A lustrous purple-black solid that sublimes directly to a violet vapour. Essential for thyroid hormone production in the body.',state:'solid',cat:'elemental'},
+'ClF3':{name:'Chlorine Trifluoride',desc:'One of the most reactive chemicals known — it ignites materials like asbestos, concrete, and sand on contact, and reacts explosively with water.',state:'gas',hazardous:true,cat:'reactive',fun:'ClF₃ is so reactive that a large leak at a factory burned through 30 cm of concrete and 1 metre of gravel beneath it.'},
+'NaClO':{name:'Sodium Hypochlorite',desc:'The active ingredient in household bleach (typically 3–8% solution). A powerful disinfectant and whitening agent.',state:'liquid',useful:true,cat:'disinfectant'},
+'NaClO3':{name:'Sodium Chlorate',desc:'A powerful oxidiser used as a herbicide and in safety matches. Can be explosive when mixed with organic materials.',state:'solid',hazardous:true,cat:'industrial'},
+
+// ── NOBLE GAS COMPOUNDS ──
+'XeF2':{name:'Xenon Difluoride',desc:'One of the few stable noble gas compounds. A powerful fluorinating agent used in semiconductor manufacturing.',state:'solid',cat:'chemical'},
+'XeF4':{name:'Xenon Tetrafluoride',desc:'The first noble gas compound ever synthesised (1962), disproving the long-held belief that noble gases were completely inert.',state:'solid',cat:'chemical',fun:'The synthesis of XeF₄ in 1962 shocked the chemistry world — it had been dogma for decades that noble gases could not form compounds.'},
+'XeO3':{name:'Xenon Trioxide',desc:'A dangerously explosive compound formed by xenon reacting with water. A very powerful oxidising agent.',state:'solid',hazardous:true,cat:'reactive'},
+
+// ── TRANSITION METALS ──
+'MnO2':{name:'Manganese Dioxide',desc:'Used in dry-cell batteries as a cathode material, as a catalyst, and as a brown-black pigment. Also decolourises glass.',state:'solid',useful:true,cat:'industrial'},
+'MnO':{name:'Manganese(II) Oxide',desc:'A greenish solid used in fertilisers, ceramics, and as a starting material for other manganese compounds.',state:'solid',cat:'mineral'},
+'Mn2O7':{name:'Manganese Heptoxide',desc:'An extremely unstable and dangerously explosive dark green liquid. Ignites organic materials on contact.',state:'liquid',hazardous:true,cat:'reactive'},
+'NiO':{name:'Nickel(II) Oxide',desc:'A black solid used to make nickel salts, as a catalyst, and in nickel-cadmium batteries.',state:'solid',cat:'industrial'},
+'NiSO4':{name:'Nickel Sulphate',desc:'Used in electroplating nickel onto metals to improve corrosion resistance and appearance.',state:'solid',cat:'industrial'},
+'CrO3':{name:'Chromium Trioxide',desc:'A powerful oxidising agent used in chrome plating. A known carcinogen — its use is increasingly restricted.',state:'solid',hazardous:true,cat:'industrial'},
+'Cr2O3':{name:'Chromium(III) Oxide',desc:'A bright green pigment (Chrome Green) used in paints, glass, and as a polishing compound (green rouge).',state:'solid',useful:true,cat:'pigment'},
+'K2Cr2O7':{name:'Potassium Dichromate',desc:'A bright orange crystalline solid used in oxidising reactions and as a mordant for dyeing. A known carcinogen.',state:'solid',hazardous:true,cat:'chemical'},
+'TiO2':{name:'Titanium Dioxide',desc:'The whitest substance known — used as a white pigment in paints, plastics, paper, and sunscreen. Extremely safe and non-toxic.',state:'solid',useful:true,cat:'pigment',fun:'TiO₂ is so white it is used to make the reference standard for measuring how white other things are. It\'s in almost every white paint on Earth.'},
+'TiCl4':{name:'Titanium Tetrachloride',desc:'A colourless fuming liquid used to produce titanium metal and titanium dioxide. Used in skywriting due to its dramatic white smoke when it meets air moisture.',state:'liquid',hazardous:true,cat:'chemical'},
+'WO3':{name:'Tungsten Trioxide',desc:'A yellow solid used in electrochromic windows (smart glass) that can switch from transparent to coloured electrically.',state:'solid',useful:true,cat:'industrial'},
+'WC':{name:'Tungsten Carbide',desc:'Extremely hard (9.5 on Mohs scale) and used in cutting tools, drill bits, and armour-piercing ammunition. Often mistaken for hardened steel.',state:'solid',useful:true,cat:'industrial'},
+'PtCl2':{name:'Platinum Chloride',desc:'Used as a starting material for synthesis of platinum compounds including cisplatin, an important cancer chemotherapy drug.',state:'solid',cat:'chemical'},
+
+// ── GOLD & PRECIOUS METALS ──
+'AuCl3':{name:'Gold(III) Chloride',desc:'A red-brown solid used in photography (gold toning of prints), gilding, and as a catalyst in organic chemistry.',state:'solid',cat:'chemical'},
+'HAuCl4':{name:'Chloroauric Acid',desc:'The compound formed when gold dissolves in aqua regia. The primary form of dissolved gold used in gold plating and nanoparticle synthesis.',state:'solid',cat:'chemical'},
+
+// ── NUCLEAR ──
+'UO2':{name:'Uranium Dioxide',desc:'The primary form of uranium used as nuclear reactor fuel. Small ceramic pellets power cities for years before replacement.',state:'solid',hazardous:true,cat:'nuclear'},
+'UF6':{name:'Uranium Hexafluoride',desc:'Used to enrich uranium for nuclear fuel and weapons. Reacts with water to produce the highly corrosive hydrofluoric acid.',state:'gas',hazardous:true,cat:'nuclear'},
+'PuO2':{name:'Plutonium Dioxide',desc:'The oxide form of plutonium used in MOX nuclear fuel (mixed with uranium) and in radioisotope thermoelectric generators (RTGs) that power deep space probes.',state:'solid',hazardous:true,cat:'nuclear',fun:'The Voyager probes, now in interstellar space, are still powered by the heat from decaying plutonium-238 dioxide.'},
+'Ra':{name:'Radium',desc:'A radioactive alkaline earth metal that glows faint blue-green in the dark due to its radioactivity. Once used in luminous paint for watch dials.',state:'solid',hazardous:true,cat:'radioactive',fun:'The "Radium Girls" — factory workers who painted watch dials with radium paint — suffered devastating radiation injuries. Their legal case established workers\' compensation rights.'},
+
+// ── ATMOSPHERIC & ENVIRONMENTAL ──
+'N2O3':{name:'Dinitrogen Trioxide',desc:'A deep blue liquid that dissociates readily into NO and NO₂. A major component of blue smog.',state:'liquid',hazardous:true,cat:'atmospheric'},
+'ClNO':{name:'Nitrosyl Chloride',desc:'A toxic yellow gas that contributes to the formation of smog and plays a role in stratospheric chemistry.',state:'gas',hazardous:true,cat:'atmospheric'},
+
+// ── BIOLOGICAL & FOOD ──
+'C3H6O3':{name:'Lactic Acid',desc:'Produced by muscles during anaerobic exercise — the burning sensation. Also produced by bacteria fermenting milk to make yogurt and cheese.',state:'liquid',useful:true,cat:'biological',fun:'The burning sensation in muscles during intense exercise was long blamed on lactic acid, but research now shows it\'s actually due to acidic hydrogen ions — lactic acid is relatively benign.'},
+'C6H8O7':{name:'Citric Acid',desc:'Found in citrus fruits and responsible for their sour taste. Widely used as a food preservative and flavouring (E330).',state:'solid',useful:true,cat:'food'},
+'C2H4O2':{name:'Glycolic Acid',desc:'The simplest alpha-hydroxy acid, used in chemical peels and skincare products to exfoliate skin.',state:'solid',useful:true,cat:'organic'},
+'C3H6O2':{name:'Lactic Acid / Propionic Acid',desc:'Propionic acid gives Swiss cheese its characteristic nutty flavour. Also used as a food preservative.',state:'liquid',useful:true,cat:'food'},
+'C4H6O4':{name:'Succinic Acid',desc:'A dicarboxylic acid found in amber (its name comes from the Latin for amber). Used in food, pharmaceuticals, and as a monomer for bioplastics.',state:'solid',useful:true,cat:'organic'},
+'C5H5N5':{name:'Adenine',desc:'One of the four nucleobases in DNA and RNA — pairs with thymine in DNA. Also part of ATP, the primary energy carrier in cells.',state:'solid',useful:true,cat:'biological'},
+'C5H5N5O':{name:'Guanine',desc:'One of the four DNA nucleobases — pairs with cytosine. Also responsible for the iridescent shimmer in fish scales and butterfly wings.',state:'solid',cat:'biological',fun:'Guanine crystals give fish scales and butterfly wings their iridescent shimmer — it\'s also used in cosmetics as a glittery ingredient.'},
+'C4H5N3O':{name:'Cytosine',desc:'One of the four nucleobases of DNA — pairs with guanine. The C in the A, T, G, C alphabet of genetics.',state:'solid',cat:'biological'},
+'C5H6N2O2':{name:'Thymine',desc:'The nucleobase that pairs with adenine in DNA. In RNA, uracil replaces thymine. The T in the genetic A, T, G, C code.',state:'solid',cat:'biological'},
+
+// ── INDUSTRIAL & SPECIALTY ──
+'NaAlO2':{name:'Sodium Aluminate',desc:'Used in water treatment as a flocculant, in paper-making, and as a source of aluminium in zeolite synthesis.',state:'solid',cat:'industrial'},
+'Na2SiO3':{name:'Sodium Silicate',desc:'Water glass — a versatile industrial adhesive, sealant, and egg preservative. Used in fire protection and concrete waterproofing.',state:'solid',useful:true,cat:'industrial'},
+'CaWO4':{name:'Calcium Tungstate',desc:'Scheelite — an important tungsten ore. Also used in fluorescent lighting where it glows blue-white under UV light.',state:'solid',cat:'mineral'},
+'BN':{name:'Boron Nitride',desc:'An extremely hard ceramic used as an abrasive and lubricant. In its cubic form it rivals diamond in hardness.',state:'solid',useful:true,cat:'industrial',fun:'Cubic boron nitride (the compressed form of BN) is the second hardest material known, after diamond — and unlike diamond it doesn\'t react with iron, making it better for cutting steel.'},
+'B2O3':{name:'Boron Trioxide',desc:'Used in borosilicate glass (Pyrex), as a fire retardant, and as a flux in welding and soldering. Absorbs water strongly.',state:'solid',cat:'industrial'},
+'B4C':{name:'Boron Carbide',desc:'One of the hardest materials known (9.3 on Mohs). Used in bullet-proof vests, tank armour, and control rods in nuclear reactors.',state:'solid',useful:true,cat:'industrial'},
+'GaAs':{name:'Gallium Arsenide',desc:'A semiconductor used in microwave-frequency electronics and solar cells. More efficient than silicon for converting light to electricity.',state:'solid',useful:true,cat:'semiconductor'},
+'InP':{name:'Indium Phosphide',desc:'A semiconductor used in high-frequency electronics, fibre optic communications, and solar cells.',state:'solid',useful:true,cat:'semiconductor'},
+'Bi2Te3':{name:'Bismuth Telluride',desc:'One of the best thermoelectric materials — converts heat directly into electricity and vice versa. Used in electronic cooling systems.',state:'solid',useful:true,cat:'semiconductor'},
+'GeO2':{name:'Germanium Dioxide',desc:'Used in optical fibres, wide-angle camera lenses, and infrared optics. Also in the production of germanium metal for semiconductors.',state:'solid',useful:true,cat:'optical'},
+'SnO2':{name:'Tin(IV) Oxide',desc:'Used as a transparent conducting electrode in solar cells, as a gas sensor, and as a polishing agent (jeweller\'s rouge for glass).',state:'solid',useful:true,cat:'industrial'},
+'SnCl2':{name:'Tin(II) Chloride',desc:'A mild reducing agent used in electroplating, food preservation, and as a mordant in dyeing.',state:'solid',useful:true,cat:'chemical'},
+
+// ── ORGANIC SPECIALTY ──
+'C6H5NH2':{name:'Aniline',desc:'An aromatic amine and the foundation of the synthetic dye industry. William Perkin accidentally discovered the first aniline dye (mauve) in 1856.',state:'liquid',hazardous:true,cat:'organic',fun:'William Perkin was 18 years old when he accidentally made the first synthetic dye from aniline while trying to synthesise quinine for malaria.'},
+'C6H5COOH':{name:'Benzoic Acid',desc:'A common food preservative (E210). Also found naturally in many fruits and used as a starting material for many organic compounds.',state:'solid',useful:true,cat:'food'},
+'C2H3N':{name:'Acetonitrile',desc:'The simplest nitrile — a common laboratory solvent with a pleasant ether-like smell. Widely used in chromatography.',state:'liquid',hazardous:true,cat:'solvent'},
+'C8H10N4O2':{name:'Caffeine',desc:'A naturally occurring stimulant found in coffee, tea, cacao, and guarana. The world\'s most widely consumed psychoactive drug.',state:'solid',cat:'alkaloid',fun:'About 90% of adults worldwide consume caffeine daily — making it the most widely used psychoactive substance in history.'},
+'C9H8O4':{name:'Aspirin',desc:'Acetylsalicylic acid — one of the world\'s most widely used drugs. A pain reliever, anti-inflammatory, and blood thinner synthesised from willow bark compounds.',state:'solid',useful:true,cat:'pharmaceutical',fun:'Aspirin has been in use since 1899 and is still one of the most prescribed drugs in the world. Low-dose aspirin prevents heart attacks by thinning the blood.'},
+'C7H5NO3S':{name:'Saccharin',desc:'The first artificial sweetener, discovered in 1879. 300-500× sweeter than sugar, with zero calories. Has a slightly metallic aftertaste.',state:'solid',useful:true,cat:'food',fun:'Saccharin was discovered accidentally when chemist Constantin Fahlberg forgot to wash his hands after a lab session and noticed his dinner tasted unusually sweet.'},
+'C6H5CH2OH':{name:'Benzyl Alcohol',desc:'A naturally occurring aromatic alcohol found in many essential oils. Used as a solvent, preservative, and in fragrances.',state:'liquid',useful:true,cat:'organic'},
+'C10H8':{name:'Naphthalene',desc:'A white crystalline compound with a distinctive mothball smell. The active ingredient in traditional mothballs — repels moths and other insects.',state:'solid',cat:'organic',fun:'Naphthalene is the simplest polycyclic aromatic hydrocarbon and has been detected in interstellar space.'},
+'C14H9Cl5':{name:'DDT',desc:'A once widely used insecticide that decimated bird populations by thinning eggshells. Its ban following Rachel Carson\'s "Silent Spring" launched the modern environmental movement.',state:'solid',hazardous:true,cat:'pesticide',fun:'Rachel Carson\'s 1962 book Silent Spring, documenting DDT\'s environmental damage, is widely credited with launching the modern environmental movement and leading to the founding of Earth Day.'},
+
+// ── POLYMERS & MATERIALS ──
+'C2H4_poly':{name:'Polyethylene (conceptual)',desc:'The world\'s most produced plastic — from milk jugs to bullet-proof vests. Made by polymerising ethylene (C₂H₄) under pressure.',state:'solid',useful:true,cat:'polymer'},
+
+// ── RADICALS & EXOTIC ──
+'NO3':{name:'Nitrate Ion / Nitrogen Trioxide',desc:'NO₃ as a radical is nitrogen trioxide — highly reactive and short-lived in the atmosphere. Plays an important role in nighttime atmospheric chemistry.',state:'gas',cat:'atmospheric'},
+'OH':{name:'Hydroxyl Radical',desc:'One of the most reactive species in the atmosphere — the "detergent" of the atmosphere, breaking down pollutants and greenhouse gases.',state:'gas',cat:'atmospheric'},
 };
 
 // ── canvas setup ──
@@ -413,121 +549,86 @@ const ctx=canvas.getContext('2d');
 const wrap=document.getElementById('canvas-wrap');
 let atoms=[],bonds=[],tool='select',bondStart=null,dragging=null,dragOff={x:0,y:0},nextId=0;
 let discoveries=new Map();
-const R=isMobile()?26:22; // bigger atoms on mobile for fat fingers
-
-function isMobile(){return window.innerWidth<=700;}
+const isMobile=()=>window.innerWidth<=700;
 const isDark=()=>window.matchMedia('(prefers-color-scheme:dark)').matches;
+const R=()=>isMobile()?26:22;
 
 function resize(){
   const dpr=window.devicePixelRatio||1;
   const w=wrap.clientWidth,h=wrap.clientHeight;
   canvas.width=w*dpr;canvas.height=h*dpr;
   canvas.style.width=w+'px';canvas.style.height=h+'px';
-  ctx.scale(dpr,dpr);
-  draw();
+  ctx.scale(dpr,dpr);draw();
 }
-window.addEventListener('resize',()=>{setTimeout(resize,50);});
+window.addEventListener('resize',()=>setTimeout(resize,50));
 resize();
 
-// ── tool management ──
 function setTool(t){
   tool=t;bondStart=null;
   document.querySelectorAll('.tbtn[id^="tool-"]').forEach(b=>b.classList.remove('active'));
-  const el=document.getElementById('tool-'+t);
-  if(el)el.classList.add('active');
+  const el=document.getElementById('tool-'+t);if(el)el.classList.add('active');
   canvas.style.cursor=t==='select'?'default':'crosshair';
-  // update mobile sheet label
   const lbl=document.getElementById('sheet-mode-lbl');
-  if(lbl)lbl.textContent=t==='select'?'tap to place':t==='bond'?'select atom first':t==='erase'?'tap to remove':'tap to place';
+  if(lbl)lbl.textContent=t==='bond'?'select atom first':t==='erase'?'tap to remove':'tap to add';
   draw();
 }
 
-// ── hit testing ──
-function getAtomAt(x,y,radius){
-  const r=radius||(isMobile()?R+8:R+3);
-  for(let i=atoms.length-1;i>=0;i--){
-    if(Math.hypot(atoms[i].x-x,atoms[i].y-y)<r)return atoms[i];
-  }
+function getAtomAt(x,y){
+  const hr=isMobile()?R()+10:R()+4;
+  for(let i=atoms.length-1;i>=0;i--)if(Math.hypot(atoms[i].x-x,atoms[i].y-y)<hr)return atoms[i];
   return null;
 }
-
 function getBondIdx(x,y){
+  const hit=isMobile()?14:9;
   for(let i=bonds.length-1;i>=0;i--){
     const b=bonds[i];
     const a1=atoms.find(a=>a.id===b.a),a2=atoms.find(a=>a.id===b.b);
     if(!a1||!a2)continue;
-    const dx=a2.x-a1.x,dy=a2.y-a1.y,len=Math.hypot(dx,dy);
-    if(len<1)continue;
-    const t=((x-a1.x)*dx+(y-a1.y)*dy)/(len*len);
-    if(t<0.1||t>0.9)continue;
-    const px=a1.x+t*dx,py=a1.y+t*dy;
-    if(Math.hypot(x-px,y-py)<(isMobile()?14:9))return i;
+    const dx=a2.x-a1.x,dy=a2.y-a1.y,len=Math.hypot(dx,dy);if(len<1)continue;
+    const t=((x-a1.x)*dx+(y-a1.y)*dy)/(len*len);if(t<0.1||t>0.9)continue;
+    if(Math.hypot(x-(a1.x+t*dx),y-(a1.y+t*dy))<hit)return i;
   }
   return -1;
 }
 
-// ── pointer helpers (unified mouse + touch) ──
 function evPos(e){
   const r=canvas.getBoundingClientRect();
-  if(e.touches&&e.touches.length>0){
-    return {x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};
-  }
-  if(e.changedTouches&&e.changedTouches.length>0){
-    return {x:e.changedTouches[0].clientX-r.left,y:e.changedTouches[0].clientY-r.top};
-  }
-  return {x:e.clientX-r.left,y:e.clientY-r.top};
+  if(e.touches&&e.touches.length>0)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};
+  if(e.changedTouches&&e.changedTouches.length>0)return{x:e.changedTouches[0].clientX-r.left,y:e.changedTouches[0].clientY-r.top};
+  return{x:e.clientX-r.left,y:e.clientY-r.top};
 }
 
-let touchMoved=false;
-let touchStartPos=null;
-
-function onPointerDown(e){
-  e.preventDefault();
-  touchMoved=false;
-  const p=evPos(e);
-  touchStartPos=p;
-  if(tool==='select'){
-    const a=getAtomAt(p.x,p.y);
-    if(a){dragging=a;dragOff={x:p.x-a.x,y:p.y-a.y};}
-  } else if(tool==='bond'){
-    const a=getAtomAt(p.x,p.y);
-    if(a){bondStart=a;draw();}
-  }
+let touchMoved=false,touchStartPos=null;
+function onDown(e){
+  e.preventDefault();touchMoved=false;
+  const p=evPos(e);touchStartPos=p;
+  if(tool==='select'){const a=getAtomAt(p.x,p.y);if(a){dragging=a;dragOff={x:p.x-a.x,y:p.y-a.y};}}
+  else if(tool==='bond'){const a=getAtomAt(p.x,p.y);if(a){bondStart=a;draw();}}
 }
-
-function onPointerMove(e){
+function onMove(e){
   e.preventDefault();
   const p=evPos(e);
   if(touchStartPos&&Math.hypot(p.x-touchStartPos.x,p.y-touchStartPos.y)>6)touchMoved=true;
-  if(tool==='select'&&dragging){
-    dragging.x=p.x-dragOff.x;dragging.y=p.y-dragOff.y;
-    updateFormula();draw();
-  } else if(tool==='bond'&&bondStart){
+  if(tool==='select'&&dragging){dragging.x=p.x-dragOff.x;dragging.y=p.y-dragOff.y;updateFormula();draw();}
+  else if(tool==='bond'&&bondStart){
     draw();
     ctx.save();ctx.strokeStyle='rgba(127,119,221,0.45)';ctx.lineWidth=2;ctx.setLineDash([5,4]);
     ctx.beginPath();ctx.moveTo(bondStart.x,bondStart.y);ctx.lineTo(p.x,p.y);ctx.stroke();
     ctx.setLineDash([]);ctx.restore();
   }
 }
-
-function onPointerUp(e){
+function onUp(e){
   e.preventDefault();
   const p=evPos(e);
-  if(tool==='select'){
-    if(!touchMoved&&!dragging){
-      // tap on empty canvas — do nothing (atoms added via palette)
-    }
-    dragging=null;
-  } else if(tool==='bond'&&bondStart){
+  if(tool==='select'){dragging=null;}
+  else if(tool==='bond'&&bondStart){
     const a=getAtomAt(p.x,p.y);
     if(a&&a.id!==bondStart.id){
       const order=parseInt(document.getElementById('bond-sel').value)||1;
       const ex=bonds.find(b=>(b.a===bondStart.id&&b.b===a.id)||(b.a===a.id&&b.b===bondStart.id));
       if(ex)ex.order=order;else bonds.push({a:bondStart.id,b:a.id,order});
       updateFormula();showToast('Bond drawn!');
-    } else if(!touchMoved){
-      showToast('Tap another atom to bond');
-    }
+    } else if(!touchMoved){showToast('Tap another atom to bond');}
     bondStart=null;draw();
   } else if(tool==='erase'&&!touchMoved){
     const a=getAtomAt(p.x,p.y);
@@ -536,73 +637,54 @@ function onPointerUp(e){
   }
 }
 
-// bind pointer events
-canvas.addEventListener('mousedown',onPointerDown,{passive:false});
-canvas.addEventListener('mousemove',onPointerMove,{passive:false});
-canvas.addEventListener('mouseup',onPointerUp,{passive:false});
-canvas.addEventListener('touchstart',onPointerDown,{passive:false});
-canvas.addEventListener('touchmove',onPointerMove,{passive:false});
-canvas.addEventListener('touchend',onPointerUp,{passive:false});
+canvas.addEventListener('mousedown',onDown,{passive:false});
+canvas.addEventListener('mousemove',onMove,{passive:false});
+canvas.addEventListener('mouseup',onUp,{passive:false});
+canvas.addEventListener('touchstart',onDown,{passive:false});
+canvas.addEventListener('touchmove',onMove,{passive:false});
+canvas.addEventListener('touchend',onUp,{passive:false});
 
-// double-tap / double-click to cycle bond order
 let lastTap=0;
 canvas.addEventListener('touchend',e=>{
   const now=Date.now();
-  if(now-lastTap<300){
-    const p=evPos(e);
-    const bi=getBondIdx(p.x,p.y);
-    if(bi>=0){bonds[bi].order=(bonds[bi].order%3)+1;draw();showToast(['Single','Double','Triple'][bonds[bi].order-1]+' bond');}
-  }
+  if(now-lastTap<300){const p=evPos(e);const bi=getBondIdx(p.x,p.y);if(bi>=0){bonds[bi].order=(bonds[bi].order%3)+1;draw();showToast(['Single','Double','Triple'][bonds[bi].order-1]+' bond');}}
   lastTap=now;
 },{passive:false});
-canvas.addEventListener('dblclick',e=>{
-  const p=evPos(e);
-  const bi=getBondIdx(p.x,p.y);
-  if(bi>=0){bonds[bi].order=(bonds[bi].order%3)+1;draw();}
-});
+canvas.addEventListener('dblclick',e=>{const p=evPos(e);const bi=getBondIdx(p.x,p.y);if(bi>=0){bonds[bi].order=(bonds[bi].order%3)+1;draw();}});
 
-// ── draw ──
 function drawBond(a1,a2,order){
-  const dx=a2.x-a1.x,dy=a2.y-a1.y,len=Math.hypot(dx,dy);
-  if(len<1)return;
+  const dx=a2.x-a1.x,dy=a2.y-a1.y,len=Math.hypot(dx,dy);if(len<1)return;
   const ux=dx/len,uy=dy/len,px=-uy,py=ux;
-  const x1=a1.x+ux*(R+1),y1=a1.y+uy*(R+1);
-  const x2=a2.x-ux*(R+1),y2=a2.y-uy*(R+1);
+  const r=R();
+  const x1=a1.x+ux*(r+1),y1=a1.y+uy*(r+1),x2=a2.x-ux*(r+1),y2=a2.y-uy*(r+1);
   const col=isDark()?'rgba(210,210,200,0.7)':'rgba(40,40,40,0.6)';
   const gap=isMobile()?4.5:3.5;
-  const offsets=order===1?[0]:order===2?[-gap,gap]:[-gap*1.5,0,gap*1.5];
+  const offs=order===1?[0]:order===2?[-gap,gap]:[-gap*1.6,0,gap*1.6];
   ctx.save();ctx.strokeStyle=col;ctx.lineCap='round';ctx.lineWidth=isMobile()?2.8:2.2;ctx.setLineDash([]);
-  offsets.forEach(off=>{
-    ctx.beginPath();ctx.moveTo(x1+px*off,y1+py*off);ctx.lineTo(x2+px*off,y2+py*off);ctx.stroke();
-  });
+  offs.forEach(o=>{ctx.beginPath();ctx.moveTo(x1+px*o,y1+py*o);ctx.lineTo(x2+px*o,y2+py*o);ctx.stroke();});
   ctx.restore();
 }
 
 function draw(){
-  const w=wrap.clientWidth,h=wrap.clientHeight;
+  const w=wrap.clientWidth,h=wrap.clientHeight,r=R();
   ctx.clearRect(0,0,w,h);
-  // subtle dot grid
   ctx.fillStyle=isDark()?'rgba(255,255,255,0.035)':'rgba(0,0,0,0.04)';
   const gs=isMobile()?36:40;
   for(let gx=gs/2;gx<w;gx+=gs)for(let gy=gs/2;gy<h;gy+=gs){ctx.beginPath();ctx.arc(gx,gy,1,0,Math.PI*2);ctx.fill();}
   bonds.forEach(b=>{const a1=atoms.find(a=>a.id===b.a),a2=atoms.find(a=>a.id===b.b);if(a1&&a2)drawBond(a1,a2,b.order);});
   atoms.forEach(a=>{
-    if(bondStart&&bondStart.id===a.id){
-      ctx.save();ctx.beginPath();ctx.arc(a.x,a.y,R+7,0,Math.PI*2);ctx.fillStyle='rgba(127,119,221,0.2)';ctx.fill();ctx.restore();
-    }
+    if(bondStart&&bondStart.id===a.id){ctx.save();ctx.beginPath();ctx.arc(a.x,a.y,r+7,0,Math.PI*2);ctx.fillStyle='rgba(127,119,221,0.2)';ctx.fill();ctx.restore();}
     ctx.save();
-    ctx.beginPath();ctx.arc(a.x,a.y,R,0,Math.PI*2);ctx.fillStyle=a.col;ctx.fill();
+    ctx.beginPath();ctx.arc(a.x,a.y,r,0,Math.PI*2);ctx.fillStyle=a.col;ctx.fill();
     ctx.strokeStyle='rgba(0,0,0,0.12)';ctx.lineWidth=1;ctx.stroke();
     ctx.fillStyle=a.tc;
     const fs=a.sym.length>2?isMobile()?11:10:a.sym.length===2?isMobile()?13:12:isMobile()?15:14;
-    ctx.font=`700 ${fs}px -apple-system,sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(a.sym,a.x,a.y);
-    ctx.restore();
+    ctx.font=`700 ${fs}px -apple-system,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(a.sym,a.x,a.y);ctx.restore();
   });
 }
 
-// ── desktop drag ──
+// ── desktop drag-and-drop ──
 let draggingEl=null;
 const ghost=document.createElement('div');
 ghost.style.cssText='position:fixed;pointer-events:none;z-index:1000;display:none;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:13px;transform:translate(-50%,-50%);width:44px;height:44px';
@@ -616,19 +698,13 @@ function renderAtomList(containerEl,filter,isGrid){
     if(isGrid){
       btn.className='sheet-atom-btn';
       btn.innerHTML=`<span class="sheet-asym" style="background:${el.col};color:${el.tc}">${el.sym}</span><span class="sheet-aname">${el.name}</span>`;
-      btn.addEventListener('click',()=>{
-        addAtomToCanvas(el);
-        // close sheet after adding
-        closePaletteSheet();
-      });
-      btn.addEventListener('touchstart',()=>{},{ passive:true });
+      btn.addEventListener('click',()=>{addAtomToCanvas(el);closePaletteSheet();});
     } else {
-      btn.className='atom-btn';
-      btn.draggable=true;
+      btn.className='atom-btn';btn.draggable=true;
       btn.innerHTML=`<span class="asym" style="background:${el.col};color:${el.tc}">${el.sym}</span><div class="alabel"><div class="aname">${el.name}</div><div class="asub">Z=${el.num} · ${el.cat}</div></div>`;
       btn.addEventListener('dragstart',ev=>{
         draggingEl=el;ev.dataTransfer.effectAllowed='copy';
-        const img=new Image();ev.dataTransfer.setDragImage(img,0,0);
+        ev.dataTransfer.setDragImage(new Image(),0,0);
         ghost.style.display='flex';ghost.style.background=el.col;ghost.style.color=el.tc;ghost.textContent=el.sym;
       });
       btn.addEventListener('dragend',()=>{ghost.style.display='none';draggingEl=null;});
@@ -647,108 +723,63 @@ canvas.addEventListener('drop',e=>{
   document.getElementById('hint-bar').style.opacity='0';
 });
 
-// ── add atom to center of visible canvas (mobile tap from sheet) ──
 function addAtomToCanvas(el){
   const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;
-  // scatter a bit so they don't all stack
-  const angle=Math.random()*Math.PI*2,dist=atoms.length===0?0:60+Math.random()*40;
-  const x=cx+Math.cos(angle)*dist,y=cy+Math.sin(angle)*dist;
-  atoms.push({id:nextId++,sym:el.sym,col:el.col,tc:el.tc,x,y});
+  const angle=Math.random()*Math.PI*2,dist=atoms.length===0?0:65+Math.random()*40;
+  atoms.push({id:nextId++,sym:el.sym,col:el.col,tc:el.tc,x:cx+Math.cos(angle)*dist,y:cy+Math.sin(angle)*dist});
   updateFormula();draw();
-  showToast(el.name+' added — drag to position');
+  showToast(el.name+' added');
 }
 
-// ── formula ──
+// ── formula helpers ──
+function hillSort(keys){
+  return keys.sort((a,b)=>{const o=k=>k==='C'?0:k==='H'?1:2;if(o(a)!==o(b))return o(a)-o(b);return a.localeCompare(b);});
+}
 function updateFormula(){
-  const count={};
-  atoms.forEach(a=>{count[a.sym]=(count[a.sym]||0)+1;});
-  const keys=Object.keys(count).sort((a,b)=>{const o=k=>k==='C'?0:k==='H'?1:2;if(o(a)!==o(b))return o(a)-o(b);return a.localeCompare(b);});
-  const f=keys.map(k=>k+(count[k]>1?count[k]:'')).join('');
+  const count={};atoms.forEach(a=>{count[a.sym]=(count[a.sym]||0)+1;});
+  const f=hillSort(Object.keys(count)).map(k=>k+(count[k]>1?count[k]:'')).join('');
   document.getElementById('formula-bar').textContent=f||'—';
-  const mf=document.getElementById('mobile-formula');
-  if(mf)mf.textContent=f||'—';
+  const mf=document.getElementById('mobile-formula');if(mf)mf.textContent=f||'—';
 }
 function getFormula(){
-  const count={};
-  atoms.forEach(a=>{count[a.sym]=(count[a.sym]||0)+1;});
-  const keys=Object.keys(count).sort((a,b)=>{const o=k=>k==='C'?0:k==='H'?1:2;if(o(a)!==o(b))return o(a)-o(b);return a.localeCompare(b);});
-  return keys.map(k=>k+(count[k]>1?count[k]:'')).join('');
+  const count={};atoms.forEach(a=>{count[a.sym]=(count[a.sym]||0)+1;});
+  return hillSort(Object.keys(count)).map(k=>k+(count[k]>1?count[k]:'')).join('');
 }
 
-// ── identify ──
-let aiLoading=false;
-async function identify(){
+// ── IDENTIFY — fully offline ──
+function identify(){
   if(atoms.length===0){showToast('Add some atoms first!');return;}
-  if(aiLoading)return;
   const key=getFormula();
-  const local=DB[key];
-
-  if(local){
+  const r=DB[key];
+  if(r){
     const isNew=!discoveries.has(key);
-    if(isNew){discoveries.set(key,local.name);addDisco(key,local.name);}
-    showResultUI(local,key,isNew,false);
-    if(isNew)showToast('Discovered: '+local.name+'!');
+    if(isNew){discoveries.set(key,r.name);addDisco(key,r.name);}
+    showResultUI(r,key,isNew);
+    if(isNew)showToast('Discovered: '+r.name+'!');
     if(isMobile())openDrawer();
-    return;
+  } else {
+    const html=`<div class="res-anim">
+      <div class="res-name" style="font-size:15px">${key}</div>
+      <div class="res-key" style="margin-bottom:8px">Unknown compound</div>
+      <p class="res-desc">This formula isn't in the built-in database. Try a different combination — there are 400+ compounds to discover! Common ones: H₂O, CO₂, NaCl, NH₃, H₂SO₄, C₆H₁₂O₆…</p>
+    </div>`;
+    setResultHTML(html);setFunHTML('',false);
+    if(isMobile())openDrawer();
   }
-
-  // AI
-  aiLoading=true;
-  const idBtn=document.getElementById('id-btn');
-  const midBtn=document.getElementById('mobile-id-btn');
-  const setBtn=(s)=>{if(idBtn)idBtn.innerHTML=s;if(midBtn)midBtn.innerHTML=s;};
-  setBtn('<span class="spinner"></span> Asking AI…');
-  if(idBtn)idBtn.disabled=true;if(midBtn)midBtn.disabled=true;
-  setResultHTML('<p class="res-empty"><span class="spinner"></span> Identifying…</p>');
-  setFunHTML('',false);
-  if(isMobile())openDrawer();
-
-  const bondDesc=bonds.map(b=>{
-    const a1=atoms.find(a=>a.id===b.a),a2=atoms.find(a=>a.id===b.b);
-    if(!a1||!a2)return '';
-    return `${a1.sym}-${a2.sym} ${['single','double','triple'][b.order-1]||'single'} bond`;
-  }).filter(Boolean).join(', ');
-
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,
-        messages:[{role:'user',content:`Identify this molecule: formula ${key}${bondDesc?', bonds: '+bondDesc:''}. Return ONLY raw JSON (no markdown): {name,description(1-2 sentences),state(gas/liquid/solid),useful(bool),hazardous(bool),category(short string),funFact(one interesting sentence or null)}. If chemically impossible, name "Not a real compound" and explain why.`}]})
-    });
-    const data=await res.json();
-    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
-    let p=null;try{p=JSON.parse(text.replace(/```json|```/g,'').trim());}catch(e){}
-    if(p&&p.name){
-      const isNew=!discoveries.has(key)&&p.name!=='Not a real compound';
-      if(isNew){discoveries.set(key,p.name);addDisco(key,p.name);}
-      showResultUI({...p,cat:p.category,desc:p.description,fun:p.funFact},key,isNew,true);
-      if(isNew)showToast('Discovered: '+p.name+'!');
-    } else {
-      setResultHTML(`<p class="res-desc">${text||'Could not identify.'}</p>`);
-    }
-  }catch(e){setResultHTML('<p class="res-empty">AI request failed.</p>');}
-  setBtn('Identify Molecule ✦');
-  if(idBtn)idBtn.disabled=false;if(midBtn)midBtn.disabled=false;
-  aiLoading=false;
 }
 
-function mkResultHTML(r,key,isNew,isAI){
-  return `<div class="res-anim">
+function showResultUI(r,key,isNew){
+  const html=`<div class="res-anim">
     <div class="res-name">${r.name}${isNew?' <span class="badge" style="font-size:9px;vertical-align:middle">New!</span>':''}</div>
     <div class="res-key">${key} · ${r.state||'?'}</div>
-    <div class="res-desc">${r.desc||r.description||''}</div>
+    <div class="res-desc">${r.desc}</div>
     <div class="tags">
       ${r.state?`<span class="tag tag-${r.state}">${r.state}</span>`:''}
       ${r.useful?'<span class="tag tag-useful">useful</span>':''}
       ${r.hazardous?'<span class="tag tag-hazardous">hazardous</span>':''}
       ${r.cat?`<span class="tag tag-cat">${r.cat}</span>`:''}
-      ${isAI?'<span class="tag tag-ai">AI</span>':''}
     </div>
   </div>`;
-}
-
-function showResultUI(r,key,isNew,isAI){
-  const html=mkResultHTML(r,key,isNew,isAI);
   setResultHTML(html);
   setFunHTML(r.fun||'',!!(r.fun));
 }
@@ -758,38 +789,27 @@ function setResultHTML(html){
   const dd=document.getElementById('drawer-result-box');if(dd)dd.innerHTML=html;
 }
 function setFunHTML(text,show){
-  const f=document.getElementById('fun-box');
-  const fd=document.getElementById('drawer-fun-box');
-  if(f){f.style.display=show?'block':'none';if(show)f.textContent='💡 '+text;}
-  if(fd){fd.style.display=show?'block':'none';if(show)fd.textContent='💡 '+text;}
+  [document.getElementById('fun-box'),document.getElementById('drawer-fun-box')].forEach(f=>{
+    if(!f)return;f.style.display=show?'block':'none';if(show)f.textContent='💡 '+text;
+  });
 }
 
 // ── discoveries ──
 function addDisco(key,name){
-  // desktop
-  const list=document.getElementById('disco-list');
-  const empty=list.querySelector('p');if(empty)list.innerHTML='';
-  const item=mkDiscoItem(key,name);list.prepend(item);
+  ['disco-list','drawer-disco-list'].forEach(id=>{
+    const list=document.getElementById(id);if(!list)return;
+    const empty=list.querySelector('p');if(empty)list.innerHTML='';
+    const item=document.createElement('div');item.className='disco-item new-disco';
+    item.innerHTML=`<span class="disco-name">${name}</span><span class="disco-key">${key}</span>`;
+    list.prepend(item);setTimeout(()=>item.classList.remove('new-disco'),1500);
+  });
   document.getElementById('disco-count').textContent=discoveries.size;
-  // mobile drawer
-  const dlist=document.getElementById('drawer-disco-list');
-  const dempty=dlist.querySelector('p');if(dempty)dlist.innerHTML='';
-  const ditem=mkDiscoItem(key,name);dlist.prepend(ditem);
-  document.getElementById('drawer-disco-count').textContent=discoveries.size;
-}
-function mkDiscoItem(key,name){
-  const item=document.createElement('div');
-  item.className='disco-item new-disco';
-  item.innerHTML=`<span class="disco-name">${name}</span><span class="disco-key">${key}</span>`;
-  setTimeout(()=>item.classList.remove('new-disco'),1500);
-  return item;
+  const dc=document.getElementById('drawer-disco-count');if(dc)dc.textContent=discoveries.size;
 }
 function clearDiscos(){
   discoveries.clear();
-  document.getElementById('disco-count').textContent=0;
-  document.getElementById('disco-list').innerHTML='<p style="font-size:11px;color:var(--text3)">None yet!</p>';
-  document.getElementById('drawer-disco-count').textContent=0;
-  document.getElementById('drawer-disco-list').innerHTML='<p style="font-size:12px;color:var(--text3)">None yet!</p>';
+  ['disco-list','drawer-disco-list'].forEach(id=>{const l=document.getElementById(id);if(l)l.innerHTML='<p style="font-size:11px;color:var(--text3)">None yet!</p>';});
+  ['disco-count','drawer-disco-count'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=0;});
 }
 
 // ── mobile sheet / drawer ──
@@ -797,22 +817,18 @@ let sheetOpen=false;
 function openPaletteSheet(){sheetOpen=true;document.getElementById('palette-sheet').classList.add('open');}
 function closePaletteSheet(){sheetOpen=false;document.getElementById('palette-sheet').classList.remove('open');}
 function toggleSheet(){if(sheetOpen)closePaletteSheet();else openPaletteSheet();}
-
 function openDrawer(){document.getElementById('result-drawer').classList.add('open');}
 function closeDrawer(){document.getElementById('result-drawer').classList.remove('open');}
-
-// close sheet when tapping canvas
 canvas.addEventListener('touchstart',()=>{if(sheetOpen)closePaletteSheet();},{passive:true});
 
-// ── canvas clear ──
+// ── clear ──
 function clearCanvas(silent){
   atoms=[];bonds=[];bondStart=null;dragging=null;
   document.getElementById('formula-bar').textContent='—';
   const mf=document.getElementById('mobile-formula');if(mf)mf.textContent='—';
   if(!silent){
     setResultHTML('<p class="res-empty">Build a molecule, then click Identify.</p>');
-    setFunHTML('',false);
-    document.getElementById('hint-bar').style.opacity='1';
+    setFunHTML('',false);document.getElementById('hint-bar').style.opacity='1';
   }
   draw();
 }
@@ -823,7 +839,7 @@ function addA(sym,x,y){
   const a={id:nextId++,sym:el.sym,col:el.col,tc:el.tc,x,y};atoms.push(a);return a;
 }
 
-// ── built-in examples ──
+// ── example molecules ──
 const EXAMPLES=[
   ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const O=addA('O',cx,cy);const H1=addA('H',cx-80,cy+58);const H2=addA('H',cx+80,cy+58);bonds.push({a:O.id,b:H1.id,order:1},{a:O.id,b:H2.id,order:1});},
   ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy);const O1=addA('O',cx-100,cy);const O2=addA('O',cx+100,cy);bonds.push({a:C.id,b:O1.id,order:2},{a:C.id,b:O2.id,order:2});},
@@ -831,7 +847,9 @@ const EXAMPLES=[
   ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const Na=addA('Na',cx-65,cy);const Cl=addA('Cl',cx+65,cy);bonds.push({a:Na.id,b:Cl.id,order:1});},
   ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy);const H1=addA('H',cx,cy-92);const H2=addA('H',cx+87,cy+46);const H3=addA('H',cx-87,cy+46);const H4=addA('H',cx,cy+92);bonds.push({a:C.id,b:H1.id,order:1},{a:C.id,b:H2.id,order:1},{a:C.id,b:H3.id,order:1},{a:C.id,b:H4.id,order:1});},
   ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C1=addA('C',cx-55,cy);const C2=addA('C',cx+55,cy);const H1=addA('H',cx-55,cy-92);const H2=addA('H',cx+55,cy-92);bonds.push({a:C1.id,b:C2.id,order:2},{a:C1.id,b:H1.id,order:1},{a:C2.id,b:H2.id,order:1});},
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C1=addA('C',cx-65,cy);const C2=addA('C',cx+65,cy);const O=addA('O',cx,cy-80);bonds.push({a:C1.id,b:C2.id,order:1},{a:C1.id,b:O.id,order:1},{a:C2.id,b:O.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy);const O1=addA('O',cx-95,cy);const O2=addA('O',cx+70,cy-70);const H=addA('H',cx+115,cy-70);bonds.push({a:C.id,b:O1.id,order:2},{a:C.id,b:O2.id,order:1},{a:O2.id,b:H.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const Fe=addA('Fe',cx-60,cy);const S=addA('S',cx+60,cy);bonds.push({a:Fe.id,b:S.id,order:1},{a:Fe.id,b:S.id,order:2});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy-60);const N=addA('N',cx+80,cy+40);const H1=addA('H',cx-80,cy+40);const H2=addA('H',cx,cy-140);bonds.push({a:C.id,b:N.id,order:3},{a:C.id,b:H1.id,order:1},{a:H2.id,b:C.id,order:1});},
 ];
 
 function surpriseMe(){
@@ -852,28 +870,20 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){bondStart=null;dragging=null;draw();}
 });
 
-// ── toast ──
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2400);
 }
 
 // ── init ──
-// desktop atom list
 renderAtomList(document.getElementById('atom-list'),'',false);
 document.getElementById('atom-search').oninput=e=>renderAtomList(document.getElementById('atom-list'),e.target.value,false);
-
-// mobile sheet atom grid
 renderAtomList(document.getElementById('sheet-atom-list'),'',true);
 document.getElementById('sheet-search').oninput=e=>renderAtomList(document.getElementById('sheet-atom-list'),e.target.value,true);
 
 draw();
 setTimeout(()=>{
-  if(isMobile()){
-    showToast('Tap "+ Elements" to add atoms');
-    // auto-open palette sheet after a beat
-    setTimeout(openPaletteSheet,800);
-  }
+  if(isMobile()){showToast('Tap "+ Elements" to add atoms');setTimeout(openPaletteSheet,800);}
 },300);
 </script>
 </body>

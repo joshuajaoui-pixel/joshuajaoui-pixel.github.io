@@ -2,78 +2,83 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Molecule Lab</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#e8e8e5;
-  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a0a09a;
-  --border:rgba(0,0,0,0.11);--border2:rgba(0,0,0,0.22);
-  --radius:10px;--radius-lg:14px;
-  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#0C447C;
+  --bg:#fff;--bg2:#f5f5f3;--bg3:#eaeae7;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a0;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.2);
   --purple:#7F77DD;--purple-bg:#EEEDFE;--purple-text:#3C3489;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#0C447C;
   --green:#639922;--green-bg:#EAF3DE;--green-text:#27500A;
   --red:#E24B4A;--red-bg:#FCEBEB;--red-text:#791F1F;
   --amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#412402;
   --teal:#1D9E75;--teal-bg:#E1F5EE;--teal-text:#085041;
+  --r:11px;--safe-bottom:env(safe-area-inset-bottom,0px);
+  --palette-h:220px;--toolbar-h:52px;
 }
 @media(prefers-color-scheme:dark){:root{
-  --bg:#1e1e1c;--bg2:#272725;--bg3:#303030;
+  --bg:#1c1c1a;--bg2:#272725;--bg3:#323230;
   --text:#f0efe8;--text2:#a0a098;--text3:#6a6a62;
-  --border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.2);
-  --blue-bg:#0c2d4a;--blue-text:#85B7EB;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.18);
   --purple-bg:#1e1b3a;--purple-text:#AFA9EC;
+  --blue-bg:#0c2d4a;--blue-text:#85B7EB;
   --green-bg:#162209;--green-text:#97C459;
   --red-bg:#2a0f0f;--red-text:#F09595;
   --amber-bg:#281a05;--amber-text:#FAC775;
   --teal-bg:#082b1e;--teal-text:#5DCAA5;
 }}
-html,body{height:100%;overflow:hidden}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
-#app{display:grid;grid-template-columns:185px 1fr 255px;height:100vh}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);touch-action:none;user-select:none;-webkit-user-select:none}
 
-/* LEFT */
-#left{display:flex;flex-direction:column;border-right:0.5px solid var(--border);padding:10px;gap:7px;overflow:hidden}
-#left h1{font-size:15px;font-weight:500}
-#atom-search{width:100%;padding:5px 9px;font-size:12px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);outline:none}
-#atom-search:focus{border-color:var(--border2)}
-#left-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
-#atom-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:1px}
+/* ── DESKTOP LAYOUT ── */
+#app{display:grid;grid-template-columns:190px 1fr 260px;grid-template-rows:100vh;height:100vh}
+#left-panel{grid-column:1;display:flex;flex-direction:column;border-right:0.5px solid var(--border);overflow:hidden}
+#center-panel{grid-column:2;display:flex;flex-direction:column;overflow:hidden;position:relative}
+#right-panel{grid-column:3;display:flex;flex-direction:column;border-left:0.5px solid var(--border);overflow:hidden}
+
+/* ── LEFT: element palette ── */
+.panel-head{padding:12px 12px 8px;flex-shrink:0}
+.panel-head h1{font-size:15px;font-weight:500;margin-bottom:8px}
+.search-inp{width:100%;padding:7px 10px;font-size:13px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);outline:none}
+.search-inp:focus{border-color:var(--border2)}
+.section-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 12px 4px;flex-shrink:0}
+#atom-list{overflow-y:auto;flex:1;padding:2px 6px 8px}
 #atom-list::-webkit-scrollbar{width:3px}
 #atom-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.atom-btn{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:7px;border:none;background:transparent;cursor:grab;transition:background .1s;width:100%;text-align:left;color:var(--text);user-select:none}
-.atom-btn:hover{background:var(--bg2)}
-.atom-btn:active{cursor:grabbing}
-.asym-sm{font-size:12px;font-weight:600;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:5px;flex-shrink:0}
-.alabel .aname{font-size:11px;font-weight:500;color:var(--text)}
-.alabel .asub{font-size:9px;color:var(--text3)}
+.atom-btn{display:flex;align-items:center;gap:8px;padding:7px 7px;border-radius:9px;border:none;background:transparent;cursor:pointer;width:100%;text-align:left;color:var(--text);transition:background .1s}
+.atom-btn:hover,.atom-btn:active{background:var(--bg2)}
+.asym{font-size:12px;font-weight:700;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;flex-shrink:0;letter-spacing:-.02em}
+.alabel .aname{font-size:12px;font-weight:500}
+.alabel .asub{font-size:10px;color:var(--text3)}
 
-/* CENTER */
-#center{display:flex;flex-direction:column;overflow:hidden}
-#toolbar{display:flex;align-items:center;gap:5px;padding:7px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0;flex-wrap:wrap}
-.tbtn{padding:4px 11px;font-size:11px;border-radius:7px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .1s;font-family:inherit;white-space:nowrap}
-.tbtn:hover{background:var(--bg2);color:var(--text)}
+/* ── CENTER: toolbar + canvas ── */
+#toolbar{display:flex;align-items:center;gap:5px;padding:7px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#toolbar::-webkit-scrollbar{display:none}
+.tbtn{padding:6px 12px;font-size:12px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .1s;font-family:inherit;white-space:nowrap;flex-shrink:0;min-height:34px}
+.tbtn:active{transform:scale(.95)}
 .tbtn.active{background:var(--purple-bg);color:var(--purple-text);border-color:transparent}
-.tsep{width:0.5px;height:16px;background:var(--border2);margin:0 1px;flex-shrink:0}
+.tsep{width:0.5px;height:18px;background:var(--border2);flex-shrink:0}
+#bond-sel{padding:5px 8px;font-size:12px;border-radius:8px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-family:inherit;cursor:pointer;flex-shrink:0;min-height:34px}
 #canvas-wrap{flex:1;position:relative;overflow:hidden}
-#mol-canvas{display:block;width:100%;height:100%}
-#hint-bar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text3);background:var(--bg2);padding:3px 12px;border-radius:20px;border:0.5px solid var(--border);pointer-events:none;white-space:nowrap}
-#formula-bar{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:500;color:var(--text);background:var(--bg);padding:4px 14px;border-radius:20px;border:0.5px solid var(--border);pointer-events:none;letter-spacing:.02em;min-width:40px;text-align:center}
+#mol-canvas{display:block;width:100%;height:100%;touch-action:none}
+#formula-bar{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:14px;font-weight:600;color:var(--text);background:var(--bg);padding:5px 16px;border-radius:20px;border:0.5px solid var(--border);pointer-events:none;min-width:44px;text-align:center;letter-spacing:.01em;white-space:nowrap}
+#hint-bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--text3);background:var(--bg2);padding:5px 14px;border-radius:20px;border:0.5px solid var(--border);pointer-events:none;white-space:nowrap;transition:opacity .3s}
 
-/* RIGHT */
-#right{display:flex;flex-direction:column;border-left:0.5px solid var(--border);overflow:hidden}
-#result-area{padding:12px;border-bottom:0.5px solid var(--border);flex-shrink:0}
-#result-area .sec-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
-#result-box{min-height:70px}
-.res-empty{font-size:12px;color:var(--text3);line-height:1.6}
-@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-.res-anim{animation:popIn .2s cubic-bezier(.34,1.56,.64,1)}
-.res-name{font-size:17px;font-weight:500;margin-bottom:2px;line-height:1.2}
-.res-key{font-size:10px;color:var(--text3);font-family:monospace;margin-bottom:5px}
-.res-desc{font-size:11px;color:var(--text2);line-height:1.65;margin-bottom:7px}
+/* ── RIGHT: results + discoveries ── */
+#result-area{padding:14px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.sec-lbl{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+#result-box{min-height:72px}
+.res-empty{font-size:12px;color:var(--text3);line-height:1.65}
+@keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.res-anim{animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
+.res-name{font-size:18px;font-weight:500;line-height:1.2;margin-bottom:3px}
+.res-key{font-size:10px;color:var(--text3);font-family:monospace;margin-bottom:6px}
+.res-desc{font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:8px}
 .tags{display:flex;flex-wrap:wrap;gap:4px}
-.tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.tag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
 .tag-gas{background:var(--blue-bg);color:var(--blue-text)}
 .tag-liquid{background:var(--teal-bg);color:var(--teal-text)}
 .tag-solid{background:var(--bg3);color:var(--text2)}
@@ -81,85 +86,215 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tag-hazardous{background:var(--red-bg);color:var(--red-text)}
 .tag-cat{background:var(--purple-bg);color:var(--purple-text)}
 .tag-ai{background:var(--amber-bg);color:var(--amber-text)}
-#fun-fact-box{font-size:10px;color:var(--amber-text);background:var(--amber-bg);border-radius:7px;padding:7px 9px;margin-top:7px;line-height:1.55;display:none}
-#id-btn{width:100%;margin-top:8px;padding:7px;font-size:12px;font-weight:500;border-radius:var(--radius);border:0.5px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer;font-family:inherit;transition:background .1s}
-#id-btn:hover{background:var(--purple-bg)}
-#id-btn:disabled{opacity:.45;cursor:not-allowed}
+#fun-box{font-size:11px;color:var(--amber-text);background:var(--amber-bg);border-radius:8px;padding:8px 10px;margin-top:8px;line-height:1.55;display:none}
+#id-btn{width:100%;margin-top:10px;padding:9px;font-size:13px;font-weight:500;border-radius:var(--r);border:0.5px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer;font-family:inherit;transition:background .1s;min-height:40px}
+#id-btn:active{background:var(--purple-bg)}
+#id-btn:disabled{opacity:.45}
+#disco-area{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:12px}
+#disco-head{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--purple-bg);color:var(--purple-text)}
+.clr-btn{font-size:10px;color:var(--text3);cursor:pointer;border:none;background:transparent;font-family:inherit;padding:2px 6px}
+#disco-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px}
+.disco-item{padding:7px 9px;border-radius:9px;background:var(--bg2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .1s}
+.disco-item:active{background:var(--bg3)}
+.disco-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.disco-key{font-family:monospace;color:var(--text3);font-size:10px;flex-shrink:0}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.new-disco{animation:slideIn .25s ease}
 
-#disco-area{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:10px}
-#disco-head{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
-.badge{font-size:9px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--purple-bg);color:var(--purple-text)}
-.clr-btn{font-size:9px;color:var(--text3);cursor:pointer;border:none;background:transparent;font-family:inherit}
-.clr-btn:hover{color:var(--text)}
-#disco-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:3px}
-#disco-list::-webkit-scrollbar{width:3px}
-#disco-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.disco-item{padding:5px 8px;border-radius:7px;background:var(--bg2);font-size:11px;cursor:pointer;transition:background .1s;display:flex;align-items:center;justify-content:space-between;gap:6px}
-.disco-item:hover{background:var(--bg3)}
-.disco-name{color:var(--text);font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.disco-key{font-family:monospace;color:var(--text3);font-size:9px;flex-shrink:0}
-@keyframes slideIn{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
-.new-disco{animation:slideIn .22s ease}
-
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius);padding:6px 14px;font-size:11px;color:var(--text);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:999}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:calc(20px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);padding:8px 18px;font-size:13px;color:var(--text);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:9999;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-#drag-ghost{position:fixed;pointer-events:none;z-index:1000;display:none;border-radius:50%;align-items:center;justify-content:center;font-weight:600;font-size:12px;transform:translate(-50%,-50%);width:40px;height:40px}
+
+/* ══════════════════════════════════════
+   MOBILE LAYOUT  (≤ 700px)
+══════════════════════════════════════ */
+@media(max-width:700px){
+  #app{display:flex;flex-direction:column;height:100dvh;height:100vh}
+  #left-panel{display:none} /* hidden – replaced by bottom sheet */
+  #right-panel{display:none} /* hidden – replaced by result drawer */
+  #center-panel{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+  #canvas-wrap{flex:1;min-height:0}
+
+  /* mobile toolbar */
+  #toolbar{padding:6px 8px;gap:4px}
+  .tbtn{padding:6px 10px;font-size:12px;min-height:36px}
+  #bond-sel{font-size:12px;padding:5px 6px;min-height:36px}
+
+  /* ── bottom result bar (tappable pill) ── */
+  #mobile-result-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 14px;border-top:0.5px solid var(--border);
+    background:var(--bg);flex-shrink:0;gap:10px;
+    padding-bottom:calc(10px + var(--safe-bottom));
+  }
+  #mobile-formula{font-size:16px;font-weight:600;color:var(--text);min-width:44px}
+  #mobile-id-btn{padding:8px 16px;font-size:13px;font-weight:500;border-radius:20px;border:0.5px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer;font-family:inherit;white-space:nowrap;min-height:38px}
+  #mobile-id-btn:active{background:var(--purple-bg)}
+  #mobile-id-btn:disabled{opacity:.45}
+
+  /* ── bottom sheet: element palette ── */
+  #palette-sheet{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--bg);
+    border-top:0.5px solid var(--border);
+    border-radius:18px 18px 0 0;
+    z-index:200;
+    transform:translateY(calc(100% - 56px));
+    transition:transform .32s cubic-bezier(.4,0,.2,1);
+    max-height:75dvh;max-height:75vh;
+    display:flex;flex-direction:column;
+    padding-bottom:var(--safe-bottom);
+  }
+  #palette-sheet.open{transform:translateY(0)}
+  #sheet-handle-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 16px 8px;flex-shrink:0;cursor:pointer
+  }
+  #sheet-handle{width:36px;height:4px;background:var(--bg3);border-radius:2px;margin:0 auto}
+  #sheet-handle-row span{font-size:13px;font-weight:500;color:var(--text)}
+  #sheet-search-wrap{padding:0 12px 8px;flex-shrink:0}
+  #sheet-search{width:100%;padding:9px 12px;font-size:14px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);outline:none}
+  #sheet-search:focus{border-color:var(--border2)}
+  #sheet-atom-list{overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 10px 12px;-webkit-overflow-scrolling:touch}
+  .sheet-atom-btn{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;padding:10px 4px;border-radius:10px;border:none;
+    background:var(--bg2);cursor:pointer;transition:background .12s;
+    font-family:inherit;color:var(--text)
+  }
+  .sheet-atom-btn:active{background:var(--bg3);transform:scale(.95)}
+  .sheet-asym{font-size:15px;font-weight:700;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px}
+  .sheet-aname{font-size:9px;color:var(--text3);text-align:center;line-height:1.2}
+
+  /* ── result drawer ── */
+  #result-drawer{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--bg);border-top:0.5px solid var(--border);
+    border-radius:18px 18px 0 0;
+    z-index:300;
+    transform:translateY(100%);
+    transition:transform .32s cubic-bezier(.4,0,.2,1);
+    max-height:80dvh;max-height:80vh;
+    display:flex;flex-direction:column;
+    padding-bottom:var(--safe-bottom);
+  }
+  #result-drawer.open{transform:translateY(0)}
+  #drawer-handle-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 16px 8px;cursor:pointer;flex-shrink:0
+  }
+  #drawer-close{font-size:20px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0 4px;color:var(--text2)}
+  #drawer-body{overflow-y:auto;padding:0 16px 16px;flex:1;-webkit-overflow-scrolling:touch}
+
+  /* hide desktop-only elements */
+  #hint-bar{display:none}
+  #formula-bar{font-size:13px;top:8px}
+}
+/* hide mobile elements on desktop */
+#mobile-result-bar,#palette-sheet,#result-drawer{display:none}
+@media(max-width:700px){
+  #mobile-result-bar{display:flex}
+  #palette-sheet,#result-drawer{display:flex}
+  #result-area,#disco-area{/* keep in DOM, used by drawer */}
+}
 </style>
 </head>
 <body>
 <div id="app">
 
-<div id="left">
-  <h1>⚗️ Molecule Lab</h1>
-  <input id="atom-search" placeholder="Search elements…" autocomplete="off"/>
-  <div id="left-label">Drag onto canvas</div>
-  <div id="atom-list"></div>
-</div>
-
-<div id="center">
-  <div id="toolbar">
-    <button class="tbtn active" id="tool-select" onclick="setTool('select')" title="Select &amp; drag (V)">Select</button>
-    <button class="tbtn" id="tool-bond" onclick="setTool('bond')" title="Draw bonds (B)">Bond</button>
-    <button class="tbtn" id="tool-erase" onclick="setTool('erase')" title="Erase (E)">Erase</button>
-    <div class="tsep"></div>
-    <select id="bond-sel" style="padding:3px 7px;font-size:11px;border-radius:7px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-family:inherit;cursor:pointer">
-      <option value="1">Single —</option>
-      <option value="2">Double =</option>
-      <option value="3">Triple ≡</option>
-    </select>
-    <div class="tsep"></div>
-    <button class="tbtn" onclick="clearCanvas()">Clear</button>
-    <button class="tbtn" onclick="surpriseMe()">Surprise me</button>
-    <div class="tsep"></div>
-    <span style="font-size:10px;color:var(--text3)" id="kb-hint">V / B / E · Enter = identify</span>
-  </div>
-  <div id="canvas-wrap">
-    <canvas id="mol-canvas"></canvas>
-    <div id="formula-bar">—</div>
-    <div id="hint-bar">Drag elements here · Bond mode: click atom → drag to another atom</div>
-  </div>
-</div>
-
-<div id="right">
-  <div id="result-area">
-    <div class="sec-label">Result</div>
-    <div id="result-box"><p class="res-empty">Build a molecule on the canvas, then click Identify.</p></div>
-    <div id="fun-fact-box"></div>
-    <button id="id-btn" onclick="identify()">Identify Molecule ✦</button>
-  </div>
-  <div id="disco-area">
-    <div id="disco-head">
-      Discoveries <span id="disco-count" class="badge">0</span>
-      <button class="clr-btn" onclick="clearDiscos()">clear all</button>
+  <!-- ══ LEFT: desktop element palette ══ -->
+  <div id="left-panel">
+    <div class="panel-head">
+      <h1>⚗️ Molecule Lab</h1>
+      <input class="search-inp" id="atom-search" placeholder="Search elements…" autocomplete="off"/>
     </div>
-    <div id="disco-list"><p style="font-size:11px;color:var(--text3)">None yet!</p></div>
+    <div class="section-label">Drag onto canvas</div>
+    <div id="atom-list"></div>
+  </div>
+
+  <!-- ══ CENTER: canvas ══ -->
+  <div id="center-panel">
+    <div id="toolbar">
+      <button class="tbtn active" id="tool-select" onclick="setTool('select')">Select</button>
+      <button class="tbtn" id="tool-bond" onclick="setTool('bond')">Bond</button>
+      <button class="tbtn" id="tool-erase" onclick="setTool('erase')">Erase</button>
+      <div class="tsep"></div>
+      <select id="bond-sel">
+        <option value="1">Single —</option>
+        <option value="2">Double =</option>
+        <option value="3">Triple ≡</option>
+      </select>
+      <div class="tsep"></div>
+      <button class="tbtn" onclick="clearCanvas()">Clear</button>
+      <button class="tbtn" onclick="surpriseMe()">Surprise me</button>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="mol-canvas"></canvas>
+      <div id="formula-bar">—</div>
+      <div id="hint-bar">Drag elements here · Bond mode: tap atom → tap another</div>
+    </div>
+    <!-- mobile bottom bar -->
+    <div id="mobile-result-bar">
+      <span id="mobile-formula">—</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="tbtn" onclick="openPaletteSheet()" style="font-size:13px;padding:7px 12px">+ Elements</button>
+        <button id="mobile-id-btn" onclick="identify()">Identify ✦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT: desktop results + discoveries ══ -->
+  <div id="right-panel">
+    <div id="result-area">
+      <div class="sec-lbl">Result</div>
+      <div id="result-box"><p class="res-empty">Build a molecule, then click Identify.</p></div>
+      <div id="fun-box"></div>
+      <button id="id-btn" onclick="identify()">Identify Molecule ✦</button>
+    </div>
+    <div id="disco-area">
+      <div id="disco-head">
+        Discoveries <span id="disco-count" class="badge">0</span>
+        <button class="clr-btn" onclick="clearDiscos()">clear</button>
+      </div>
+      <div id="disco-list"><p style="font-size:11px;color:var(--text3)">None yet!</p></div>
+    </div>
   </div>
 </div>
 
+<!-- ══ MOBILE: element palette bottom sheet ══ -->
+<div id="palette-sheet">
+  <div id="sheet-handle-row" onclick="toggleSheet()">
+    <span>Elements</span>
+    <div id="sheet-handle"></div>
+    <span id="sheet-mode-lbl" style="font-size:12px;color:var(--text3)">tap to add</span>
+  </div>
+  <div id="sheet-search-wrap">
+    <input class="search-inp" id="sheet-search" placeholder="Search elements…" autocomplete="off"/>
+  </div>
+  <div id="sheet-atom-list"></div>
 </div>
-<div id="drag-ghost"></div>
+
+<!-- ══ MOBILE: result drawer ══ -->
+<div id="result-drawer">
+  <div id="drawer-handle-row">
+    <span style="font-size:14px;font-weight:500" id="drawer-title">Result</span>
+    <button id="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div id="drawer-body">
+    <div id="drawer-result-box"></div>
+    <div id="drawer-fun-box" style="font-size:11px;color:var(--amber-text);background:var(--amber-bg);border-radius:8px;padding:8px 10px;margin-top:10px;line-height:1.55;display:none"></div>
+    <div id="drawer-disco" style="margin-top:16px">
+      <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        Discoveries <span id="drawer-disco-count" class="badge">0</span>
+      </div>
+      <div id="drawer-disco-list"><p style="font-size:12px;color:var(--text3)">None yet!</p></div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -199,97 +334,88 @@ const ELEMENTS=[
 
 const DB={
   'H2O':{name:'Water',desc:'The most essential molecule for life — a polar solvent covering 71% of Earth and ~60% of your body.',state:'liquid',useful:true,cat:'essential',fun:'Water is the only natural substance that occurs in all three states at temperatures found naturally on Earth.'},
-  'CO2':{name:'Carbon Dioxide',desc:'A greenhouse gas produced by respiration and combustion. Plants absorb it during photosynthesis.',state:'gas',cat:'atmospheric',fun:'CO₂ makes up only 0.04% of the atmosphere, yet has an outsized effect on global climate.'},
-  'O2':{name:'Oxygen Gas',desc:'Diatomic oxygen — makes up 21% of Earth\'s atmosphere. Essential for aerobic respiration.',state:'gas',useful:true,fun:'A single large tree produces enough oxygen per day for about 2 people to breathe.'},
-  'H2':{name:'Hydrogen Gas',desc:'The lightest element. Burns cleanly to produce only water — a promising future fuel.',state:'gas',cat:'fuel',fun:'75% of the entire mass of the universe is hydrogen.'},
-  'N2':{name:'Nitrogen Gas',desc:'Makes up 78% of our atmosphere. Relatively inert — used in food packaging and cryogenics.',state:'gas',fun:'Liquid nitrogen boils at −196°C — cold enough to shatter a rubber ball instantly.'},
-  'NaCl':{name:'Table Salt',desc:'Sodium chloride — essential for life, once used as currency, and used to preserve food for millennia.',state:'solid',useful:true,cat:'food',fun:'The word "salary" comes from Latin "salarium" — Roman soldiers were partly paid in salt.'},
-  'HCl':{name:'Hydrochloric Acid',desc:'A strong acid found in stomach acid. Industrially used in metal cleaning and PVC production.',state:'liquid',hazardous:true,cat:'acid',fun:'Your stomach produces about 1.5 litres of hydrochloric acid every single day.'},
-  'H2SO4':{name:'Sulfuric Acid',desc:'The world\'s most produced industrial chemical. Extremely corrosive and violently reactive with water.',state:'liquid',hazardous:true,cat:'acid',fun:'Over 200 million tonnes of sulfuric acid are produced globally each year.'},
+  'CO2':{name:'Carbon Dioxide',desc:'A greenhouse gas produced by respiration and combustion. Plants absorb it during photosynthesis.',state:'gas',cat:'atmospheric',fun:'CO₂ makes up just 0.04% of the atmosphere yet drives significant climate change.'},
+  'O2':{name:'Oxygen Gas',desc:'Diatomic oxygen — 21% of Earth\'s atmosphere, essential for aerobic respiration.',state:'gas',useful:true,fun:'A single large tree produces enough oxygen per day for about 2 people to breathe.'},
+  'H2':{name:'Hydrogen Gas',desc:'The lightest element. Burns cleanly to produce only water — a promising clean fuel.',state:'gas',cat:'fuel',fun:'75% of the entire mass of the universe is hydrogen.'},
+  'N2':{name:'Nitrogen Gas',desc:'Makes up 78% of our atmosphere. Inert at room temperature; used in food packaging and cryogenics.',state:'gas',fun:'Liquid nitrogen boils at −196°C — cold enough to shatter a rubber ball instantly.'},
+  'NaCl':{name:'Table Salt',desc:'Sodium chloride — essential for life and once so valuable it was used as currency.',state:'solid',useful:true,cat:'food',fun:'The word "salary" comes from the Latin "salarium" — Roman soldiers were partly paid in salt.'},
+  'HCl':{name:'Hydrochloric Acid',desc:'A strong acid found in stomach acid. Used industrially in metal cleaning and PVC production.',state:'liquid',hazardous:true,cat:'acid',fun:'Your stomach produces about 1.5 litres of hydrochloric acid every single day.'},
+  'H2SO4':{name:'Sulfuric Acid',desc:'The world\'s most produced industrial chemical. Extremely corrosive and violent with water.',state:'liquid',hazardous:true,cat:'acid',fun:'Over 200 million tonnes of sulfuric acid are produced globally per year.'},
   'HNO3':{name:'Nitric Acid',desc:'A highly corrosive strong acid used in fertiliser and explosives manufacturing.',state:'liquid',hazardous:true,cat:'acid'},
-  'NH3':{name:'Ammonia',desc:'A pungent gas used in fertilisers. The Haber process synthesises it from N₂ and H₂.',state:'gas',cat:'industrial',fun:'The Haber process for making ammonia is credited with feeding roughly half the world\'s current population.'},
-  'CH4':{name:'Methane',desc:'The primary component of natural gas. A potent greenhouse gas — 80× more warming than CO₂ over 20 years.',state:'gas',cat:'fuel',fun:'Methane has been detected on Mars, fuelling debate about possible past microbial life.'},
-  'C3H8':{name:'Propane',desc:'Liquefied petroleum gas used in heating and cooking — stored as a liquid under pressure.',state:'gas',cat:'fuel'},
+  'NH3':{name:'Ammonia',desc:'A pungent gas used in fertilisers. Synthesised from N₂ and H₂ via the Haber process.',state:'gas',cat:'industrial',fun:'The Haber process feeds roughly half the world\'s current population.'},
+  'CH4':{name:'Methane',desc:'The primary component of natural gas. 80× more warming than CO₂ over 20 years.',state:'gas',cat:'fuel',fun:'Methane has been detected on Mars, fuelling debate about possible microbial life.'},
+  'C3H8':{name:'Propane',desc:'Liquefied petroleum gas used in heating and cooking — stored as liquid under pressure.',state:'gas',cat:'fuel'},
   'C6H12O6':{name:'Glucose',desc:'The primary energy currency of life — produced by plants via photosynthesis.',state:'solid',useful:true,cat:'organic',fun:'Your brain alone consumes about 120g of glucose per day.'},
-  'C12H22O11':{name:'Sucrose',desc:'Common table sugar — a disaccharide of glucose and fructose from sugar cane and beet.',state:'solid',useful:true,cat:'food'},
-  'CO':{name:'Carbon Monoxide',desc:'An odourless, invisible, extremely toxic gas produced by incomplete combustion.',state:'gas',hazardous:true,cat:'toxic',fun:'CO binds to haemoglobin 200× more strongly than oxygen — making it especially deadly.'},
+  'C12H22O11':{name:'Sucrose',desc:'Common table sugar — a disaccharide of glucose and fructose.',state:'solid',useful:true,cat:'food'},
+  'CO':{name:'Carbon Monoxide',desc:'An odourless, invisible, extremely toxic gas from incomplete combustion.',state:'gas',hazardous:true,cat:'toxic',fun:'CO binds to haemoglobin 200× more strongly than oxygen, making it especially deadly.'},
   'SO2':{name:'Sulphur Dioxide',desc:'Produced by volcanoes and fossil fuels. A major cause of acid rain.',state:'gas',cat:'pollutant'},
-  'NO2':{name:'Nitrogen Dioxide',desc:'Reddish-brown toxic gas — the characteristic haze visible over polluted cities.',state:'gas',hazardous:true,cat:'pollutant'},
+  'NO2':{name:'Nitrogen Dioxide',desc:'Reddish-brown toxic gas — the characteristic haze over polluted cities.',state:'gas',hazardous:true,cat:'pollutant'},
   'CaCO3':{name:'Calcium Carbonate',desc:'Found in limestone, chalk, marble, and shells. Used in cement and antacids.',state:'solid',useful:true,cat:'mineral',fun:'The White Cliffs of Dover are almost entirely calcium carbonate — compressed shells of tiny sea creatures.'},
   'NaOH':{name:'Sodium Hydroxide',desc:'Lye or caustic soda — a strong base in soap-making, paper production, and drain cleaners.',state:'solid',hazardous:true,cat:'base',fun:'Traditional pretzels get their shiny crust from being dipped in lye solution before baking.'},
   'SiO2':{name:'Silicon Dioxide',desc:'Quartz — one of Earth\'s most abundant minerals. Used to make glass, optical fibres, and chips.',state:'solid',useful:true,cat:'mineral'},
   'Fe2O3':{name:'Iron(III) Oxide',desc:'The most common form of rust. Gives Mars its red colour.',state:'solid',cat:'mineral',fun:'Mars is red because its surface is coated in iron(III) oxide — a planet-wide layer of rust.'},
-  'Fe3O4':{name:'Magnetite',desc:'The most magnetic of all naturally occurring minerals — used as a compass by ancient navigators.',state:'solid',cat:'mineral'},
+  'Fe3O4':{name:'Magnetite',desc:'The most magnetic naturally occurring mineral — used as a compass by ancient navigators.',state:'solid',cat:'mineral'},
   'ZnO':{name:'Zinc Oxide',desc:'Used in sunscreen (UV blocker), rubber vulcanisation, and as a mild antiseptic.',state:'solid',useful:true,cat:'mineral'},
-  'H2O2':{name:'Hydrogen Peroxide',desc:'Used as a bleach and antiseptic. Decomposes slowly into water and oxygen.',state:'liquid',useful:true,cat:'oxidiser'},
-  'N2O':{name:'Nitrous Oxide',desc:'Laughing gas — used as a dental anaesthetic. Also a potent greenhouse gas.',state:'gas',cat:'medical',fun:'Nitrous oxide was synthesised in 1772 and became popular at "laughing gas parties" in the early 1800s.'},
+  'H2O2':{name:'Hydrogen Peroxide',desc:'Used as a bleach and antiseptic. Slowly decomposes into water and oxygen.',state:'liquid',useful:true,cat:'oxidiser'},
+  'N2O':{name:'Nitrous Oxide',desc:'Laughing gas — a dental anaesthetic and greenhouse gas 300× more potent than CO₂.',state:'gas',cat:'medical',fun:'Nitrous oxide was synthesised in 1772 and became popular at "laughing gas parties" in the early 1800s.'},
   'C2H5OH':{name:'Ethanol',desc:'The alcohol in drinks. Also used as a fuel additive, solvent, and 70% antiseptic.',state:'liquid',useful:true,cat:'organic'},
-  'CH3OH':{name:'Methanol',desc:'Simplest alcohol — extremely toxic. Even small amounts can cause blindness or death.',state:'liquid',hazardous:true,cat:'toxic'},
-  'NaHCO3':{name:'Baking Soda',desc:'Reacts with acids to produce CO₂ — a leavening agent for baking and a gentle antacid.',state:'solid',useful:true,cat:'food'},
+  'CH3OH':{name:'Methanol',desc:'The simplest alcohol — extremely toxic. Even small amounts can cause blindness or death.',state:'liquid',hazardous:true,cat:'toxic'},
+  'NaHCO3':{name:'Baking Soda',desc:'Reacts with acids to release CO₂ — a leavening agent in baking and a gentle antacid.',state:'solid',useful:true,cat:'food'},
   'Na2CO3':{name:'Washing Soda',desc:'Sodium carbonate — a water softener used in cleaning and glass manufacturing.',state:'solid',cat:'useful'},
-  'MgSO4':{name:'Epsom Salt',desc:'Magnesium sulphate — used in bath salts, as a laxative, and in agriculture.',state:'solid',useful:true,cat:'medical'},
+  'MgSO4':{name:'Epsom Salt',desc:'Magnesium sulphate — bath salts, laxative, and agricultural supplement.',state:'solid',useful:true,cat:'medical'},
   'I2':{name:'Iodine',desc:'A purple-black solid that sublimes to violet gas. Essential for thyroid hormone production.',state:'solid',cat:'elemental'},
-  'Cl2':{name:'Chlorine Gas',desc:'Yellow-green toxic gas used to disinfect water. Used as a chemical weapon in WWI.',state:'gas',hazardous:true,cat:'toxic'},
+  'Cl2':{name:'Chlorine Gas',desc:'Yellow-green toxic gas used to purify water. Used as a chemical weapon in WWI.',state:'gas',hazardous:true,cat:'toxic'},
   'FeS2':{name:"Fool's Gold",desc:"Iron pyrite — famous for deceiving gold prospectors. Used in batteries and semiconductors today.",state:'solid',cat:'mineral'},
-  'UO2':{name:'Uranium Dioxide',desc:'The primary nuclear reactor fuel — ceramic pellets that power cities for years.',state:'solid',hazardous:true,cat:'nuclear'},
-  'KNO3':{name:'Potassium Nitrate',desc:'Saltpetre — a key ingredient in gunpowder. Also used in fertilisers and food preservation.',state:'solid',cat:'historical',fun:'Medieval gunpowder was roughly 75% potassium nitrate, 15% charcoal, and 10% sulphur.'},
+  'UO2':{name:'Uranium Dioxide',desc:'The primary nuclear reactor fuel — small ceramic pellets that power cities for years.',state:'solid',hazardous:true,cat:'nuclear'},
+  'KNO3':{name:'Potassium Nitrate',desc:'Saltpetre — a key component of gunpowder. Also used in fertilisers and food preservation.',state:'solid',cat:'historical',fun:'Medieval gunpowder was ~75% KNO₃, 15% charcoal, and 10% sulphur.'},
   'CuSO4':{name:'Copper Sulphate',desc:'Bright blue crystals used as a fungicide, in electroplating, and in chemistry labs.',state:'solid',useful:true,cat:'chemical'},
-  'KMnO4':{name:'Potassium Permanganate',desc:'Deep purple crystals — a powerful oxidiser used to disinfect water and treat wounds.',state:'solid',useful:true,cat:'oxidiser'},
+  'KMnO4':{name:'Potassium Permanganate',desc:'Deep purple crystals — a powerful oxidiser used to disinfect and treat wounds.',state:'solid',useful:true,cat:'oxidiser'},
   'AgNO3':{name:'Silver Nitrate',desc:'Used in photography and to detect chloride ions. Stains skin black permanently.',state:'solid',cat:'chemical'},
   'HF':{name:'Hydrofluoric Acid',desc:'Extremely dangerous — penetrates skin silently, disrupts calcium levels, and etches glass.',state:'liquid',hazardous:true,cat:'acid'},
-  'BaSO4':{name:'Barium Sulphate',desc:'Used as a contrast agent in X-ray digestive imaging (barium meal). Also a white pigment.',state:'solid',useful:true,cat:'medical'},
+  'BaSO4':{name:'Barium Sulphate',desc:'Contrast agent for X-ray digestive imaging (barium meal). Also a white pigment.',state:'solid',useful:true,cat:'medical'},
   'CaCl2':{name:'Calcium Chloride',desc:'Used to de-ice roads, preserve food, and accelerate concrete hardening.',state:'solid',cat:'industrial'},
-  'MgO':{name:'Magnesium Oxide',desc:'Used as a refractory lining in furnaces, an antacid, and a laxative.',state:'solid',cat:'mineral'},
-  'Al2O3':{name:'Corundum',desc:'One of the hardest minerals. Rubies and sapphires are gem forms coloured by trace impurities.',state:'solid',cat:'mineral',fun:'Rubies and sapphires are both Al₂O₃ — the colour difference is just a few trace atoms of chromium or titanium.'},
+  'MgO':{name:'Magnesium Oxide',desc:'Used as a furnace lining, antacid, and laxative.',state:'solid',cat:'mineral'},
+  'Al2O3':{name:'Corundum',desc:'One of the hardest minerals. Rubies and sapphires are gem forms coloured by trace impurities.',state:'solid',cat:'mineral',fun:'Rubies and sapphires are both Al₂O₃ — the colour comes from just a few trace atoms.'},
   'FeCl3':{name:'Iron(III) Chloride',desc:'Used in water treatment and to etch copper circuit boards.',state:'solid',useful:true,cat:'industrial'},
-  'NaI':{name:'Sodium Iodide',desc:'Used in medicine for thyroid imaging and in radiation scintillation detectors.',state:'solid',cat:'medical'},
+  'NaI':{name:'Sodium Iodide',desc:'Used for thyroid imaging and in radiation scintillation detectors.',state:'solid',cat:'medical'},
   'KI':{name:'Potassium Iodide',desc:'Added to salt to prevent iodine deficiency. Distributed near nuclear plants for protection.',state:'solid',useful:true,cat:'medical'},
   'SiC':{name:'Silicon Carbide',desc:'Extremely hard ceramic — used in cutting tools, armour, brake discs, and LEDs.',state:'solid',useful:true,cat:'industrial'},
-  'C6H6':{name:'Benzene',desc:'Sweet-smelling aromatic hydrocarbon — the simplest aromatic compound. A known carcinogen.',state:'liquid',hazardous:true,cat:'organic'},
-  'CH2O':{name:'Formaldehyde',desc:'Pungent toxic gas used to preserve biological specimens and in resin manufacturing.',state:'gas',hazardous:true,cat:'toxic'},
+  'C6H6':{name:'Benzene',desc:'The simplest aromatic hydrocarbon — sweet-smelling and a known carcinogen.',state:'liquid',hazardous:true,cat:'organic'},
+  'CH2O':{name:'Formaldehyde',desc:'Pungent toxic gas used to preserve biological specimens and make resins.',state:'gas',hazardous:true,cat:'toxic'},
   'NO':{name:'Nitric Oxide',desc:'A signalling molecule controlling blood vessel dilation. Also produced by lightning.',state:'gas',cat:'signalling'},
-  'C2H2':{name:'Acetylene',desc:'Burns at 3500°C with oxygen — used in oxy-acetylene welding and cutting torches.',state:'gas',cat:'fuel'},
+  'C2H2':{name:'Acetylene',desc:'Burns at 3500°C with oxygen — used in welding and cutting torches.',state:'gas',cat:'fuel'},
   'H3PO4':{name:'Phosphoric Acid',desc:'Used in fertilisers and as a flavouring in cola drinks — that signature tangy bite.',state:'liquid',cat:'acid',fun:'Phosphoric acid gives Coca-Cola its tang — the drink has a pH of about 2.3.'},
   'SO3':{name:'Sulphur Trioxide',desc:'Reacts with water instantly to form sulfuric acid. A major contributor to acid rain.',state:'gas',cat:'acid'},
   'KCl':{name:'Potassium Chloride',desc:'Used as a salt substitute, in fertilisers, and in IV solutions.',state:'solid',cat:'mineral'},
-  'CaO':{name:'Quicklime',desc:'Made by strongly heating limestone. Reacts violently with water, releasing intense heat.',state:'solid',cat:'industrial'},
-  'Cu2O':{name:'Copper(I) Oxide',desc:'A red solid used as a pigment, antifouling paint additive, and in solar cells.',state:'solid',cat:'mineral'},
-  'CuO':{name:'Copper(II) Oxide',desc:'A black solid semiconductor. Reacts with acids to form blue-green copper salts.',state:'solid',cat:'mineral'},
+  'CaO':{name:'Quicklime',desc:'Made by heating limestone. Reacts violently with water, releasing intense heat.',state:'solid',cat:'industrial'},
+  'Cu2O':{name:'Copper(I) Oxide',desc:'A red solid used as a pigment, antifouling agent, and in solar cells.',state:'solid',cat:'mineral'},
+  'CuO':{name:'Copper(II) Oxide',desc:'A black semiconductor. Reacts with acids to form blue-green copper salts.',state:'solid',cat:'mineral'},
   'MgCl2':{name:'Magnesium Chloride',desc:'Found in seawater and salt lakes. Used for de-icing and in tofu-making.',state:'solid',cat:'mineral'},
   'FeO':{name:'Iron(II) Oxide',desc:'A black magnetic mineral (wüstite). Used in pigments and ceramics.',state:'solid',cat:'mineral'},
   'Na2SO4':{name:'Sodium Sulphate',desc:'Used in detergents, glass production, and the Kraft paper process.',state:'solid',cat:'industrial'},
-  'ZnSO4':{name:'Zinc Sulphate',desc:'Used as a fertiliser, dietary supplement, and in rayon production.',state:'solid',cat:'mineral'},
   'AgCl':{name:'Silver Chloride',desc:'A light-sensitive white precipitate — the principle behind traditional photographic film.',state:'solid',cat:'chemical'},
-  'PbO':{name:'Lead Oxide',desc:'Used in batteries and glass. Highly toxic — lead poisoning has affected populations throughout history.',state:'solid',hazardous:true,cat:'toxic'},
-  'HgO':{name:'Mercury(II) Oxide',desc:'A toxic red solid. Lavoisier used its decomposition to discover the role of oxygen in combustion.',state:'solid',hazardous:true,cat:'toxic'},
+  'PbO':{name:'Lead Oxide',desc:'Used in batteries and glass. Highly toxic — its use is now heavily restricted.',state:'solid',hazardous:true,cat:'toxic'},
   'N2O5':{name:'Dinitrogen Pentoxide',desc:'The anhydride of nitric acid. A powerful oxidiser used in rocket propellants.',state:'solid',cat:'reactive'},
-  'P4O10':{name:'Phosphorus Pentoxide',desc:'An extremely powerful desiccant. Reacts violently with water.',state:'solid',cat:'desiccant'},
-  'BaCl2':{name:'Barium Chloride',desc:'Used in fireworks for vivid green colour. Toxic — very different from the safe BaSO₄ used in medicine.',state:'solid',hazardous:true,cat:'toxic'},
-  'NaHSO4':{name:'Sodium Bisulphate',desc:'Used in toilet bowl cleaners, metal finishing, and as a food additive.',state:'solid',cat:'acid'},
-  'KOH':{name:'Potassium Hydroxide',desc:'A strong base used in soap-making, batteries, and as a food additive (E525).',state:'solid',hazardous:true,cat:'base'},
-  'Ca3P2O8':{name:'Calcium Phosphate',desc:'The mineral that makes up bones and teeth. Also used as a fertiliser.',state:'solid',useful:true,cat:'biological'},
-  'MnO2':{name:'Manganese Dioxide',desc:'Used in dry-cell batteries, as a pigment, and as a catalyst in chemistry.',state:'solid',cat:'industrial'},
-  'Fe2S3':{name:'Iron(III) Sulphide',desc:'An unstable compound that readily decomposes. A dark-coloured solid.',state:'solid',cat:'mineral'},
-  'C2H6':{name:'Ethane',desc:'A simple alkane in natural gas. Used as feedstock to produce ethylene for plastics.',state:'gas'},
-  'C2H4':{name:'Ethylene',desc:'The simplest alkene — a plant hormone that triggers fruit ripening. Also the basis for polyethylene plastic.',state:'gas',cat:'industrial'},
-  'CH3COOH':{name:'Acetic Acid',desc:'The acid in vinegar — responsible for its pungent smell and sour taste.',state:'liquid',useful:true,cat:'organic',fun:'Vinegar is typically 4-8% acetic acid in water. Pure acetic acid is called "glacial" acetic acid.'},
+  'BaCl2':{name:'Barium Chloride',desc:'Used in fireworks for vivid green colour. Toxic — very different from safe BaSO₄.',state:'solid',hazardous:true,cat:'toxic'},
+  'C2H6':{name:'Ethane',desc:'A simple alkane in natural gas. Feedstock for ethylene production.',state:'gas'},
+  'C2H4':{name:'Ethylene',desc:'The simplest alkene — a plant hormone that triggers fruit ripening, and basis for polyethylene.',state:'gas',cat:'industrial'},
+  'CH3COOH':{name:'Acetic Acid',desc:'The acid in vinegar — responsible for its pungent smell and sour taste.',state:'liquid',useful:true,cat:'organic',fun:'Vinegar is typically 4–8% acetic acid in water. Pure acetic acid is called "glacial" acetic acid.'},
+  'ZnSO4':{name:'Zinc Sulphate',desc:'Used as a fertiliser, dietary supplement, and in rayon production.',state:'solid',cat:'mineral'},
+  'MnO2':{name:'Manganese Dioxide',desc:'Used in dry-cell batteries, as a pigment, and as a catalyst.',state:'solid',cat:'industrial'},
+  'KOH':{name:'Potassium Hydroxide',desc:'A strong base used in soap-making, batteries, and as a food additive.',state:'solid',hazardous:true,cat:'base'},
+  'Fe2S3':{name:'Iron(III) Sulphide',desc:'An unstable dark solid. Readily decomposes to iron and sulphur.',state:'solid',cat:'mineral'},
+  'HgO':{name:'Mercury(II) Oxide',desc:'A toxic red solid. Lavoisier used its decomposition to discover the role of oxygen.',state:'solid',hazardous:true,cat:'toxic'},
 };
 
+// ── canvas setup ──
 const canvas=document.getElementById('mol-canvas');
 const ctx=canvas.getContext('2d');
 const wrap=document.getElementById('canvas-wrap');
-
-let atoms=[];
-let bonds=[];
-let tool='select';
-let bondStart=null;
-let dragging=null;
-let dragOff={x:0,y:0};
-let nextId=0;
+let atoms=[],bonds=[],tool='select',bondStart=null,dragging=null,dragOff={x:0,y:0},nextId=0;
 let discoveries=new Map();
-const R=22;
+const R=isMobile()?26:22; // bigger atoms on mobile for fat fingers
 
-// detect dark mode
+function isMobile(){return window.innerWidth<=700;}
 const isDark=()=>window.matchMedia('(prefers-color-scheme:dark)').matches;
 
 function resize(){
@@ -300,21 +426,27 @@ function resize(){
   ctx.scale(dpr,dpr);
   draw();
 }
-window.addEventListener('resize',resize);
+window.addEventListener('resize',()=>{setTimeout(resize,50);});
 resize();
 
+// ── tool management ──
 function setTool(t){
   tool=t;bondStart=null;
   document.querySelectorAll('.tbtn[id^="tool-"]').forEach(b=>b.classList.remove('active'));
   const el=document.getElementById('tool-'+t);
   if(el)el.classList.add('active');
-  canvas.style.cursor=t==='select'?'default':t==='erase'?'crosshair':'crosshair';
+  canvas.style.cursor=t==='select'?'default':'crosshair';
+  // update mobile sheet label
+  const lbl=document.getElementById('sheet-mode-lbl');
+  if(lbl)lbl.textContent=t==='select'?'tap to place':t==='bond'?'select atom first':t==='erase'?'tap to remove':'tap to place';
   draw();
 }
 
-function getAtomAt(x,y){
+// ── hit testing ──
+function getAtomAt(x,y,radius){
+  const r=radius||(isMobile()?R+8:R+3);
   for(let i=atoms.length-1;i>=0;i--){
-    if(Math.hypot(atoms[i].x-x,atoms[i].y-y)<R+3)return atoms[i];
+    if(Math.hypot(atoms[i].x-x,atoms[i].y-y)<r)return atoms[i];
   }
   return null;
 }
@@ -329,80 +461,117 @@ function getBondIdx(x,y){
     const t=((x-a1.x)*dx+(y-a1.y)*dy)/(len*len);
     if(t<0.1||t>0.9)continue;
     const px=a1.x+t*dx,py=a1.y+t*dy;
-    if(Math.hypot(x-px,y-py)<9)return i;
+    if(Math.hypot(x-px,y-py)<(isMobile()?14:9))return i;
   }
   return -1;
 }
 
-let mouseXY={x:0,y:0};
+// ── pointer helpers (unified mouse + touch) ──
+function evPos(e){
+  const r=canvas.getBoundingClientRect();
+  if(e.touches&&e.touches.length>0){
+    return {x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};
+  }
+  if(e.changedTouches&&e.changedTouches.length>0){
+    return {x:e.changedTouches[0].clientX-r.left,y:e.changedTouches[0].clientY-r.top};
+  }
+  return {x:e.clientX-r.left,y:e.clientY-r.top};
+}
 
-canvas.addEventListener('mousedown',e=>{
+let touchMoved=false;
+let touchStartPos=null;
+
+function onPointerDown(e){
   e.preventDefault();
-  const p=cpos(e);
+  touchMoved=false;
+  const p=evPos(e);
+  touchStartPos=p;
   if(tool==='select'){
     const a=getAtomAt(p.x,p.y);
     if(a){dragging=a;dragOff={x:p.x-a.x,y:p.y-a.y};}
   } else if(tool==='bond'){
     const a=getAtomAt(p.x,p.y);
     if(a){bondStart=a;draw();}
-  } else if(tool==='erase'){
-    const a=getAtomAt(p.x,p.y);
-    if(a){bonds=bonds.filter(b=>b.a!==a.id&&b.b!==a.id);atoms=atoms.filter(at=>at.id!==a.id);updateFormula();draw();}
-    else{const bi=getBondIdx(p.x,p.y);if(bi>=0){bonds.splice(bi,1);draw();}}
   }
-});
+}
 
-canvas.addEventListener('mousemove',e=>{
-  const p=cpos(e);mouseXY=p;
+function onPointerMove(e){
+  e.preventDefault();
+  const p=evPos(e);
+  if(touchStartPos&&Math.hypot(p.x-touchStartPos.x,p.y-touchStartPos.y)>6)touchMoved=true;
   if(tool==='select'&&dragging){
     dragging.x=p.x-dragOff.x;dragging.y=p.y-dragOff.y;
     updateFormula();draw();
   } else if(tool==='bond'&&bondStart){
     draw();
-    ctx.save();
-    ctx.strokeStyle='rgba(127,119,221,0.45)';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+    ctx.save();ctx.strokeStyle='rgba(127,119,221,0.45)';ctx.lineWidth=2;ctx.setLineDash([5,4]);
     ctx.beginPath();ctx.moveTo(bondStart.x,bondStart.y);ctx.lineTo(p.x,p.y);ctx.stroke();
     ctx.setLineDash([]);ctx.restore();
   }
-});
+}
 
-canvas.addEventListener('mouseup',e=>{
-  const p=cpos(e);
-  if(tool==='select'){dragging=null;}
-  else if(tool==='bond'&&bondStart){
+function onPointerUp(e){
+  e.preventDefault();
+  const p=evPos(e);
+  if(tool==='select'){
+    if(!touchMoved&&!dragging){
+      // tap on empty canvas — do nothing (atoms added via palette)
+    }
+    dragging=null;
+  } else if(tool==='bond'&&bondStart){
     const a=getAtomAt(p.x,p.y);
     if(a&&a.id!==bondStart.id){
       const order=parseInt(document.getElementById('bond-sel').value)||1;
       const ex=bonds.find(b=>(b.a===bondStart.id&&b.b===a.id)||(b.a===a.id&&b.b===bondStart.id));
-      if(ex)ex.order=order;
-      else bonds.push({a:bondStart.id,b:a.id,order});
-      updateFormula();
+      if(ex)ex.order=order;else bonds.push({a:bondStart.id,b:a.id,order});
+      updateFormula();showToast('Bond drawn!');
+    } else if(!touchMoved){
+      showToast('Tap another atom to bond');
     }
     bondStart=null;draw();
+  } else if(tool==='erase'&&!touchMoved){
+    const a=getAtomAt(p.x,p.y);
+    if(a){bonds=bonds.filter(b=>b.a!==a.id&&b.b!==a.id);atoms=atoms.filter(at=>at.id!==a.id);updateFormula();draw();}
+    else{const bi=getBondIdx(p.x,p.y);if(bi>=0){bonds.splice(bi,1);draw();}}
   }
-});
+}
 
-// double-click to cycle bond order
+// bind pointer events
+canvas.addEventListener('mousedown',onPointerDown,{passive:false});
+canvas.addEventListener('mousemove',onPointerMove,{passive:false});
+canvas.addEventListener('mouseup',onPointerUp,{passive:false});
+canvas.addEventListener('touchstart',onPointerDown,{passive:false});
+canvas.addEventListener('touchmove',onPointerMove,{passive:false});
+canvas.addEventListener('touchend',onPointerUp,{passive:false});
+
+// double-tap / double-click to cycle bond order
+let lastTap=0;
+canvas.addEventListener('touchend',e=>{
+  const now=Date.now();
+  if(now-lastTap<300){
+    const p=evPos(e);
+    const bi=getBondIdx(p.x,p.y);
+    if(bi>=0){bonds[bi].order=(bonds[bi].order%3)+1;draw();showToast(['Single','Double','Triple'][bonds[bi].order-1]+' bond');}
+  }
+  lastTap=now;
+},{passive:false});
 canvas.addEventListener('dblclick',e=>{
-  const p=cpos(e);
+  const p=evPos(e);
   const bi=getBondIdx(p.x,p.y);
   if(bi>=0){bonds[bi].order=(bonds[bi].order%3)+1;draw();}
 });
 
-function cpos(e){
-  const r=canvas.getBoundingClientRect();
-  return {x:e.clientX-r.left,y:e.clientY-r.top};
-}
-
+// ── draw ──
 function drawBond(a1,a2,order){
   const dx=a2.x-a1.x,dy=a2.y-a1.y,len=Math.hypot(dx,dy);
   if(len<1)return;
   const ux=dx/len,uy=dy/len,px=-uy,py=ux;
   const x1=a1.x+ux*(R+1),y1=a1.y+uy*(R+1);
   const x2=a2.x-ux*(R+1),y2=a2.y-uy*(R+1);
-  const col=isDark()?'rgba(210,210,210,0.75)':'rgba(40,40,40,0.65)';
-  const offsets=order===1?[0]:order===2?[-3.5,3.5]:[-5,0,5];
-  ctx.save();ctx.strokeStyle=col;ctx.lineCap='round';ctx.lineWidth=2.2;ctx.setLineDash([]);
+  const col=isDark()?'rgba(210,210,200,0.7)':'rgba(40,40,40,0.6)';
+  const gap=isMobile()?4.5:3.5;
+  const offsets=order===1?[0]:order===2?[-gap,gap]:[-gap*1.5,0,gap*1.5];
+  ctx.save();ctx.strokeStyle=col;ctx.lineCap='round';ctx.lineWidth=isMobile()?2.8:2.2;ctx.setLineDash([]);
   offsets.forEach(off=>{
     ctx.beginPath();ctx.moveTo(x1+px*off,y1+py*off);ctx.lineTo(x2+px*off,y2+py*off);ctx.stroke();
   });
@@ -412,77 +581,93 @@ function drawBond(a1,a2,order){
 function draw(){
   const w=wrap.clientWidth,h=wrap.clientHeight;
   ctx.clearRect(0,0,w,h);
-
-  // grid dots (subtle)
-  ctx.fillStyle=isDark()?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)';
-  for(let gx=30;gx<w;gx+=40)for(let gy=30;gy<h;gy+=40){ctx.beginPath();ctx.arc(gx,gy,1,0,Math.PI*2);ctx.fill();}
-
-  bonds.forEach(b=>{
-    const a1=atoms.find(a=>a.id===b.a),a2=atoms.find(a=>a.id===b.b);
-    if(a1&&a2)drawBond(a1,a2,b.order);
-  });
-
+  // subtle dot grid
+  ctx.fillStyle=isDark()?'rgba(255,255,255,0.035)':'rgba(0,0,0,0.04)';
+  const gs=isMobile()?36:40;
+  for(let gx=gs/2;gx<w;gx+=gs)for(let gy=gs/2;gy<h;gy+=gs){ctx.beginPath();ctx.arc(gx,gy,1,0,Math.PI*2);ctx.fill();}
+  bonds.forEach(b=>{const a1=atoms.find(a=>a.id===b.a),a2=atoms.find(a=>a.id===b.b);if(a1&&a2)drawBond(a1,a2,b.order);});
   atoms.forEach(a=>{
-    // glow for bond-start
     if(bondStart&&bondStart.id===a.id){
-      ctx.save();ctx.beginPath();ctx.arc(a.x,a.y,R+6,0,Math.PI*2);
-      ctx.fillStyle='rgba(127,119,221,0.18)';ctx.fill();ctx.restore();
+      ctx.save();ctx.beginPath();ctx.arc(a.x,a.y,R+7,0,Math.PI*2);ctx.fillStyle='rgba(127,119,221,0.2)';ctx.fill();ctx.restore();
     }
     ctx.save();
-    ctx.beginPath();ctx.arc(a.x,a.y,R,0,Math.PI*2);
-    ctx.fillStyle=a.col;ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,0.15)';ctx.lineWidth=1;ctx.stroke();
+    ctx.beginPath();ctx.arc(a.x,a.y,R,0,Math.PI*2);ctx.fillStyle=a.col;ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.12)';ctx.lineWidth=1;ctx.stroke();
     ctx.fillStyle=a.tc;
-    const fs=a.sym.length>2?10:a.sym.length===2?12:14;
-    ctx.font=`600 ${fs}px -apple-system,sans-serif`;
+    const fs=a.sym.length>2?isMobile()?11:10:a.sym.length===2?isMobile()?13:12:isMobile()?15:14;
+    ctx.font=`700 ${fs}px -apple-system,sans-serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(a.sym,a.x,a.y);
     ctx.restore();
   });
 }
 
-// ---- drag from palette ----
-const ghost=document.getElementById('drag-ghost');
+// ── desktop drag ──
 let draggingEl=null;
+const ghost=document.createElement('div');
+ghost.style.cssText='position:fixed;pointer-events:none;z-index:1000;display:none;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:13px;transform:translate(-50%,-50%);width:44px;height:44px';
+document.body.appendChild(ghost);
 
-function renderAtoms(filter=''){
-  const list=document.getElementById('atom-list');list.innerHTML='';
-  const f=filter.toLowerCase();
+function renderAtomList(containerEl,filter,isGrid){
+  containerEl.innerHTML='';
+  const f=(filter||'').toLowerCase();
   ELEMENTS.filter(a=>!f||a.name.toLowerCase().includes(f)||a.sym.toLowerCase().includes(f)).forEach(el=>{
     const btn=document.createElement('div');
-    btn.className='atom-btn';btn.draggable=true;
-    btn.innerHTML=`<span class="asym-sm" style="background:${el.col};color:${el.tc}">${el.sym}</span><div class="alabel"><div class="aname">${el.name}</div><div class="asub">Z=${el.num} · ${el.cat}</div></div>`;
-    btn.addEventListener('dragstart',ev=>{
-      draggingEl=el;ev.dataTransfer.effectAllowed='copy';
-      const img=new Image();ev.dataTransfer.setDragImage(img,0,0);
-      ghost.style.display='flex';ghost.style.background=el.col;ghost.style.color=el.tc;
-      ghost.textContent=el.sym;
-    });
-    btn.addEventListener('dragend',()=>{ghost.style.display='none';draggingEl=null;});
-    list.appendChild(btn);
+    if(isGrid){
+      btn.className='sheet-atom-btn';
+      btn.innerHTML=`<span class="sheet-asym" style="background:${el.col};color:${el.tc}">${el.sym}</span><span class="sheet-aname">${el.name}</span>`;
+      btn.addEventListener('click',()=>{
+        addAtomToCanvas(el);
+        // close sheet after adding
+        closePaletteSheet();
+      });
+      btn.addEventListener('touchstart',()=>{},{ passive:true });
+    } else {
+      btn.className='atom-btn';
+      btn.draggable=true;
+      btn.innerHTML=`<span class="asym" style="background:${el.col};color:${el.tc}">${el.sym}</span><div class="alabel"><div class="aname">${el.name}</div><div class="asub">Z=${el.num} · ${el.cat}</div></div>`;
+      btn.addEventListener('dragstart',ev=>{
+        draggingEl=el;ev.dataTransfer.effectAllowed='copy';
+        const img=new Image();ev.dataTransfer.setDragImage(img,0,0);
+        ghost.style.display='flex';ghost.style.background=el.col;ghost.style.color=el.tc;ghost.textContent=el.sym;
+      });
+      btn.addEventListener('dragend',()=>{ghost.style.display='none';draggingEl=null;});
+    }
+    containerEl.appendChild(btn);
   });
 }
 
-document.addEventListener('dragover',e=>{
-  e.preventDefault();ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';
-});
+document.addEventListener('dragover',e=>{e.preventDefault();ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';});
 canvas.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy';});
 canvas.addEventListener('drop',e=>{
   e.preventDefault();if(!draggingEl)return;
-  const p=cpos(e);
+  const p=evPos(e);
   atoms.push({id:nextId++,sym:draggingEl.sym,col:draggingEl.col,tc:draggingEl.tc,x:p.x,y:p.y});
   updateFormula();draw();ghost.style.display='none';
-  document.getElementById('hint-bar').style.display='none';
+  document.getElementById('hint-bar').style.opacity='0';
 });
 
+// ── add atom to center of visible canvas (mobile tap from sheet) ──
+function addAtomToCanvas(el){
+  const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;
+  // scatter a bit so they don't all stack
+  const angle=Math.random()*Math.PI*2,dist=atoms.length===0?0:60+Math.random()*40;
+  const x=cx+Math.cos(angle)*dist,y=cy+Math.sin(angle)*dist;
+  atoms.push({id:nextId++,sym:el.sym,col:el.col,tc:el.tc,x,y});
+  updateFormula();draw();
+  showToast(el.name+' added — drag to position');
+}
+
+// ── formula ──
 function updateFormula(){
   const count={};
   atoms.forEach(a=>{count[a.sym]=(count[a.sym]||0)+1;});
   const keys=Object.keys(count).sort((a,b)=>{const o=k=>k==='C'?0:k==='H'?1:2;if(o(a)!==o(b))return o(a)-o(b);return a.localeCompare(b);});
   const f=keys.map(k=>k+(count[k]>1?count[k]:'')).join('');
   document.getElementById('formula-bar').textContent=f||'—';
+  const mf=document.getElementById('mobile-formula');
+  if(mf)mf.textContent=f||'—';
 }
-
 function getFormula(){
   const count={};
   atoms.forEach(a=>{count[a.sym]=(count[a.sym]||0)+1;});
@@ -490,30 +675,33 @@ function getFormula(){
   return keys.map(k=>k+(count[k]>1?count[k]:'')).join('');
 }
 
+// ── identify ──
 let aiLoading=false;
 async function identify(){
   if(atoms.length===0){showToast('Add some atoms first!');return;}
   if(aiLoading)return;
   const key=getFormula();
   const local=DB[key];
-  const panel=document.getElementById('result-box');
-  const ff=document.getElementById('fun-fact-box');
-  const btn=document.getElementById('id-btn');
 
   if(local){
     const isNew=!discoveries.has(key);
     if(isNew){discoveries.set(key,local.name);addDisco(key,local.name);}
-    panel.innerHTML=renderResult(local,key,isNew,false);
-    ff.style.display=local.fun?'block':'none';
-    if(local.fun)ff.textContent='💡 '+local.fun;
+    showResultUI(local,key,isNew,false);
     if(isNew)showToast('Discovered: '+local.name+'!');
+    if(isMobile())openDrawer();
     return;
   }
 
   // AI
   aiLoading=true;
-  btn.innerHTML='<span class="spinner"></span> Asking AI…';btn.disabled=true;
-  panel.innerHTML='<p class="res-empty"><span class="spinner"></span> Identifying…</p>';ff.style.display='none';
+  const idBtn=document.getElementById('id-btn');
+  const midBtn=document.getElementById('mobile-id-btn');
+  const setBtn=(s)=>{if(idBtn)idBtn.innerHTML=s;if(midBtn)midBtn.innerHTML=s;};
+  setBtn('<span class="spinner"></span> Asking AI…');
+  if(idBtn)idBtn.disabled=true;if(midBtn)midBtn.disabled=true;
+  setResultHTML('<p class="res-empty"><span class="spinner"></span> Identifying…</p>');
+  setFunHTML('',false);
+  if(isMobile())openDrawer();
 
   const bondDesc=bonds.map(b=>{
     const a1=atoms.find(a=>a.id===b.a),a2=atoms.find(a=>a.id===b.b);
@@ -524,7 +712,8 @@ async function identify(){
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:`Identify this molecule: formula ${key}${bondDesc?', bonds: '+bondDesc:''}. Return ONLY raw JSON (no markdown, no backticks): {name, description (1-2 sentences), state (gas/liquid/solid), useful (bool), hazardous (bool), category (short string), funFact (one interesting sentence or null)}. If chemically impossible, name it "Not a real compound" and explain in description.`}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,
+        messages:[{role:'user',content:`Identify this molecule: formula ${key}${bondDesc?', bonds: '+bondDesc:''}. Return ONLY raw JSON (no markdown): {name,description(1-2 sentences),state(gas/liquid/solid),useful(bool),hazardous(bool),category(short string),funFact(one interesting sentence or null)}. If chemically impossible, name "Not a real compound" and explain why.`}]})
     });
     const data=await res.json();
     const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
@@ -532,17 +721,18 @@ async function identify(){
     if(p&&p.name){
       const isNew=!discoveries.has(key)&&p.name!=='Not a real compound';
       if(isNew){discoveries.set(key,p.name);addDisco(key,p.name);}
-      panel.innerHTML=renderResult({...p,cat:p.category},key,isNew,true);
-      if(p.funFact){ff.style.display='block';ff.textContent='💡 '+p.funFact;}else ff.style.display='none';
+      showResultUI({...p,cat:p.category,desc:p.description,fun:p.funFact},key,isNew,true);
       if(isNew)showToast('Discovered: '+p.name+'!');
     } else {
-      panel.innerHTML=`<p class="res-desc">${text||'Could not identify this formula.'}</p>`;
+      setResultHTML(`<p class="res-desc">${text||'Could not identify.'}</p>`);
     }
-  }catch(e){panel.innerHTML='<p class="res-empty">AI request failed.</p>';}
-  btn.innerHTML='Identify Molecule ✦';btn.disabled=false;aiLoading=false;
+  }catch(e){setResultHTML('<p class="res-empty">AI request failed.</p>');}
+  setBtn('Identify Molecule ✦');
+  if(idBtn)idBtn.disabled=false;if(midBtn)midBtn.disabled=false;
+  aiLoading=false;
 }
 
-function renderResult(r,key,isNew,isAI){
+function mkResultHTML(r,key,isNew,isAI){
   return `<div class="res-anim">
     <div class="res-name">${r.name}${isNew?' <span class="badge" style="font-size:9px;vertical-align:middle">New!</span>':''}</div>
     <div class="res-key">${key} · ${r.state||'?'}</div>
@@ -557,55 +747,104 @@ function renderResult(r,key,isNew,isAI){
   </div>`;
 }
 
-function addDisco(key,name){
-  const list=document.getElementById('disco-list');
-  const empty=list.querySelector('p');if(empty)list.innerHTML='';
-  const item=document.createElement('div');item.className='disco-item new-disco';
-  item.innerHTML=`<span class="disco-name">${name}</span><span class="disco-key">${key}</span>`;
-  item.title=`${name} (${key})`;
-  list.prepend(item);
-  document.getElementById('disco-count').textContent=discoveries.size;
-  setTimeout(()=>item.classList.remove('new-disco'),1500);
+function showResultUI(r,key,isNew,isAI){
+  const html=mkResultHTML(r,key,isNew,isAI);
+  setResultHTML(html);
+  setFunHTML(r.fun||'',!!(r.fun));
 }
 
+function setResultHTML(html){
+  const d=document.getElementById('result-box');if(d)d.innerHTML=html;
+  const dd=document.getElementById('drawer-result-box');if(dd)dd.innerHTML=html;
+}
+function setFunHTML(text,show){
+  const f=document.getElementById('fun-box');
+  const fd=document.getElementById('drawer-fun-box');
+  if(f){f.style.display=show?'block':'none';if(show)f.textContent='💡 '+text;}
+  if(fd){fd.style.display=show?'block':'none';if(show)fd.textContent='💡 '+text;}
+}
+
+// ── discoveries ──
+function addDisco(key,name){
+  // desktop
+  const list=document.getElementById('disco-list');
+  const empty=list.querySelector('p');if(empty)list.innerHTML='';
+  const item=mkDiscoItem(key,name);list.prepend(item);
+  document.getElementById('disco-count').textContent=discoveries.size;
+  // mobile drawer
+  const dlist=document.getElementById('drawer-disco-list');
+  const dempty=dlist.querySelector('p');if(dempty)dlist.innerHTML='';
+  const ditem=mkDiscoItem(key,name);dlist.prepend(ditem);
+  document.getElementById('drawer-disco-count').textContent=discoveries.size;
+}
+function mkDiscoItem(key,name){
+  const item=document.createElement('div');
+  item.className='disco-item new-disco';
+  item.innerHTML=`<span class="disco-name">${name}</span><span class="disco-key">${key}</span>`;
+  setTimeout(()=>item.classList.remove('new-disco'),1500);
+  return item;
+}
+function clearDiscos(){
+  discoveries.clear();
+  document.getElementById('disco-count').textContent=0;
+  document.getElementById('disco-list').innerHTML='<p style="font-size:11px;color:var(--text3)">None yet!</p>';
+  document.getElementById('drawer-disco-count').textContent=0;
+  document.getElementById('drawer-disco-list').innerHTML='<p style="font-size:12px;color:var(--text3)">None yet!</p>';
+}
+
+// ── mobile sheet / drawer ──
+let sheetOpen=false;
+function openPaletteSheet(){sheetOpen=true;document.getElementById('palette-sheet').classList.add('open');}
+function closePaletteSheet(){sheetOpen=false;document.getElementById('palette-sheet').classList.remove('open');}
+function toggleSheet(){if(sheetOpen)closePaletteSheet();else openPaletteSheet();}
+
+function openDrawer(){document.getElementById('result-drawer').classList.add('open');}
+function closeDrawer(){document.getElementById('result-drawer').classList.remove('open');}
+
+// close sheet when tapping canvas
+canvas.addEventListener('touchstart',()=>{if(sheetOpen)closePaletteSheet();},{passive:true});
+
+// ── canvas clear ──
+function clearCanvas(silent){
+  atoms=[];bonds=[];bondStart=null;dragging=null;
+  document.getElementById('formula-bar').textContent='—';
+  const mf=document.getElementById('mobile-formula');if(mf)mf.textContent='—';
+  if(!silent){
+    setResultHTML('<p class="res-empty">Build a molecule, then click Identify.</p>');
+    setFunHTML('',false);
+    document.getElementById('hint-bar').style.opacity='1';
+  }
+  draw();
+}
+
+// ── addA helper ──
 function addA(sym,x,y){
   const el=ELEMENTS.find(e=>e.sym===sym)||{sym,col:'#ccc',tc:'#333'};
   const a={id:nextId++,sym:el.sym,col:el.col,tc:el.tc,x,y};atoms.push(a);return a;
 }
 
+// ── built-in examples ──
 const EXAMPLES=[
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const O=addA('O',cx,cy);const H1=addA('H',cx-75,cy+55);const H2=addA('H',cx+75,cy+55);bonds.push({a:O.id,b:H1.id,order:1},{a:O.id,b:H2.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const O=addA('O',cx,cy);const H1=addA('H',cx-80,cy+58);const H2=addA('H',cx+80,cy+58);bonds.push({a:O.id,b:H1.id,order:1},{a:O.id,b:H2.id,order:1});},
   ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy);const O1=addA('O',cx-100,cy);const O2=addA('O',cx+100,cy);bonds.push({a:C.id,b:O1.id,order:2},{a:C.id,b:O2.id,order:2});},
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const N=addA('N',cx,cy);const H1=addA('H',cx-75,cy+65);const H2=addA('H',cx+75,cy+65);const H3=addA('H',cx,cy-85);bonds.push({a:N.id,b:H1.id,order:1},{a:N.id,b:H2.id,order:1},{a:N.id,b:H3.id,order:1});},
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const Na=addA('Na',cx-60,cy);const Cl=addA('Cl',cx+60,cy);bonds.push({a:Na.id,b:Cl.id,order:1});},
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy);const H1=addA('H',cx,cy-90);const H2=addA('H',cx+85,cy+45);const H3=addA('H',cx-85,cy+45);const H4=addA('H',cx,cy+90);bonds.push({a:C.id,b:H1.id,order:1},{a:C.id,b:H2.id,order:1},{a:C.id,b:H3.id,order:1},{a:C.id,b:H4.id,order:1});},
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C1=addA('C',cx-50,cy);const C2=addA('C',cx+50,cy);const H1=addA('H',cx-50,cy-90);const H2=addA('H',cx+50,cy-90);bonds.push({a:C1.id,b:C2.id,order:2},{a:C1.id,b:H1.id,order:1},{a:C2.id,b:H2.id,order:1});},
-  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C1=addA('C',cx-60,cy);const C2=addA('C',cx+60,cy);const H1=addA('H',cx-60,cy-90);const H2=addA('H',cx+60,cy-90);const H3=addA('H',cx-60,cy+90);const H4=addA('H',cx+60,cy+90);bonds.push({a:C1.id,b:C2.id,order:1},{a:C1.id,b:H1.id,order:1},{a:C1.id,b:H3.id,order:1},{a:C2.id,b:H2.id,order:1},{a:C2.id,b:H4.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const N=addA('N',cx,cy);const H1=addA('H',cx-80,cy+68);const H2=addA('H',cx+80,cy+68);const H3=addA('H',cx,cy-88);bonds.push({a:N.id,b:H1.id,order:1},{a:N.id,b:H2.id,order:1},{a:N.id,b:H3.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const Na=addA('Na',cx-65,cy);const Cl=addA('Cl',cx+65,cy);bonds.push({a:Na.id,b:Cl.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C=addA('C',cx,cy);const H1=addA('H',cx,cy-92);const H2=addA('H',cx+87,cy+46);const H3=addA('H',cx-87,cy+46);const H4=addA('H',cx,cy+92);bonds.push({a:C.id,b:H1.id,order:1},{a:C.id,b:H2.id,order:1},{a:C.id,b:H3.id,order:1},{a:C.id,b:H4.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C1=addA('C',cx-55,cy);const C2=addA('C',cx+55,cy);const H1=addA('H',cx-55,cy-92);const H2=addA('H',cx+55,cy-92);bonds.push({a:C1.id,b:C2.id,order:2},{a:C1.id,b:H1.id,order:1},{a:C2.id,b:H2.id,order:1});},
+  ()=>{const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;const C1=addA('C',cx-65,cy);const C2=addA('C',cx+65,cy);const O=addA('O',cx,cy-80);bonds.push({a:C1.id,b:C2.id,order:1},{a:C1.id,b:O.id,order:1},{a:C2.id,b:O.id,order:1});},
 ];
 
 function surpriseMe(){
   clearCanvas(true);
   EXAMPLES[Math.floor(Math.random()*EXAMPLES.length)]();
   updateFormula();draw();
-  setTimeout(()=>identify(),80);
+  setTimeout(identify,80);
 }
 
-function clearCanvas(silent){
-  atoms=[];bonds=[];bondStart=null;dragging=null;
-  document.getElementById('formula-bar').textContent='—';
-  if(!silent){
-    document.getElementById('result-box').innerHTML='<p class="res-empty">Build a molecule on the canvas, then click Identify.</p>';
-    document.getElementById('fun-fact-box').style.display='none';
-    document.getElementById('hint-bar').style.display='';
-  }
-  draw();
-}
-
-function clearDiscos(){discoveries.clear();document.getElementById('disco-count').textContent=0;document.getElementById('disco-list').innerHTML='<p style="font-size:11px;color:var(--text3)">None yet!</p>';}
-
-document.getElementById('atom-search').oninput=e=>renderAtoms(e.target.value);
+// ── keyboard shortcuts ──
 document.addEventListener('keydown',e=>{
-  if(document.activeElement===document.getElementById('atom-search'))return;
+  const active=document.activeElement;
+  if(active&&(active.tagName==='INPUT'||active.tagName==='SELECT'))return;
   if(e.key==='v'||e.key==='V')setTool('select');
   if(e.key==='b'||e.key==='B')setTool('bond');
   if(e.key==='e'||e.key==='E')setTool('erase');
@@ -613,12 +852,29 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){bondStart=null;dragging=null;draw();}
 });
 
+// ── toast ──
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-renderAtoms();draw();
+// ── init ──
+// desktop atom list
+renderAtomList(document.getElementById('atom-list'),'',false);
+document.getElementById('atom-search').oninput=e=>renderAtomList(document.getElementById('atom-list'),e.target.value,false);
+
+// mobile sheet atom grid
+renderAtomList(document.getElementById('sheet-atom-list'),'',true);
+document.getElementById('sheet-search').oninput=e=>renderAtomList(document.getElementById('sheet-atom-list'),e.target.value,true);
+
+draw();
+setTimeout(()=>{
+  if(isMobile()){
+    showToast('Tap "+ Elements" to add atoms');
+    // auto-open palette sheet after a beat
+    setTimeout(openPaletteSheet,800);
+  }
+},300);
 </script>
 </body>
 </html>

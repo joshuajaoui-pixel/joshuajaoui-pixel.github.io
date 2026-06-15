@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Voxelore</title>
+<style>
+:root{
+  --bg:#0a0e12;
+  --panel:rgba(14,22,28,0.90);
+  --panel2:rgba(20,30,38,0.95);
+  --edge:#3c4f58;
+  --amber:#e0a847;
+  --amber-dim:#7a5d2c;
+  --cyan:#5fe0d4;
+  --red:#d1453b;
+  --green:#7cc576;
+  --blue:#4a9fd4;
+  --snow:#cfe8ee;
+  --text:#e8e4d8;
+  --text-dim:#8a96a0;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono: 'Courier New', monospace;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none;}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:var(--font);color:var(--text);}
+#game-root{position:fixed;inset:0;width:100%;height:100%;}
+#game-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;outline:none;}
+
+/* ============ shared panel / button / bar styles ============ */
+.panel{
+  background:var(--panel);
+  box-shadow: inset 0 0 0 2px var(--edge), 0 8px 30px rgba(0,0,0,0.5);
+  clip-path: polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  padding:18px;
+}
+.panel.accent{ box-shadow: inset 0 0 0 2px var(--amber), 0 8px 30px rgba(0,0,0,0.5); }
+.panel.accent-cyan{ box-shadow: inset 0 0 0 2px var(--cyan), 0 8px 30px rgba(0,0,0,0.5); }
+
+.btn{
+  font-family:var(--font); font-size:14px; font-weight:600; letter-spacing:0.04em;
+  text-transform:uppercase; color:var(--text); background:var(--panel2);
+  box-shadow: inset 0 0 0 1px var(--edge);
+  clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  padding:10px 22px; cursor:pointer; transition:background .12s, box-shadow .12s, color .12s;
+}
+.btn:hover{ box-shadow: inset 0 0 0 1px var(--amber); color:var(--amber); }
+.btn:active{ background:#1c2a32; }
+.btn.primary{ box-shadow: inset 0 0 0 1px var(--amber); color:var(--amber); }
+.btn.primary:hover{ background:#23303a; }
+.btn:disabled, .btn.disabled{ opacity:0.35; cursor:default; pointer-events:none; }
+.btn.small{ padding:6px 12px; font-size:11px; }
+
+/* ── Minecraft-style pixel slots ── */
+.slot{
+  width:40px;height:40px;background:#8b8b8b;
+  border:2px solid;border-color:#373737 #fff #fff #373737;
+  position:relative;cursor:pointer;image-rendering:pixelated;flex-shrink:0;
+  box-sizing:border-box;
+}
+.slot:hover{background:#9a9a9a;}
+.slot.selected{outline:2px solid #fff;outline-offset:-1px;z-index:1;}
+.slot .icon{position:absolute;inset:3px;background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated;}
+.slot .count{position:absolute;right:2px;bottom:0;font-size:9px;font-weight:700;color:#fff;text-shadow:1px 1px 0 #3f3f3f,-1px 1px 0 #3f3f3f;font-family:var(--mono);pointer-events:none;}
+.slot .key{position:absolute;left:3px;top:1px;font-size:9px;color:rgba(255,255,255,0.6);}
+
+/* ── Hotbar ── */
+#hotbar{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  display:flex;gap:2px;pointer-events:auto;
+  background:#8b8b8b;border:3px solid;border-color:#fff #373737 #373737 #fff;
+  padding:2px;box-shadow:0 4px 14px rgba(0,0,0,0.85);
+}
+
+/* ── Hearts / Hunger HUD ── */
+#mc-hud{
+  position:absolute;bottom:52px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:2px;pointer-events:none;width:364px;
+}
+#hearts-row,#hunger-row{display:flex;gap:2px;height:18px;}
+#hearts-row{justify-content:flex-start;}
+#hunger-row{justify-content:flex-end;}
+.hud-heart,.hud-food{
+  width:18px;height:18px;image-rendering:pixelated;
+  filter:drop-shadow(1px 1px 0 #000);
+}
+
+/* ── Minecraft-style inventory overlay ── */
+#inv-overlay{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  z-index:40;cursor:default;
+}
+#inv-overlay.show{display:flex;}
+.mc-panel{
+  background:#c6c6c6;border:3px solid;border-color:#fff #555 #555 #fff;
+  padding:8px;font-family:var(--mono);color:#404040;
+  box-shadow:4px 4px 0 #000;user-select:none;
+}
+.mc-label{font-size:11px;margin-bottom:4px;color:#404040;}
+.mc-sep{height:2px;background:#555;margin:6px 0 4px;border-top:1px solid #fff;}
+.craft-section{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.craft-grid{display:grid;grid-template-columns:repeat(2,40px);gap:2px;}
+.craft-arrow{font-size:22px;color:#555;padding:0 4px;}
+#craft-output.slot{width:40px;height:40px;}
+.inv-row{display:flex;gap:2px;margin-bottom:2px;}
+.inv-grid{display:flex;flex-direction:column;gap:2px;}
+/* Held-item cursor */
+#held-cursor{
+  position:fixed;pointer-events:none;width:36px;height:36px;z-index:200;
+  image-rendering:pixelated;background-size:contain;background-repeat:no-repeat;background-position:center;
+  display:none;transform:translate(-50%,-50%);
+}
+#held-count{
+  position:fixed;z-index:201;pointer-events:none;font-size:10px;font-weight:700;
+  color:#fff;text-shadow:1px 1px 0 #3f3f3f;font-family:var(--mono);display:none;
+  transform:translate(6px,10px);
+}
+#title-screen{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background: radial-gradient(ellipse at 50% 30%, #1b2a33 0%, #0a0e12 70%);
+  z-index:50; gap:28px;
+}
+#title-screen.hidden{ display:none; }
+.logo{ font-size:min(13vw,86px); font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--amber); font-family:var(--mono);
+  text-shadow: 3px 3px 0 #6b4e22, 6px 6px 0 #3a2c14, 0 0 40px rgba(224,168,71,0.35);
+}
+.logo .accent2{ color:var(--cyan); text-shadow:3px 3px 0 #2a5650, 6px 6px 0 #163230, 0 0 40px rgba(95,224,212,0.35); }
+.subtitle{ color:var(--text-dim); letter-spacing:0.3em; text-transform:uppercase; font-size:12px; margin-top:-18px; }
+.menu-col{ display:flex; flex-direction:column; gap:10px; width:min(86vw,320px); }
+.seed-row{ display:flex; gap:8px; }
+.seed-row input{
+  flex:1; font-family:var(--mono); font-size:14px; padding:10px 12px; background:var(--panel2);
+  color:var(--text); box-shadow: inset 0 0 0 1px var(--edge); border:none;
+  clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+}
+.seed-row input::placeholder{ color:var(--text-dim); }
+.credits{ position:absolute; bottom:14px; font-size:11px; color:var(--text-dim); letter-spacing:0.08em; text-align:center; }
+
+/* ============ HUD ============ */
+#hud{ position:absolute; inset:0; pointer-events:none; z-index:10; display:none; }
+#hud.active{ display:block; }
+#crosshair{
+  position:absolute; top:50%; left:50%; width:18px; height:18px; transform:translate(-50%,-50%);
+}
+#crosshair::before,#crosshair::after{ content:''; position:absolute; background:rgba(255,255,255,0.85); }
+#crosshair::before{ left:50%; top:0; width:2px; height:100%; transform:translateX(-1px); }
+#crosshair::after{ top:50%; left:0; height:2px; width:100%; transform:translateY(-1px); }
+#crosshair.targeting::before,#crosshair.targeting::after{ background:var(--amber); }
+
+#stats-panel{ position:absolute; left:14px; bottom:84px; width:200px; pointer-events:none; }
+#breath-row{ display:none; }
+#breath-row.show{ display:flex; }
+
+#hotbar{
+  position:absolute; left:50%; bottom:12px; transform:translateX(-50%);
+  display:flex; gap:4px; pointer-events:auto;
+}
+.slot{
+  width:52px; height:52px; background:var(--panel2); box-shadow: inset 0 0 0 1px var(--edge);
+  clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+  position:relative; cursor:pointer; image-rendering:pixelated;
+}
+.slot.selected{ box-shadow: inset 0 0 0 2px var(--amber); }
+.slot .icon{ position:absolute; inset:4px; background-size:contain; background-repeat:no-repeat; background-position:center; image-rendering:pixelated; }
+.slot .count{ position:absolute; right:3px; bottom:1px; font-size:11px; font-weight:700; text-shadow:1px 1px 0 #000; }
+.slot .key{ position:absolute; left:3px; top:1px; font-size:10px; color:var(--text-dim); }
+
+#topright{ position:absolute; top:14px; right:14px; display:flex; flex-direction:column; align-items:flex-end; gap:8px; pointer-events:auto; }
+#clock{ width:46px; height:46px; position:relative; }
+#weather-icon{ font-size:20px; opacity:0.85; }
+#hint-bar{ position:absolute; left:50%; top:14px; transform:translateX(-50%); font-size:13px; color:var(--text); background:rgba(10,14,18,0.6); padding:6px 14px; clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); display:none; pointer-events:none; }
+#hint-bar.show{ display:block; }
+
+#mining-progress{ position:absolute; top:56%; left:50%; transform:translate(-50%,0); width:120px; height:6px; background:#10171c; box-shadow: inset 0 0 0 1px var(--edge); display:none; }
+#mining-progress > i{ display:block; height:100%; width:0%; background:var(--amber); }
+#mining-progress.show{ display:block; }
+
+#sun-glow{ position:absolute; inset:0; pointer-events:none; z-index:9; mix-blend-mode:screen; opacity:0; transition:opacity .3s; }
+
+#debug-overlay{
+  position:absolute; left:14px; top:14px; font-family:var(--mono); font-size:12px; color:#bcd; line-height:1.5;
+  background:rgba(8,12,16,0.55); padding:8px 12px; clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  display:none; white-space:pre; pointer-events:none;
+}
+#debug-overlay.show{ display:block; }
+
+/* ============ Modal screens (inventory/crafting/furnace/settings/pause/controls/death) ============ */
+.modal{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:40; background:rgba(5,8,11,0.55); }
+.modal.show{ display:flex; }
+.modal .panel{ width:min(92vw,640px); max-height:86vh; overflow:auto; }
+.modal h2{ margin:0 0 14px; letter-spacing:0.08em; text-transform:uppercase; font-size:18px; color:var(--amber); }
+.modal h2 .cyan{ color:var(--cyan); }
+.modal .close-row{ display:flex; justify-content:flex-end; margin-top:14px; }
+
+.grid{ display:grid; grid-template-columns:repeat(9,52px); gap:4px; justify-content:center; margin-bottom:10px; }
+.tabs{ display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+.tab{ padding:6px 14px; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; background:var(--panel2); box-shadow: inset 0 0 0 1px var(--edge); clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+.tab.active{ box-shadow: inset 0 0 0 1px var(--amber); color:var(--amber); }
+
+.recipe-list{ display:flex; flex-direction:column; gap:6px; max-height:340px; overflow-y:auto; }
+.recipe{ display:flex; align-items:center; gap:10px; padding:8px 10px; background:var(--panel2); box-shadow: inset 0 0 0 1px var(--edge); clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); }
+.recipe.craftable{ box-shadow: inset 0 0 0 1px var(--amber-dim); }
+.recipe .icon{ width:32px; height:32px; background-size:contain; background-repeat:no-repeat; background-position:center; image-rendering:pixelated; flex:none; }
+.recipe .info{ flex:1; font-size:13px; }
+.recipe .info .name{ font-weight:600; }
+.recipe .info .reqs{ color:var(--text-dim); font-size:11px; margin-top:2px; }
+.recipe .reqs .have{ color:var(--green); }
+.recipe .reqs .missing{ color:var(--red); }
+
+.furnace-row{ display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:16px; }
+.furnace-arrow{ width:60px; height:8px; background:#10171c; box-shadow: inset 0 0 0 1px var(--edge); position:relative; }
+.furnace-arrow > i{ display:block; height:100%; width:0%; background:var(--amber); }
+.furnace-arrow::after{ content:'\25B6'; position:absolute; right:-12px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:12px; }
+
+.settings-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid var(--edge); }
+.settings-row:last-child{ border-bottom:none; }
+.settings-row label{ font-size:13px; }
+input[type=range]{ width:140px; accent-color: var(--amber); }
+.toggle{ width:42px; height:22px; background:var(--panel2); box-shadow: inset 0 0 0 1px var(--edge); position:relative; cursor:pointer; clip-path: polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px); }
+.toggle > i{ position:absolute; top:2px; left:2px; width:16px; height:16px; background:var(--text-dim); transition:left .15s, background .15s; }
+.toggle.on{ box-shadow: inset 0 0 0 1px var(--amber); }
+.toggle.on > i{ left:22px; background:var(--amber); }
+
+.controls-grid{ display:grid; grid-template-columns:120px 1fr; gap:6px 14px; font-size:13px; }
+.controls-grid .key{ color:var(--amber); font-family:var(--mono); }
+
+#death-screen .panel{ text-align:center; }
+#death-screen h2{ color:var(--red); }
+
+/* ============ touch controls ============ */
+#touch-controls{ position:absolute; inset:0; pointer-events:none; z-index:8; display:none; }
+#touch-controls.active{ display:block; }
+.touch-zone{ position:absolute; pointer-events:auto; touch-action:none; }
+#touch-look{ right:0; top:0; width:60%; height:70%; }
+#touch-move{ left:0; bottom:0; width:40%; height:50%; }
+#joystick-base{ position:absolute; left:50px; bottom:50px; width:100px; height:100px; border-radius:50%; background:rgba(255,255,255,0.08); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18); }
+#joystick-knob{ position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; background:rgba(255,255,255,0.22); }
+.touch-btn{ position:absolute; pointer-events:auto; width:62px; height:62px; border-radius:50%; background:rgba(20,30,38,0.55); box-shadow: inset 0 0 0 2px var(--edge); display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--text); }
+.touch-btn:active{ background:rgba(224,168,71,0.35); }
+#btn-jump{ right:90px; bottom:130px; }
+#btn-break{ right:18px; bottom:200px; width:74px; height:74px; }
+#btn-place{ right:110px; bottom:60px; }
+#btn-inv{ right:18px; top:70px; width:48px; height:48px; font-size:18px; }
+
+@media (min-width:900px){
+  #touch-controls{ display:none !important; }
+}
+</style>
+</head>
+<body>
+<div id="game-root">
+  <canvas id="game-canvas"></canvas>
+
+  <!-- ================= TITLE SCREEN ================= -->
+  <div id="title-screen">
+    <div class="logo">VOX<span class="accent2">EL</span>ORE</div>
+    <div class="subtitle">an original voxel sandbox</div>
+    <div class="menu-col">
+      <div class="seed-row">
+        <input id="seed-input" type="text" placeholder="World seed (optional)" maxlength="24">
+      </div>
+      <button class="btn primary" id="btn-new-world">Generate World</button>
+      <button class="btn" id="btn-continue" disabled>Continue</button>
+      <button class="btn" id="btn-controls">Controls</button>
+    </div>
+    <div class="credits">Voxelore — fully original assets, code, shaders &amp; audio, generated from scratch.</div>
+  </div>
+
+  <!-- ================= HUD ================= -->
+  <div id="hud">
+    <div id="crosshair"></div>
+    <div id="sun-glow"></div>
+    <div id="hint-bar"></div>
+    <div id="mining-progress"><i></i></div>
+    <div id="debug-overlay"></div>
+
+    <div id="stats-panel">
+      <div class="stat-row"><svg class="stat-icon" viewBox="0 0 16 16"><path fill="#d1453b" d="M8 14 1.5 7.5a3.5 3.5 0 0 1 5-5L8 4l1.5-1.5a3.5 3.5 0 0 1 5 5z"/></svg><div class="statbar health"><i style="width:100%"></i></div></div>
+      <div class="stat-row"><svg class="stat-icon" viewBox="0 0 16 16"><path fill="#e0a847" d="M4 2h2v5l-1 2v5H4V9L3 7zM10 2h2v12h-2V9c-1.5 0-2.5-1-2.5-2.5S8.5 4 10 4z"/></svg><div class="statbar hunger"><i style="width:100%"></i></div></div>
+      <div class="stat-row"><svg class="stat-icon" viewBox="0 0 16 16"><path fill="#7cc576" d="M8 1l2 4 4 .5-3 3 .8 4.5L8 11l-3.8 2 .8-4.5-3-3L6 5z"/></svg><div class="statbar stamina"><i style="width:100%"></i></div></div>
+      <div class="stat-row"><svg class="stat-icon" viewBox="0 0 16 16"><path fill="#4a9fd4" d="M8 1c2 3 4 5.5 4 8.2A4 4 0 0 1 4 9.2C4 6.5 6 4 8 1z"/></svg><div class="statbar hydration"><i style="width:100%"></i></div></div>
+      <div class="stat-row"><svg class="stat-icon" viewBox="0 0 16 16"><path fill="#cfe8ee" d="M8 0v16M2 4l12 8M14 4 2 12" stroke="#cfe8ee" stroke-width="1.4" fill="none"/></svg><div class="statbar temperature"><i></i><div id="temp-marker" style="position:absolute;top:-3px;width:3px;height:16px;background:#fff;left:50%;"></div></div></div>
+      <div class="stat-row" id="breath-row"><svg class="stat-icon" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="#bfe3ff" stroke-width="1.5" fill="none"/></svg><div class="statbar hydration"><i id="breath-bar" style="width:100%;background:#bfe3ff"></i></div></div>
+    </div>
+
+    <div id="hotbar"></div>
+
+    <div id="topright">
+      <svg id="clock" viewBox="0 0 46 46">
+        <circle cx="23" cy="23" r="21" fill="rgba(10,14,18,0.55)" stroke="#3c4f58" stroke-width="2"/>
+        <g id="clock-face"></g>
+      </svg>
+      <div id="weather-icon">☀</div>
+    </div>
+  </div>
+
+  <!-- ================= TOUCH CONTROLS ================= -->
+  <div id="touch-controls">
+    <div class="touch-zone" id="touch-look"></div>
+    <div class="touch-zone" id="touch-move">
+      <div id="joystick-base"><div id="joystick-knob"></div></div>
+    </div>
+    <div class="touch-btn" id="btn-jump">▲</div>
+    <div class="touch-btn" id="btn-break">⛏</div>
+    <div class="touch-btn" id="btn-place">▮</div>
+    <div class="touch-btn" id="btn-inv">▤</div>
+  </div>
+
+  <!-- ================= INVENTORY ================= -->
+  <div class="modal" id="inventory-modal">
+    <div class="panel accent">
+      <h2>Inventory</h2>
+      <div class="grid" id="inventory-grid"></div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:10px;">Click a slot to move it to the hotbar / first empty slot</div>
+      <div class="close-row"><button class="btn primary" id="inv-close">Close (E)</button></div>
+    </div>
+  </div>
+
+  <!-- ================= CRAFTING ================= -->
+  <div class="modal" id="crafting-modal">
+    <div class="panel accent">
+      <h2 id="crafting-title">Crafting</h2>
+      <div class="tabs" id="crafting-tabs"></div>
+      <div class="recipe-list" id="recipe-list"></div>
+      <div class="close-row"><button class="btn primary" id="craft-close">Close</button></div>
+    </div>
+  </div>
+
+  <!-- ================= FURNACE ================= -->
+  <div class="modal" id="furnace-modal">
+    <div class="panel accent-cyan">
+      <h2>Furnace</h2>
+      <div class="furnace-row">
+        <div class="slot" id="furnace-input"><div class="icon"></div><div class="count"></div></div>
+        <div class="furnace-arrow"><i id="furnace-progress"></i></div>
+        <div class="slot" id="furnace-output"><div class="icon"></div><div class="count"></div></div>
+      </div>
+      <div class="furnace-row" style="margin-top:-4px;">
+        <div class="slot" id="furnace-fuel"><div class="icon"></div><div class="count"></div></div>
+        <div style="font-size:12px;color:var(--text-dim);max-width:220px;">Fuel: coal, planks or logs. Click input/fuel slots to load from your held item.</div>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);text-align:center;margin-bottom:6px;">Hold an item on the hotbar, then click a furnace slot to load it. Click output to collect.</div>
+      <div class="close-row"><button class="btn primary" id="furnace-close">Close</button></div>
+    </div>
+  </div>
+
+  <!-- ================= SETTINGS ================= -->
+  <div class="modal" id="settings-modal">
+    <div class="panel accent">
+      <h2>Settings</h2>
+      <div class="settings-row"><label>Render distance</label><input type="range" id="set-renderdist" min="2" max="6" step="1"></div>
+      <div class="settings-row"><label>Shadows</label><div class="toggle" id="set-shadows"><i></i></div></div>
+      <div class="settings-row"><label>Weather effects</label><div class="toggle" id="set-weather"><i></i></div></div>
+      <div class="settings-row"><label>Water waves</label><div class="toggle" id="set-waves"><i></i></div></div>
+      <div class="settings-row"><label>Sound</label><div class="toggle" id="set-sound"><i></i></div></div>
+      <div class="settings-row"><label>Day length (minutes)</label><input type="range" id="set-daylength" min="2" max="20" step="1"></div>
+      <div class="settings-row"><label>Mouse sensitivity</label><input type="range" id="set-sensitivity" min="1" max="10" step="1"></div>
+      <div class="close-row"><button class="btn primary" id="settings-close">Close</button></div>
+    </div>
+  </div>
+
+  <!-- ================= CONTROLS HELP ================= -->
+  <div class="modal" id="controls-modal">
+    <div class="panel accent-cyan">
+      <h2>Controls</h2>
+      <div class="controls-grid">
+        <div class="key">WASD</div><div>Move</div>
+        <div class="key">Mouse</div><div>Look around</div>
+        <div class="key">Space</div><div>Jump</div>
+        <div class="key">Shift</div><div>Sprint (uses stamina)</div>
+        <div class="key">Ctrl</div><div>Crouch</div>
+        <div class="key">Left Click</div><div>Mine / attack</div>
+        <div class="key">Right Click</div><div>Place block / interact</div>
+        <div class="key">R</div><div>Drink water (look at water, hold)</div>
+        <div class="key">1-9</div><div>Select hotbar slot</div>
+        <div class="key">E</div><div>Inventory</div>
+        <div class="key">F3</div><div>Debug info</div>
+        <div class="key">Esc</div><div>Pause / release mouse</div>
+      </div>
+      <div class="close-row"><button class="btn primary" id="controls-close">Close</button></div>
+    </div>
+  </div>
+
+  <!-- ================= PAUSE ================= -->
+  <div class="modal" id="pause-modal">
+    <div class="panel accent">
+      <h2>Paused</h2>
+      <div class="menu-col" style="width:260px;">
+        <button class="btn primary" id="btn-resume">Resume</button>
+        <button class="btn" id="btn-save">Save World</button>
+        <button class="btn" id="btn-settings">Settings</button>
+        <button class="btn" id="btn-pause-controls">Controls</button>
+        <button class="btn" id="btn-title">Quit to Title</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DEATH ================= -->
+  <div class="modal" id="death-screen">
+    <div class="panel accent">
+      <h2>You collapsed...</h2>
+      <p style="color:var(--text-dim);max-width:320px;">The wilds of Voxelore are unforgiving. You wake up battered, but alive.</p>
+      <div class="close-row" style="justify-content:center;"><button class="btn primary" id="btn-respawn">Respawn</button></div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST ================= -->
+  <div id="toast" style="position:absolute;left:50%;bottom:120px;transform:translateX(-50%);font-size:13px;background:rgba(10,14,18,0.75);padding:8px 16px;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);opacity:0;transition:opacity .3s;pointer-events:none;z-index:30;"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+'use strict';
+/* ========================================================================
+   VOXELORE — an original voxel sandbox survival prototype
+   Single-file engine: config/data, noise, world generation, meshing,
+   gameplay systems, rendering, controls, AI, UI. See ARCHITECTURE doc
+   for how this maps onto a full multi-file / multiplayer project.
+   ======================================================================== */
+
+/* ===================== CONFIG ===================== */
+const CHUNK_SIZE = 16;
+const WORLD_HEIGHT = 64;
+const SEA_LEVEL = 24;
+
+const BLOCKS = {
+  AIR:0, GRASS:1, DIRT:2, STONE:3, SAND:4, SANDSTONE:5, SNOW:6, WATER:7, ICE:8,
+  LOG:9, LEAVES:10, PLANKS:11, COBBLESTONE:12, GLASS:13,
+  COAL_ORE:14, IRON_ORE:15, GOLD_ORE:16, DIAMOND_ORE:17, BEDROCK:18,
+  CRAFTING_TABLE:19, FURNACE:20, ANCIENT_BRICK:21, ANCIENT_CORE_ORE:22,
+  CACTUS:23, BERRY_BUSH:24, TORCH:25
+};
+const BIOME = { PLAINS:0, FOREST:1, DESERT:2, TUNDRA:3 };
+const BIOME_NAMES = ['Plains','Forest','Desert','Tundra'];
+
+function idx(x,y,z){ return x | (z<<4) | (y<<8); }
+function chunkKey(cx,cz){ return cx+','+cz; }
+function blockKey(x,y,z){ return x+','+y+','+z; }
+
+const NONSOLID = new Set([BLOCKS.AIR, BLOCKS.WATER, BLOCKS.TORCH]);
+function isSolidBlock(id){ return id !== undefined && id >= 0 && !NONSOLID.has(id); }
+
+const TUNING = {
+  gravity: 28,
+  jumpVelocity: 8.6,
+  walkSpeed: 4.3,
+  sprintSpeed: 6.6,
+  crouchSpeed: 2.0,
+  swimSpeed: 2.6,
+  airControl: 0.5,
+  reach: 5.2,
+  stepUpVelocity: 5.2,
+  fallDamageThreshold: 3.5,
+};
+
+/* ===================== NOISE ===================== */
+function hash2D(x, y, seed) {
+  let h = Math.imul(x | 0, 0x27d4eb2d) ^ Math.imul(y | 0, 0x165667b1) ^ Math.imul(seed | 0, 0x9e3779b9);
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+function hash3D(x, y, z, seed) {
+  let h = Math.imul(x | 0, 0x27d4eb2d) ^ Math.imul(y | 0, 0x165667b1) ^
+          Math.imul(z | 0, 0x9e3779b9) ^ Math.imul(seed | 0, 0x85ebca6b);
+  h = Math.imul(h ^ (h >>> 15), 0xc2b2ae35);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0x27d4eb2d);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function valueNoise2D(x, y, seed) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const u = fade(xf), v = fade(yf);
+  const a = hash2D(xi, yi, seed), b = hash2D(xi + 1, yi, seed);
+  const c = hash2D(xi, yi + 1, seed), d = hash2D(xi + 1, yi + 1, seed);
+  return lerp(lerp(a, b, u), lerp(c, d, u), v);
+}
+function valueNoise3D(x, y, z, seed) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const xf = x - xi, yf = y - yi, zf = z - zi;
+  const u = fade(xf), v = fade(yf), w = fade(zf);
+  const c000=hash3D(xi,yi,zi,seed), c100=hash3D(xi+1,yi,zi,seed);
+  const c010=hash3D(xi,yi+1,zi,seed), c110=hash3D(xi+1,yi+1,zi,seed);
+  const c001=hash3D(xi,yi,zi+1,seed), c101=hash3D(xi+1,yi,zi+1,seed);
+  const c011=hash3D(xi,yi+1,zi+1,seed), c111=hash3D(xi+1,yi+1,zi+1,seed);
+  const x00=lerp(c000,c100,u), x10=lerp(c010,c110,u);
+  const x01=lerp(c001,c101,u), x11=lerp(c011,c111,u);
+  return lerp(lerp(x00,x10,v), lerp(x01,x11,v), w);
+}
+function fbm2D(x, y, seed, octaves, freq, gain) {
+  let sum=0, amp=1, max=0, f=freq, s=seed;
+  for (let i=0;i<octaves;i++){ sum+=valueNoise2D(x*f,y*f,s)*amp; max+=amp; amp*=gain; f*=2; s=(s+101)|0; }
+  return sum/max;
+}
+function fbm3D(x, y, z, seed, octaves, freq, gain) {
+  let sum=0, amp=1, max=0, f=freq, s=seed;
+  for (let i=0;i<octaves;i++){ sum+=valueNoise3D(x*f,y*f,z*f,s)*amp; max+=amp; amp*=gain; f*=2; s=(s+101)|0; }
+  return sum/max;
+}
+
+/* ===================== WORLD GENERATION ===================== */
+const BIOME_AMPLITUDE = [6, 9, 4, 7];
+
+function getBiome(wx, wz, seed) {
+  const temp = fbm2D(wx, wz, seed + 1, 3, 0.005, 0.5);
+  const humid = fbm2D(wx, wz, seed + 2, 3, 0.0046, 0.5);
+  if (temp < 0.34) return BIOME.TUNDRA;
+  if (temp > 0.62) return BIOME.DESERT;
+  return humid > 0.5 ? BIOME.FOREST : BIOME.PLAINS;
+}
+function getSurfaceHeight(wx, wz, seed, biome) {
+  const base = fbm2D(wx, wz, seed, 4, 0.01, 0.5);
+  const amp = BIOME_AMPLITUDE[biome];
+  let h = SEA_LEVEL + Math.round((base - 0.5) * 2 * amp);
+  const mountain = fbm2D(wx + 10000, wz + 10000, seed + 50, 5, 0.006, 0.5);
+  if (mountain > 0.58) h += Math.round((mountain - 0.58) * 95);
+  return Math.max(3, Math.min(WORLD_HEIGHT - 2, h));
+}
+function getOre(wx, wy, wz, seed) {
+  const r = hash3D(wx, wy, wz, seed + 777);
+  if (wy <= 13 && r < 0.006) return BLOCKS.DIAMOND_ORE;
+  if (wy <= 24 && r < 0.018) return BLOCKS.GOLD_ORE;
+  if (wy <= 40 && r < 0.040) return BLOCKS.IRON_ORE;
+  if (wy <= 56 && r < 0.075) return BLOCKS.COAL_ORE;
+  return BLOCKS.STONE;
+}
+function isCave(wx, wy, wz, seed) {
+  const cavern = fbm3D(wx, wy * 1.4, wz, seed + 55, 4, 0.045, 0.5);
+  if (cavern > 0.63) return true;
+  const tunnel = fbm3D(wx + 500, wy, wz + 500, seed + 88, 3, 0.07, 0.5);
+  return Math.abs(tunnel - 0.5) < 0.018;
+}
+function placeTree(data, lx, h, lz, wx, wz, seed) {
+  const trunk = 3 + Math.floor(hash2D(wx, wz, seed + 335) * 3);
+  for (let i = 1; i <= trunk; i++) data[idx(lx, h + i, lz)] = BLOCKS.LOG;
+  const top = h + trunk;
+  for (let dy = -1; dy <= 1; dy++) {
+    const ry = (dy === 1) ? 1 : 2;
+    for (let dx = -ry; dx <= ry; dx++) {
+      for (let dz = -ry; dz <= ry; dz++) {
+        if (dx * dx + dz * dz > ry * ry + 1) continue;
+        const x = lx + dx, y = top + dy, z = lz + dz;
+        if (x < 0 || x >= CHUNK_SIZE || z < 0 || z >= CHUNK_SIZE || y < 0 || y >= WORLD_HEIGHT) continue;
+        if (data[idx(x, y, z)] === BLOCKS.AIR) data[idx(x, y, z)] = BLOCKS.LEAVES;
+      }
+    }
+  }
+}
+function placeRuin(data, heights, lx, lz, cx, cz, seed) {
+  for (let dx = -2; dx <= 2; dx++) {
+    for (let dz = -2; dz <= 2; dz++) {
+      const x = lx + dx, z = lz + dz;
+      if (x < 0 || x >= CHUNK_SIZE || z < 0 || z >= CHUNK_SIZE) continue;
+      const ch = heights[x + z * CHUNK_SIZE];
+      const onRing = Math.abs(dx) === 2 || Math.abs(dz) === 2;
+      if (dx === 0 && dz === 0) {
+        data[idx(x, ch, z)] = BLOCKS.ANCIENT_CORE_ORE;
+        if (ch + 1 < WORLD_HEIGHT) data[idx(x, ch + 1, z)] = BLOCKS.AIR;
+      } else if (onRing) {
+        if (hash3D(cx * 16 + x, ch, cz * 16 + z, seed + 9002) < 0.6) {
+          data[idx(x, ch, z)] = BLOCKS.ANCIENT_BRICK;
+          if (ch + 1 < WORLD_HEIGHT && hash3D(cx * 16 + x, ch + 1, cz * 16 + z, seed + 9003) < 0.3) {
+            data[idx(x, ch + 1, z)] = BLOCKS.ANCIENT_BRICK;
+          }
+        }
+      } else {
+        data[idx(x, ch, z)] = BLOCKS.ANCIENT_BRICK;
+      }
+    }
+  }
+}
+function placeDecorations(data, heights, biomes, cx, cz, seed) {
+  for (let lz = 2; lz < CHUNK_SIZE - 2; lz++) {
+    for (let lx = 2; lx < CHUNK_SIZE - 2; lx++) {
+      const wx = cx * CHUNK_SIZE + lx, wz = cz * CHUNK_SIZE + lz;
+      const h = heights[lx + lz * CHUNK_SIZE];
+      if (h <= SEA_LEVEL) continue;
+      const biome = biomes[lx + lz * CHUNK_SIZE];
+      const surface = data[idx(lx, h, lz)];
+      const roll = hash2D(wx, wz, seed + 333);
+      if (surface === BLOCKS.GRASS && (biome === BIOME.FOREST || biome === BIOME.PLAINS || biome === BIOME.TUNDRA)) {
+        const chance = biome === BIOME.FOREST ? 0.05 : biome === BIOME.TUNDRA ? 0.02 : 0.012;
+        if (roll < chance) { placeTree(data, lx, h, lz, wx, wz, seed); continue; }
+        if (biome === BIOME.FOREST && roll > 0.9 && roll < 0.935) { data[idx(lx, h + 1, lz)] = BLOCKS.BERRY_BUSH; continue; }
+      }
+      if (biome === BIOME.DESERT && surface === BLOCKS.SAND && roll < 0.01) {
+        const height = 1 + Math.floor(hash2D(wx + 1, wz + 1, seed + 334) * 3);
+        for (let i = 1; i <= height; i++) data[idx(lx, h + i, lz)] = BLOCKS.CACTUS;
+      }
+    }
+  }
+  if (hash2D(cx, cz, seed + 9001) < 0.05) {
+    const h = heights[7 + 7 * CHUNK_SIZE];
+    if (h > SEA_LEVEL + 1) placeRuin(data, heights, 7, 7, cx, cz, seed);
+  }
+}
+function generateChunkData(cx, cz, seed) {
+  const data = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE * WORLD_HEIGHT);
+  const heights = new Int16Array(CHUNK_SIZE * CHUNK_SIZE);
+  const biomes = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE);
+  for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+    for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+      const wx = cx * CHUNK_SIZE + lx, wz = cz * CHUNK_SIZE + lz;
+      const biome = getBiome(wx, wz, seed);
+      const h = getSurfaceHeight(wx, wz, seed, biome);
+      heights[lx + lz * CHUNK_SIZE] = h;
+      biomes[lx + lz * CHUNK_SIZE] = biome;
+      for (let y = 0; y < WORLD_HEIGHT; y++) {
+        let block = BLOCKS.AIR, carveable = false;
+        if (y === 0) block = BLOCKS.BEDROCK;
+        else if (y > h) { if (y <= SEA_LEVEL) block = (biome === BIOME.TUNDRA && y === SEA_LEVEL) ? BLOCKS.ICE : BLOCKS.WATER; }
+        else if (y === h) {
+          if (biome === BIOME.DESERT) block = BLOCKS.SAND;
+          else if (biome === BIOME.TUNDRA) block = BLOCKS.SNOW;
+          else if (h > SEA_LEVEL + 19) block = BLOCKS.SNOW;
+          else if (h > SEA_LEVEL + 13) block = BLOCKS.STONE;
+          else if (h <= SEA_LEVEL) block = BLOCKS.SAND;
+          else block = BLOCKS.GRASS;
+        } else if (y > h - 4) {
+          block = (biome === BIOME.DESERT) ? BLOCKS.SANDSTONE : BLOCKS.DIRT;
+          carveable = y < h - 1;
+        } else { block = getOre(wx, y, wz, seed); carveable = true; }
+        if (carveable && y >= 2 && isCave(wx, y, wz, seed)) block = BLOCKS.AIR;
+        data[idx(lx, y, lz)] = block;
+      }
+    }
+  }
+  placeDecorations(data, heights, biomes, cx, cz, seed);
+  return { data, heights, biomes };
+}
+
+/* ===================== GAMEPLAY DATA ===================== */
+const TIER = { HAND:0, WOOD:1, STONE:2, IRON:3, VOLTIUM:4 };
+const ITEMS = {
+  grass:{name:'Grass Block',stack:64,block:BLOCKS.GRASS}, dirt:{name:'Dirt',stack:64,block:BLOCKS.DIRT},
+  stone:{name:'Stone',stack:64,block:BLOCKS.STONE}, sand:{name:'Sand',stack:64,block:BLOCKS.SAND},
+  sandstone:{name:'Sandstone',stack:64,block:BLOCKS.SANDSTONE}, snow:{name:'Snow Block',stack:64,block:BLOCKS.SNOW},
+  ice:{name:'Ice',stack:64,block:BLOCKS.ICE}, log:{name:'Log',stack:64,block:BLOCKS.LOG,fuel:15},
+  leaves:{name:'Leaves',stack:64,block:BLOCKS.LEAVES}, planks:{name:'Planks',stack:64,block:BLOCKS.PLANKS,fuel:8},
+  cobblestone:{name:'Cobblestone',stack:64,block:BLOCKS.COBBLESTONE}, glass:{name:'Glass',stack:64,block:BLOCKS.GLASS},
+  coal_ore:{name:'Coal Ore',stack:64,block:BLOCKS.COAL_ORE}, iron_ore:{name:'Iron Ore',stack:64,block:BLOCKS.IRON_ORE},
+  gold_ore:{name:'Gold Ore',stack:64,block:BLOCKS.GOLD_ORE}, diamond_ore:{name:'Diamond Ore',stack:64,block:BLOCKS.DIAMOND_ORE},
+  crafting_table:{name:'Crafting Table',stack:64,block:BLOCKS.CRAFTING_TABLE}, furnace:{name:'Furnace',stack:64,block:BLOCKS.FURNACE},
+  ancient_brick:{name:'Ancient Brick',stack:64,block:BLOCKS.ANCIENT_BRICK}, cactus:{name:'Cactus',stack:64,block:BLOCKS.CACTUS},
+  berry_bush:{name:'Berry Bush',stack:64,block:BLOCKS.BERRY_BUSH}, torch:{name:'Torch',stack:64,block:BLOCKS.TORCH,fuel:4},
+  stick:{name:'Stick',stack:64}, coal:{name:'Coal',stack:64,fuel:80},
+  iron_ingot:{name:'Iron Ingot',stack:64}, gold_ingot:{name:'Gold Ingot',stack:64}, diamond:{name:'Diamond',stack:64},
+  ancient_core:{name:'Ancient Core',stack:64}, voltium_alloy:{name:'Voltium Alloy',stack:64},
+  berries:{name:'Berries',stack:64,food:4}, raw_meat:{name:'Raw Meat',stack:64,food:2}, cooked_meat:{name:'Cooked Meat',stack:64,food:8},
+  wood_pickaxe:{name:'Wood Pickaxe',stack:1,tool:'pickaxe',tier:TIER.WOOD}, wood_axe:{name:'Wood Axe',stack:1,tool:'axe',tier:TIER.WOOD},
+  wood_sword:{name:'Wood Sword',stack:1,tool:'sword',tier:TIER.WOOD,damage:3},
+  stone_pickaxe:{name:'Stone Pickaxe',stack:1,tool:'pickaxe',tier:TIER.STONE}, stone_axe:{name:'Stone Axe',stack:1,tool:'axe',tier:TIER.STONE},
+  stone_sword:{name:'Stone Sword',stack:1,tool:'sword',tier:TIER.STONE,damage:4},
+  iron_pickaxe:{name:'Iron Pickaxe',stack:1,tool:'pickaxe',tier:TIER.IRON}, iron_axe:{name:'Iron Axe',stack:1,tool:'axe',tier:TIER.IRON},
+  iron_sword:{name:'Iron Sword',stack:1,tool:'sword',tier:TIER.IRON,damage:6},
+  voltium_pickaxe:{name:'Voltium Pickaxe',stack:1,tool:'pickaxe',tier:TIER.VOLTIUM}, voltium_axe:{name:'Voltium Axe',stack:1,tool:'axe',tier:TIER.VOLTIUM},
+  voltium_sword:{name:'Voltium Sword',stack:1,tool:'sword',tier:TIER.VOLTIUM,damage:9},
+  voltium_lantern:{name:'Voltium Lantern',stack:1,lightRadius:9,warmth:25},
+};
+const BLOCK_DROPS = { [BLOCKS.STONE]:'cobblestone', [BLOCKS.ANCIENT_CORE_ORE]:'ancient_core' };
+function blockToItem(blockId) {
+  if (BLOCK_DROPS[blockId]) return BLOCK_DROPS[blockId];
+  for (const k in ITEMS) if (ITEMS[k].block === blockId) return k;
+  return null;
+}
+function itemToBlock(itemId) { const def = ITEMS[itemId]; return def && def.block !== undefined ? def.block : null; }
+
+const MINE_CATEGORY = {
+  [BLOCKS.LOG]:'wood',[BLOCKS.LEAVES]:'wood',[BLOCKS.PLANKS]:'wood',[BLOCKS.CRAFTING_TABLE]:'wood',
+  [BLOCKS.BERRY_BUSH]:'wood',[BLOCKS.CACTUS]:'wood',
+  [BLOCKS.STONE]:'stone',[BLOCKS.COBBLESTONE]:'stone',[BLOCKS.SANDSTONE]:'stone',[BLOCKS.COAL_ORE]:'stone',
+  [BLOCKS.IRON_ORE]:'stone',[BLOCKS.GOLD_ORE]:'stone',[BLOCKS.DIAMOND_ORE]:'stone',[BLOCKS.ANCIENT_BRICK]:'stone',
+  [BLOCKS.ANCIENT_CORE_ORE]:'stone',[BLOCKS.FURNACE]:'stone',[BLOCKS.ICE]:'stone',
+};
+const BLOCK_HARDNESS = {
+  [BLOCKS.GRASS]:0.6,[BLOCKS.DIRT]:0.5,[BLOCKS.SAND]:0.5,[BLOCKS.SNOW]:0.3,
+  [BLOCKS.STONE]:1.5,[BLOCKS.SANDSTONE]:1.2,[BLOCKS.COBBLESTONE]:1.2,[BLOCKS.ICE]:0.5,
+  [BLOCKS.LOG]:1.0,[BLOCKS.LEAVES]:0.3,[BLOCKS.PLANKS]:0.8,[BLOCKS.GLASS]:0.3,
+  [BLOCKS.COAL_ORE]:1.8,[BLOCKS.IRON_ORE]:2.5,[BLOCKS.GOLD_ORE]:2.5,[BLOCKS.DIAMOND_ORE]:3.5,
+  [BLOCKS.BEDROCK]:Infinity,[BLOCKS.CRAFTING_TABLE]:0.8,[BLOCKS.FURNACE]:2.0,
+  [BLOCKS.ANCIENT_BRICK]:1.8,[BLOCKS.ANCIENT_CORE_ORE]:3.0,[BLOCKS.CACTUS]:0.5,[BLOCKS.BERRY_BUSH]:0.3,[BLOCKS.TORCH]:0.1,
+};
+const BLOCK_REQUIRED_TIER = {
+  [BLOCKS.STONE]:TIER.WOOD,[BLOCKS.COBBLESTONE]:TIER.WOOD,[BLOCKS.SANDSTONE]:TIER.WOOD,[BLOCKS.COAL_ORE]:TIER.WOOD,
+  [BLOCKS.ANCIENT_BRICK]:TIER.WOOD,[BLOCKS.FURNACE]:TIER.WOOD,[BLOCKS.ICE]:TIER.HAND,
+  [BLOCKS.IRON_ORE]:TIER.STONE,
+  [BLOCKS.GOLD_ORE]:TIER.IRON,[BLOCKS.DIAMOND_ORE]:TIER.IRON,[BLOCKS.ANCIENT_CORE_ORE]:TIER.IRON,
+};
+function getMiningTime(blockId, heldItemId) {
+  const hardness = BLOCK_HARDNESS[blockId] ?? 0.6;
+  if (!isFinite(hardness)) return Infinity;
+  const category = MINE_CATEGORY[blockId] || 'dirt';
+  const requiredTier = BLOCK_REQUIRED_TIER[blockId] ?? TIER.HAND;
+  const tool = ITEMS[heldItemId];
+  const toolTier = tool ? tool.tier ?? 0 : 0;
+  if (category === 'stone' && toolTier < requiredTier) return Infinity;
+  let mult = 1;
+  if (tool) {
+    if (category === 'stone' && tool.tool === 'pickaxe') mult = 1 + toolTier * 1.5;
+    else if (category === 'wood' && tool.tool === 'axe') mult = 1 + toolTier * 1.5;
+    else mult = 1 + toolTier * 0.5;
+  }
+  return hardness / mult;
+}
+function countItem(inventory, itemId) {
+  let total = 0;
+  for (const slot of inventory) if (slot && slot.item === itemId) total += slot.count;
+  return total;
+}
+function addItem(inventory, itemId, count) {
+  const def = ITEMS[itemId]; const stackSize = def ? def.stack : 64; let remaining = count;
+  for (const slot of inventory) {
+    if (remaining <= 0) break;
+    if (slot && slot.item === itemId && slot.count < stackSize) {
+      const take = Math.min(stackSize - slot.count, remaining); slot.count += take; remaining -= take;
+    }
+  }
+  for (let i = 0; i < inventory.length && remaining > 0; i++) {
+    if (inventory[i] === null) { const take = Math.min(stackSize, remaining); inventory[i] = { item: itemId, count: take }; remaining -= take; }
+  }
+  return count - remaining;
+}
+function removeItem(inventory, itemId, count) {
+  let remaining = count;
+  for (let i = 0; i < inventory.length && remaining > 0; i++) {
+    const slot = inventory[i];
+    if (slot && slot.item === itemId) {
+      const take = Math.min(slot.count, remaining); slot.count -= take; remaining -= take;
+      if (slot.count <= 0) inventory[i] = null;
+    }
+  }
+  return count - remaining;
+}
+const RECIPES = [
+  { id:'planks', name:'Planks', category:'basic', inputs:[{item:'log',count:1}], output:{item:'planks',count:4} },
+  { id:'sticks', name:'Sticks', category:'basic', inputs:[{item:'planks',count:2}], output:{item:'stick',count:4} },
+  { id:'crafting_table', name:'Crafting Table', category:'basic', inputs:[{item:'planks',count:4}], output:{item:'crafting_table',count:1} },
+  { id:'torch', name:'Torch', category:'basic', inputs:[{item:'stick',count:1},{item:'coal',count:1}], output:{item:'torch',count:4} },
+  { id:'furnace', name:'Furnace', category:'building', inputs:[{item:'cobblestone',count:8}], output:{item:'furnace',count:1}, requires:'crafting_table' },
+  { id:'wood_pickaxe', name:'Wood Pickaxe', category:'tools', inputs:[{item:'planks',count:3},{item:'stick',count:2}], output:{item:'wood_pickaxe',count:1}, requires:'crafting_table' },
+  { id:'wood_axe', name:'Wood Axe', category:'tools', inputs:[{item:'planks',count:3},{item:'stick',count:2}], output:{item:'wood_axe',count:1}, requires:'crafting_table' },
+  { id:'wood_sword', name:'Wood Sword', category:'tools', inputs:[{item:'planks',count:2},{item:'stick',count:1}], output:{item:'wood_sword',count:1}, requires:'crafting_table' },
+  { id:'stone_pickaxe', name:'Stone Pickaxe', category:'tools', inputs:[{item:'cobblestone',count:3},{item:'stick',count:2}], output:{item:'stone_pickaxe',count:1}, requires:'crafting_table' },
+  { id:'stone_axe', name:'Stone Axe', category:'tools', inputs:[{item:'cobblestone',count:3},{item:'stick',count:2}], output:{item:'stone_axe',count:1}, requires:'crafting_table' },
+  { id:'stone_sword', name:'Stone Sword', category:'tools', inputs:[{item:'cobblestone',count:2},{item:'stick',count:1}], output:{item:'stone_sword',count:1}, requires:'crafting_table' },
+  { id:'iron_pickaxe', name:'Iron Pickaxe', category:'tools', inputs:[{item:'iron_ingot',count:3},{item:'stick',count:2}], output:{item:'iron_pickaxe',count:1}, requires:'crafting_table' },
+  { id:'iron_axe', name:'Iron Axe', category:'tools', inputs:[{item:'iron_ingot',count:3},{item:'stick',count:2}], output:{item:'iron_axe',count:1}, requires:'crafting_table' },
+  { id:'iron_sword', name:'Iron Sword', category:'tools', inputs:[{item:'iron_ingot',count:2},{item:'stick',count:1}], output:{item:'iron_sword',count:1}, requires:'crafting_table' },
+  { id:'voltium_alloy', name:'Voltium Alloy', category:'advanced', inputs:[{item:'iron_ingot',count:2},{item:'diamond',count:1},{item:'ancient_core',count:1}], output:{item:'voltium_alloy',count:2}, requires:'crafting_table' },
+  { id:'voltium_pickaxe', name:'Voltium Pickaxe', category:'advanced', inputs:[{item:'voltium_alloy',count:3},{item:'stick',count:2}], output:{item:'voltium_pickaxe',count:1}, requires:'crafting_table' },
+  { id:'voltium_axe', name:'Voltium Axe', category:'advanced', inputs:[{item:'voltium_alloy',count:3},{item:'stick',count:2}], output:{item:'voltium_axe',count:1}, requires:'crafting_table' },
+  { id:'voltium_sword', name:'Voltium Sword', category:'advanced', inputs:[{item:'voltium_alloy',count:2},{item:'stick',count:1}], output:{item:'voltium_sword',count:1}, requires:'crafting_table' },
+  { id:'voltium_lantern', name:'Voltium Lantern', category:'advanced', inputs:[{item:'voltium_alloy',count:2},{item:'coal',count:1},{item:'glass',count:2}], output:{item:'voltium_lantern',count:1}, requires:'crafting_table' },
+];
+function canCraft(recipe, inventory, nearTable) {
+  if (recipe.requires === 'crafting_table' && !nearTable) return false;
+  return recipe.inputs.every(req => countItem(inventory, req.item) >= req.count);
+}
+function craft(recipe, inventory, nearTable) {
+  if (!canCraft(recipe, inventory, nearTable)) return false;
+  for (const req of recipe.inputs) removeItem(inventory, req.item, req.count);
+  addItem(inventory, recipe.output.item, recipe.output.count);
+  return true;
+}
+const SMELT_RECIPES = {
+  iron_ore:{output:'iron_ingot',time:6}, gold_ore:{output:'gold_ingot',time:7},
+  sand:{output:'glass',time:5}, raw_meat:{output:'cooked_meat',time:4},
+};
+function updateFurnace(furnace, dt) {
+  const recipe = furnace.input ? SMELT_RECIPES[furnace.input] : null;
+  const canOutput = !furnace.output || (furnace.output === (recipe && recipe.output) && furnace.outputCount < 64);
+  const active = recipe && furnace.inputCount > 0 && canOutput;
+  if (!active) { furnace.progress = 0; return furnace; }
+  if (furnace.burnTimeLeft <= 0) {
+    if (furnace.fuelCount > 0) {
+      const fuelDef = ITEMS[furnace.fuel];
+      furnace.burnTimeLeft += fuelDef ? fuelDef.fuel : 0;
+      furnace.fuelCount -= 1;
+      if (furnace.fuelCount === 0) furnace.fuel = null;
+    } else { furnace.progress = 0; return furnace; }
+  }
+  const burn = Math.min(dt, furnace.burnTimeLeft);
+  furnace.burnTimeLeft -= burn; furnace.progress += burn;
+  if (furnace.progress >= recipe.time) {
+    furnace.progress -= recipe.time; furnace.inputCount -= 1;
+    if (furnace.inputCount === 0) furnace.input = null;
+    furnace.output = recipe.output; furnace.outputCount = (furnace.outputCount || 0) + 1;
+  }
+  return furnace;
+}
+const AI_TUNING = {
+  passive:{fleeRange:4,fleeSpeed:3.2,wanderSpeed:1.4},
+  hostile:{chaseRange:11,attackRange:1.3,chaseSpeed:3.0,wanderSpeed:1.0,attackDamage:8,attackCooldown:1.0},
+};
+function updateMobAI(mob, dt, playerPos) {
+  const dx = playerPos.x - mob.x, dz = playerPos.z - mob.z;
+  const dist = Math.hypot(dx, dz);
+  if (mob.type === 'hostile') {
+    const t = AI_TUNING.hostile;
+    mob.attackCooldown = Math.max(0, (mob.attackCooldown || 0) - dt);
+    if (dist <= t.attackRange) {
+      const didAttack = mob.attackCooldown <= 0;
+      if (didAttack) mob.attackCooldown = t.attackCooldown;
+      return { state:'attack', vx:0, vz:0, didAttack };
+    }
+    if (dist <= t.chaseRange) return { state:'chase', vx:(dx/dist)*t.chaseSpeed, vz:(dz/dist)*t.chaseSpeed, didAttack:false };
+    return wander(mob, dt, t.wanderSpeed, 'idle');
+  }
+  const t = AI_TUNING.passive;
+  if (dist <= t.fleeRange && dist > 0) return { state:'flee', vx:(-dx/dist)*t.fleeSpeed, vz:(-dz/dist)*t.fleeSpeed, didAttack:false };
+  return wander(mob, dt, t.wanderSpeed, 'idle');
+}
+function wander(mob, dt, speed, idleState) {
+  mob.wanderTimer = (mob.wanderTimer || 0) - dt;
+  if (mob.wanderTimer <= 0) {
+    mob.wanderTimer = 2 + Math.random() * 3;
+    if (Math.random() < 0.6) {
+      const angle = Math.random() * Math.PI * 2;
+      mob.wanderDirX = Math.cos(angle); mob.wanderDirZ = Math.sin(angle);
+    } else { mob.wanderDirX = 0; mob.wanderDirZ = 0; }
+  }
+  const moving = (mob.wanderDirX || 0) !== 0 || (mob.wanderDirZ || 0) !== 0;
+  return { state: moving ? 'wander' : idleState, vx:(mob.wanderDirX||0)*speed, vz:(mob.wanderDirZ||0)*speed, didAttack:false };
+}
+
+/* ===================== MESHING ===================== */
+const TILE = 1 / 16;
+const CATEGORY = { EMPTY:0, OPAQUE:1, TRANSPARENT:2, LIQUID:3 };
+function categoryOf(id) {
+  if (id === BLOCKS.AIR || id === BLOCKS.TORCH) return CATEGORY.EMPTY;
+  if (id === BLOCKS.WATER) return CATEGORY.LIQUID;
+  if (id === BLOCKS.LEAVES || id === BLOCKS.GLASS) return CATEGORY.TRANSPARENT;
+  return CATEGORY.OPAQUE;
+}
+function faceVisible(curId, neighId, unknown) {
+  const curCat = categoryOf(curId);
+  if (curCat === CATEGORY.EMPTY) return false;
+  const neighCat = unknown ? CATEGORY.OPAQUE : categoryOf(neighId);
+  if (curCat === CATEGORY.OPAQUE) return neighCat === CATEGORY.EMPTY || neighCat === CATEGORY.LIQUID || neighCat === CATEGORY.TRANSPARENT;
+  if (curCat === CATEGORY.LIQUID) return neighCat === CATEGORY.EMPTY;
+  if (neighCat === CATEGORY.EMPTY || neighCat === CATEGORY.LIQUID) return true;
+  if (neighCat === CATEGORY.TRANSPARENT) return neighId !== curId;
+  return false;
+}
+// With THREE.CanvasTexture flipY=true (default): v=0 = canvas BOTTOM, v=1 = canvas TOP.
+// Tiles are drawn at canvas top so we invert V: v0 = 1-(row+1)*T, v1 = 1-row*T.
+// That way v1 (larger) → canvas top of tile → renders at top of geometry face.
+function tileUV(col, row) {
+  const u0=col*TILE, u1=(col+1)*TILE;
+  const v0=1-(row+1)*TILE, v1=1-row*TILE;
+  return [u0, v0, u1, v1];
+}
+const BLOCK_TILES = {
+  [BLOCKS.GRASS]:{top:[0,0],bottom:[2,0],side:[1,0]}, [BLOCKS.DIRT]:{all:[2,0]}, [BLOCKS.STONE]:{all:[3,0]},
+  [BLOCKS.SAND]:{all:[4,0]}, [BLOCKS.SANDSTONE]:{all:[5,0]}, [BLOCKS.SNOW]:{all:[6,0]}, [BLOCKS.ICE]:{all:[7,0]},
+  [BLOCKS.LOG]:{top:[8,0],bottom:[8,0],side:[9,0]}, [BLOCKS.LEAVES]:{all:[10,0]}, [BLOCKS.PLANKS]:{all:[11,0]},
+  [BLOCKS.COBBLESTONE]:{all:[12,0]}, [BLOCKS.GLASS]:{all:[13,0]}, [BLOCKS.COAL_ORE]:{all:[14,0]}, [BLOCKS.IRON_ORE]:{all:[15,0]},
+  [BLOCKS.GOLD_ORE]:{all:[0,1]}, [BLOCKS.DIAMOND_ORE]:{all:[1,1]}, [BLOCKS.BEDROCK]:{all:[2,1]},
+  [BLOCKS.CRAFTING_TABLE]:{top:[3,1],bottom:[11,0],side:[4,1]}, [BLOCKS.FURNACE]:{top:[6,1],bottom:[6,1],side:[5,1]},
+  [BLOCKS.ANCIENT_BRICK]:{all:[7,1]}, [BLOCKS.ANCIENT_CORE_ORE]:{all:[8,1]}, [BLOCKS.CACTUS]:{all:[9,1]}, [BLOCKS.BERRY_BUSH]:{all:[10,1]},
+};
+function getTile(blockId, face) {
+  const def = BLOCK_TILES[blockId]; if (!def) return [0,0];
+  if (face === 'py' && def.top) return def.top;
+  if (face === 'ny' && def.bottom) return def.bottom;
+  if (def.side && (face==='px'||face==='nx'||face==='pz'||face==='nz')) return def.side;
+  return def.all || def.side || def.top || [0,0];
+}
+const LEAF_TINT = { [BIOME.TUNDRA]: [0.78,0.86,0.95] };
+function leafTint(biome) { return LEAF_TINT[biome] || [1,1,1]; }
+const FACES = [
+  { dir:'px', d:[1,0,0], n:[1,0,0], shade:0.80, corners:[[1,0,0],[1,1,0],[1,1,1],[1,0,1]] },
+  { dir:'nx', d:[-1,0,0], n:[-1,0,0], shade:0.80, corners:[[0,0,1],[0,1,1],[0,1,0],[0,0,0]] },
+  { dir:'py', d:[0,1,0], n:[0,1,0], shade:1.00, corners:[[0,1,0],[0,1,1],[1,1,1],[1,1,0]] },
+  { dir:'ny', d:[0,-1,0], n:[0,-1,0], shade:0.50, corners:[[0,0,0],[1,0,0],[1,0,1],[0,0,1]] },
+  { dir:'pz', d:[0,0,1], n:[0,0,1], shade:0.80, corners:[[1,0,1],[1,1,1],[0,1,1],[0,0,1]] },
+  { dir:'nz', d:[0,0,-1], n:[0,0,-1], shade:0.80, corners:[[0,0,0],[0,1,0],[1,1,0],[1,0,0]] },
+];
+const QUAD_UV = [[0,0],[1,0],[1,1],[0,1]];
+function meshChunk(data, biomes, getBlock, cx, cz) {
+  const solid = { positions:[], normals:[], uvs:[], colors:[], indices:[] };
+  const water = { positions:[], normals:[], indices:[] };
+  const specials = [];
+  function neighbor(lx, ly, lz) {
+    if (ly < 0 || ly >= WORLD_HEIGHT) return { id:-1, unknown:true };
+    if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) return { id: data[idx(lx,ly,lz)], unknown:false };
+    const wx = cx*CHUNK_SIZE+lx, wz = cz*CHUNK_SIZE+lz;
+    const id = getBlock(wx, ly, wz);
+    return { id, unknown: id === -1 };
+  }
+  for (let ly=0; ly<WORLD_HEIGHT; ly++) {
+    for (let lz=0; lz<CHUNK_SIZE; lz++) {
+      for (let lx=0; lx<CHUNK_SIZE; lx++) {
+        const block = data[idx(lx,ly,lz)];
+        if (block === BLOCKS.AIR) continue;
+        if (block === BLOCKS.TORCH) { specials.push({type:'torch',x:lx,y:ly,z:lz}); continue; }
+        const isWater = block === BLOCKS.WATER;
+        const biome = biomes ? biomes[lx+lz*CHUNK_SIZE] : BIOME.PLAINS;
+        const tint = (block === BLOCKS.LEAVES) ? leafTint(biome) : [1,1,1];
+        for (const face of FACES) {
+          const n = neighbor(lx+face.d[0], ly+face.d[1], lz+face.d[2]);
+          if (!faceVisible(block, n.id, n.unknown)) continue;
+          const target = isWater ? water : solid;
+          const base = target.positions.length / 3;
+          for (let c=0;c<4;c++) {
+            const corner = face.corners[c];
+            target.positions.push(lx+corner[0], ly+corner[1], lz+corner[2]);
+            target.normals.push(face.n[0], face.n[1], face.n[2]);
+            if (!isWater) {
+              const [u0,v0,u1,v1] = tileUV(...getTile(block, face.dir));
+              const uvc = QUAD_UV[c];
+              target.uvs.push(uvc[0]?u1:u0, uvc[1]?v1:v0);
+              target.colors.push(face.shade*tint[0], face.shade*tint[1], face.shade*tint[2]);
+            }
+          }
+          target.indices.push(base, base+1, base+2, base, base+2, base+3);
+        }
+      }
+    }
+  }
+  return {
+    solid:{ positions:Float32Array.from(solid.positions), normals:Float32Array.from(solid.normals), uvs:Float32Array.from(solid.uvs), colors:Float32Array.from(solid.colors), indices:Uint32Array.from(solid.indices) },
+    water:{ positions:Float32Array.from(water.positions), normals:Float32Array.from(water.normals), indices:Uint32Array.from(water.indices) },
+    specials,
+  };
+}
+
+/* ===================== SHARED GAME STATE ===================== */
+const Game = {
+  scene:null, camera:null, renderer:null, clock:null,
+  skyMesh:null, sunLight:null, moonLight:null, ambientLight:null, shadowTarget:null,
+  materials:{ solid:null, water:null },
+  atlasTexture:null, atlasCanvas:null, itemIcons:{},
+
+  seed:0, started:false, paused:false, debug:false,
+
+  world:{ chunks:new Map(), loadQueue:[], modifications:new Map(), spawn:{x:0.5,y:40,z:0.5} },
+
+  player:{
+    position:new THREE.Vector3(0.5,40,0.5),
+    velocity:new THREE.Vector3(0,0,0),
+    yaw:0, pitch:0,
+    radius:0.3, height:1.8, eyeHeight:1.62,
+    crouching:false, sprinting:false, onGround:false,
+    inWater:false, headInWater:false, fallStart:0, falling:false,
+    selectedSlot:0,
+    inventory:new Array(36).fill(null),
+    stats:{ health:100, maxHealth:100, hunger:100, stamina:100, hydration:100, temperature:60 },
+    breath:10, maxBreath:10,
+    drinkProgress:0, lastHitTime:-10, regenAccum:0,
+  },
+
+  time:{ dayTime:0.27, totalDays:0, season:0 },
+  weather:{ type:'clear', intensity:0, target:0, timer:20 },
+
+  mobs:[],
+  furnaces:new Map(),
+  harvestCooldowns:new Map(),
+  particles:[],
+  rain:null, snow:null, leaves:null,
+
+  input:{
+    forward:false, back:false, left:false, right:false, jump:false, sprint:false, crouch:false,
+    mouseDX:0, mouseDY:0, leftDown:false, rightDown:false, drink:false,
+    touchMoveX:0, touchMoveY:0, touchLookDX:0, touchLookDY:0,
+  },
+
+  settings:{ renderDistance:3, shadows:true, weatherFx:true, waterWaves:true, sound:true, dayLengthMinutes:10, sensitivity:5 },
+
+  ui:{ activeModal:null, craftingTab:'basic' },
+
+  audio:{ ctx:null, master:null, lastStep:0 },
+
+  raycastHit:null, miningTarget:null, miningProgress:0,
+};
+function dayLengthSeconds(){ return Game.settings.dayLengthMinutes * 60; }
+
+/* ===================== TEXTURES ===================== */
+function buildAtlasTexture(){
+  const cv=document.createElement('canvas'); cv.width=cv.height=256;
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=false;
+  Game.atlasCanvas=cv;
+  const h=(x,y,s)=>hash2D(Math.floor(x),Math.floor(y),s);
+  const v=(x,y,s,a=20)=>(h(x,y,s)-0.5)*2*a;
+  const cl=(n,lo=0,hi=255)=>Math.max(lo,Math.min(hi,n|0));
+  const rp=(r,g2,b)=>`rgb(${cl(r)},${cl(g2)},${cl(b)})`;
+  const ra=(r,g2,b,a)=>`rgba(${cl(r)},${cl(g2)},${cl(b)},${Math.max(0,Math.min(1,+a)).toFixed(2)})`;
+  function tile(col,row,fn){const ox=col*16,oy=row*16;for(let y=0;y<16;y++)for(let x=0;x<16;x++)fn(g,ox+x,oy+y,x,y);}
+  // Row 0
+  tile(0,0,(g,px,py,x,y)=>{const n=v(x*5,y*5,1,22);g.fillStyle=rp(70+n,h(x*3,y*3,2)>0.5?138+n:145+n,52+n);g.fillRect(px,py,1,1);});
+  tile(1,0,(g,px,py,x,y)=>{const n=v(x*4,y*4,3,16);g.fillStyle=y<3?rp(70+n,138+n,52+n):rp(120+n,84+n,44+n);g.fillRect(px,py,1,1);});
+  tile(2,0,(g,px,py,x,y)=>{const n=v(x*4,y*4,4,16);g.fillStyle=rp(125+n,88+n,46+n);g.fillRect(px,py,1,1);});
+  tile(3,0,(g,px,py,x,y)=>{const n=v(x*3,y*3,5,22);g.fillStyle=rp(108+n,108+n,108+n);g.fillRect(px,py,1,1);});
+  tile(4,0,(g,px,py,x,y)=>{const n=v(x*6,y*6,6,14);g.fillStyle=rp(210+n,190+n,140+n);g.fillRect(px,py,1,1);});
+  tile(5,0,(g,px,py,x,y)=>{const n=v(x*3,y*3,7,10),s=(y%4<2)?15:0;g.fillStyle=rp(200+s+n,178+s+n,130+s+n);g.fillRect(px,py,1,1);});
+  tile(6,0,(g,px,py,x,y)=>{const n=v(x*5,y*5,8,10);g.fillStyle=rp(230+n,235+n,245+n);g.fillRect(px,py,1,1);});
+  tile(7,0,(g,px,py,x,y)=>{const n=v(x*3,y*3,9,8);g.fillStyle=ra(140+n,200+n,240+n,0.88);g.fillRect(px,py,1,1);});
+  tile(8,0,(g,px,py,x,y)=>{const cx2=x-7.5,cy2=y-7.5,r=Math.sqrt(cx2*cx2+cy2*cy2),ring=Math.abs(r%3-1.5)<0.9,n=v(x*2,y*2,10,10);g.fillStyle=ring?rp(88+n,58+n,24+n):rp(112+n,78+n,32+n);g.fillRect(px,py,1,1);});
+  tile(9,0,(g,px,py,x,y)=>{const n=v(x*2,y*5,11,14);g.fillStyle=(x%4<1)?rp(78+n,50+n,18+n):rp(108+n,73+n,28+n);g.fillRect(px,py,1,1);});
+  tile(10,0,(g,px,py,x,y)=>{const n=v(x*5,y*5,12,22),hole=h(x*7,y*7,13)<0.25;if(hole){g.clearRect(px,py,1,1);}else{g.fillStyle=rp(48+n,112+n,36+n);g.fillRect(px,py,1,1);}});
+  tile(11,0,(g,px,py,x,y)=>{const n=v(x*2,y*3,14,10),jt=(y%4===0)||(x%8===0);g.fillStyle=jt?rp(138+n,93+n,38+n):rp(158+n,110+n,52+n);g.fillRect(px,py,1,1);});
+  tile(12,0,(g,px,py,x,y)=>{const n=v(x*4,y*4,15,20),jt=h(x*2+0.5,y*2+0.5,16)<0.3;g.fillStyle=jt?rp(58+n,58+n,58+n):rp(103+n,103+n,103+n);g.fillRect(px,py,1,1);});
+  tile(13,0,(g,px,py,x,y)=>{const e=(x===0||x===15||y===0||y===15);g.fillStyle=e?ra(160,210,240,0.7):ra(180,220,250,0.12);g.fillRect(px,py,1,1);});
+  tile(14,0,(g,px,py,x,y)=>{const n=v(x*3,y*3,17,18),o=h(x*7,y*7,18)<0.25;g.fillStyle=o?rp(28+n,28+n,28+n):rp(108+n,108+n,108+n);g.fillRect(px,py,1,1);});
+  tile(15,0,(g,px,py,x,y)=>{const n=v(x*3,y*3,19,16),o=h(x*7,y*7,20)<0.25;g.fillStyle=o?rp(178+n,138+n,108+n):rp(108+n,108+n,108+n);g.fillRect(px,py,1,1);});
+  // Row 1
+  tile(0,1,(g,px,py,x,y)=>{const n=v(x*3,y*3,21,16),o=h(x*7,y*7,22)<0.25;g.fillStyle=o?rp(238+n,208+n,28+n):rp(108+n,108+n,108+n);g.fillRect(px,py,1,1);});
+  tile(1,1,(g,px,py,x,y)=>{const n=v(x*3,y*3,23,16),o=h(x*7,y*7,24)<0.25;g.fillStyle=o?rp(78+n,218+n,218+n):rp(108+n,108+n,108+n);g.fillRect(px,py,1,1);});
+  tile(2,1,(g,px,py,x,y)=>{const n=v(x*4,y*4,25,16),d=h(x*6,y*6,26)<0.3;g.fillStyle=d?rp(18+n,18+n,18+n):rp(43+n,43+n,43+n);g.fillRect(px,py,1,1);});
+  tile(3,1,(g,px,py,x,y)=>{const n=v(x*2,y*2,27,8),gd=(x===7||x===8||y===7||y===8);g.fillStyle=gd?rp(78+n,52+n,18+n):rp(152+n,106+n,50+n);g.fillRect(px,py,1,1);});
+  tile(4,1,(g,px,py,x,y)=>{const n=v(x*2,y*2,28,8),lg=(x>=5&&x<=10&&y>=5&&y<=10);g.fillStyle=lg?rp(58+n,38+n,13+n):rp(152+n,106+n,50+n);g.fillRect(px,py,1,1);});
+  tile(5,1,(g,px,py,x,y)=>{const n=v(x*3,y*3,29,12),pt=(x>=5&&x<=10&&y>=4&&y<=10);g.fillStyle=pt?rp(178+n,78+n,18+n):rp(88+n,88+n,88+n);g.fillRect(px,py,1,1);});
+  tile(6,1,(g,px,py,x,y)=>{const n=v(x*3,y*3,30,12);g.fillStyle=rp(88+n,88+n,88+n);g.fillRect(px,py,1,1);});
+  tile(7,1,(g,px,py,x,y)=>{const n=v(x*3,y*3,31,12),jt=(y%4===0)||(y%4===1&&x%8>=4)||(y%4===3&&x%8<4);g.fillStyle=jt?rp(48+n,38+n,33+n):rp(118+n,93+n,78+n);g.fillRect(px,py,1,1);});
+  tile(8,1,(g,px,py,x,y)=>{const n=v(x*3,y*3,32,12),c=h(x*5,y*5,33)<0.3;g.fillStyle=c?rp(198+n,168+n,48+n):rp(98+n,78+n,68+n);g.fillRect(px,py,1,1);});
+  tile(9,1,(g,px,py,x,y)=>{const n=v(x*4,y*4,34,12);g.fillStyle=(x===0||x===15)?rp(23+n,73+n,28+n):rp(43+n,118+n,38+n);g.fillRect(px,py,1,1);});
+  tile(10,1,(g,px,py,x,y)=>{const n=v(x*5,y*5,35,16),b=h(x*9,y*9,36)<0.15,l=h(x*4,y*4,37)>0.2;if(b){g.fillStyle=rp(178+n,38+n,38+n);g.fillRect(px,py,1,1);}else if(l){g.fillStyle=rp(43+n,98+n,33+n);g.fillRect(px,py,1,1);}else g.clearRect(px,py,1,1);});
+  // Torch sprite [12,1]
+  tile(12,1,(g,px,py)=>g.clearRect(px,py,1,1));
+  {const ox=12*16,oy=1*16;g.fillStyle='#8B4513';for(let y=6;y<15;y++)g.fillRect(ox+7,oy+y,2,1);for(const[x,y] of [[6,3],[7,2],[8,2],[9,3],[6,4],[7,3],[8,3],[9,4],[7,4],[8,4]]){g.fillStyle=y<3?'#ffee44':'#ff8800';g.fillRect(ox+x,oy+y,1,1);}g.fillStyle='#ffff88';g.fillRect(ox+7,oy+2,2,1);}
+  // ── Atlas brightness pass — lift all opaque pixels so colours look vibrant ──
+  const imgd=g.getImageData(0,0,256,256),pd=imgd.data;
+  for(let i=0;i<pd.length;i+=4){
+    if(pd[i+3]>0){pd[i]=Math.min(255,pd[i]*1.75|0);pd[i+1]=Math.min(255,pd[i+1]*1.75|0);pd[i+2]=Math.min(255,pd[i+2]*1.75|0);}
+  }
+  g.putImageData(imgd,0,0);
+  const tex=new THREE.CanvasTexture(cv);
+  tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;
+  Game.atlasTexture=tex;
+  // Item icons (data-URLs for UI slots)
+  for(const[id,def] of Object.entries(ITEMS)){
+    const ic=document.createElement('canvas');ic.width=ic.height=32;
+    const ictx=ic.getContext('2d');ictx.imageSmoothingEnabled=false;
+    if(def.block!==undefined){
+      const td=BLOCK_TILES[def.block];
+      if(td){const t=td.all||td.top||td.side||[0,0];ictx.drawImage(cv,t[0]*16,t[1]*16,16,16,0,0,32,32);}
+    }else{
+      const cols={stick:'#8B4513',coal:'#1a1a1a',iron_ingot:'#a8a8a8',gold_ingot:'#e8c030',diamond:'#60d8d8',ancient_core:'#c8a030',voltium_alloy:'#40d8c8',berries:'#c02020',raw_meat:'#d84030',cooked_meat:'#904020'};
+      ictx.fillStyle=cols[id]||'#666';ictx.fillRect(4,4,24,24);
+      ictx.strokeStyle='rgba(255,255,255,0.25)';ictx.lineWidth=1;ictx.strokeRect(4,4,24,24);
+    }
+    Game.itemIcons[id]=ic.toDataURL();
+  }
+}
+
+/* ===================== SHADERS ===================== */
+// THREE.ShaderMaterial automatically provides: position, normal, uv, projectionMatrix,
+// modelViewMatrix, viewMatrix, normalMatrix, cameraPosition, and precision.
+// Only declare custom uniforms/varyings below.
+
+const WATER_VERT=`
+uniform float uTime;
+uniform float fogNear;
+uniform float fogFar;
+varying vec2 vUv;
+varying float vFog;
+void main(){
+  vec3 pos=position;
+  pos.y-=0.13;
+  if(normal.y>0.5) pos.y+=sin(pos.x*2.1+uTime*1.6)*cos(pos.z*1.8+uTime*1.3)*0.065;
+  vec4 mv=modelViewMatrix*vec4(pos,1.0);
+  gl_Position=projectionMatrix*mv;
+  vUv=pos.xz;
+  vFog=smoothstep(fogNear,fogFar,-mv.z);
+}`;
+const WATER_FRAG=`
+uniform vec3 fogColor;
+uniform float uTime;
+uniform float uBright;
+varying vec2 vUv;
+varying float vFog;
+void main(){
+  float w=sin(vUv.x*3.0+uTime)*sin(vUv.y*3.0+uTime*0.7)*0.1+0.5;
+  vec3 col=vec3(0.10+w*0.05,0.30+w*0.10,0.65+w*0.05)*uBright;
+  gl_FragColor=vec4(mix(col,fogColor,vFog),0.70);
+}`;
+const SKY_VERT=`
+varying vec3 vPos;
+void main(){
+  vPos=position;
+  gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+}`;
+const SKY_FRAG=`
+uniform vec3 uZenith;
+uniform vec3 uHorizon;
+uniform vec3 uGround;
+uniform vec3 uSunDir;
+uniform float uSunVis;
+varying vec3 vPos;
+void main(){
+  vec3 d=normalize(vPos);
+  float up=d.y;
+  vec3 sky=up>0.0 ? mix(uHorizon,uZenith,pow(up,0.45)) : mix(uHorizon,uGround,pow(-up,0.4));
+  float sd=dot(d,normalize(uSunDir));
+  sky=mix(sky,vec3(1.0,0.97,0.92),smoothstep(0.9988,0.9999,sd)*uSunVis);
+  sky+=vec3(1.0,0.7,0.3)*pow(max(0.0,sd),30.0)*0.45*uSunVis;
+  gl_FragColor=vec4(sky,1.0);
+}`;
+
+/* ===================== RENDERER INIT ===================== */
+function initRenderer(){
+  const canvas=document.getElementById('game-canvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.shadowMap.enabled=false;
+  Game.renderer=renderer;
+  const scene=new THREE.Scene();
+  const fd=(Game.settings.renderDistance+0.5)*CHUNK_SIZE*1.4;
+  scene.fog=new THREE.Fog(0x87ceeb,fd*0.28,fd);
+  Game.scene=scene;
+  const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.05,800);
+  Game.camera=camera; scene.add(camera);
+  Game.clock=new THREE.Clock();
+  Game.ambientLight=new THREE.AmbientLight(0xffffff,0.55); scene.add(Game.ambientLight);
+  Game.sunLight=new THREE.DirectionalLight(0xfff4e0,1.0); Game.sunLight.position.set(100,200,50); scene.add(Game.sunLight);
+  Game.moonLight=new THREE.DirectionalLight(0x8898cc,0.10); Game.moonLight.position.set(-100,100,-50); scene.add(Game.moonLight);
+  // Sky dome
+  const skyGeo=new THREE.SphereGeometry(460,20,10);
+  const skyMat=new THREE.ShaderMaterial({vertexShader:SKY_VERT,fragmentShader:SKY_FRAG,
+    uniforms:{uZenith:{value:new THREE.Color(0x2060b0)},uHorizon:{value:new THREE.Color(0x87ceeb)},
+              uGround:{value:new THREE.Color(0x1a2010)},uSunDir:{value:new THREE.Vector3(0.6,0.8,0.2)},uSunVis:{value:1.0}},
+    side:THREE.BackSide,depthWrite:false,fog:false});
+  Game.skyMesh=new THREE.Mesh(skyGeo,skyMat); Game.skyMesh.renderOrder=-1; scene.add(Game.skyMesh);
+  // Materials
+  Game.materials.solid=new THREE.MeshBasicMaterial({map:Game.atlasTexture,vertexColors:true});
+  Game.materials.water=new THREE.ShaderMaterial({vertexShader:WATER_VERT,fragmentShader:WATER_FRAG,
+    uniforms:{uTime:{value:0},uBright:{value:1},fogColor:{value:new THREE.Color(0x87ceeb)},fogNear:{value:fd*0.28},fogFar:{value:fd}},
+    transparent:true,side:THREE.DoubleSide});
+  // Selection box
+  const edges=new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002,1.002,1.002));
+  Game.selectionBox=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x000000,opacity:0.55,transparent:true}));
+  Game.selectionBox.visible=false; scene.add(Game.selectionBox);
+  window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+}
+
+/* ===================== CHUNK MANAGER ===================== */
+const chunkMeshMap=new Map();
+let chunkCooldown=0;
+
+function getBlock(wx,wy,wz){
+  if(wy<0) return BLOCKS.BEDROCK;
+  if(wy>=WORLD_HEIGHT) return BLOCKS.AIR;
+  const cx=Math.floor(wx/CHUNK_SIZE),cz=Math.floor(wz/CHUNK_SIZE);
+  const c=Game.world.chunks.get(chunkKey(cx,cz));
+  if(!c) return -1;
+  const lx=((wx%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE,lz=((wz%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE;
+  return c.data[idx(lx,wy,lz)];
+}
+function setBlock(wx,wy,wz,blockId){
+  if(wy<0||wy>=WORLD_HEIGHT) return false;
+  const cx=Math.floor(wx/CHUNK_SIZE),cz=Math.floor(wz/CHUNK_SIZE);
+  const c=Game.world.chunks.get(chunkKey(cx,cz)); if(!c) return false;
+  const lx=((wx%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE,lz=((wz%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE;
+  c.data[idx(lx,wy,lz)]=blockId;
+  Game.world.modifications.set(blockKey(wx,wy,wz),blockId);
+  remeshChunk(cx,cz);
+  if(lx===0)remeshChunk(cx-1,cz);if(lx===CHUNK_SIZE-1)remeshChunk(cx+1,cz);
+  if(lz===0)remeshChunk(cx,cz-1);if(lz===CHUNK_SIZE-1)remeshChunk(cx,cz+1);
+  return true;
+}
+function buildChunkMesh(cx,cz){
+  const c=Game.world.chunks.get(chunkKey(cx,cz)); if(!c) return;
+  unloadChunkMesh(cx,cz);
+  const md=meshChunk(c.data,c.biomes,getBlock,cx,cz);
+  const ox=cx*CHUNK_SIZE,oz=cz*CHUNK_SIZE;
+  const grp={solid:null,water:null,torchLights:[]};
+  if(md.solid.indices.length>0){
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(md.solid.positions,3));
+    geo.setAttribute('normal',  new THREE.BufferAttribute(md.solid.normals,3));
+    geo.setAttribute('uv',      new THREE.BufferAttribute(md.solid.uvs,2));
+    geo.setAttribute('color',   new THREE.BufferAttribute(md.solid.colors,3));
+    geo.setIndex(new THREE.BufferAttribute(md.solid.indices,1));
+    geo.computeBoundingSphere();
+    const mesh=new THREE.Mesh(geo,Game.materials.solid);
+    mesh.position.set(ox,0,oz); Game.scene.add(mesh); grp.solid=mesh;
+  }
+  if(md.water.indices.length>0){
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(md.water.positions,3));
+    geo.setAttribute('normal',  new THREE.BufferAttribute(md.water.normals,3));
+    geo.setIndex(new THREE.BufferAttribute(md.water.indices,1));
+    geo.computeBoundingSphere();
+    const mesh=new THREE.Mesh(geo,Game.materials.water);
+    mesh.position.set(ox,0,oz); Game.scene.add(mesh); grp.water=mesh;
+  }
+  for(let i=0;i<Math.min(md.specials.length,3);i++){
+    const s=md.specials[i];
+    if(s.type==='torch'){const l=new THREE.PointLight(0xffaa44,0.9,9);l.position.set(ox+s.x+0.5,s.y+0.7,oz+s.z+0.5);Game.scene.add(l);grp.torchLights.push(l);}
+  }
+  chunkMeshMap.set(chunkKey(cx,cz),grp);
+}
+function remeshChunk(cx,cz){if(Game.world.chunks.has(chunkKey(cx,cz)))buildChunkMesh(cx,cz);}
+function unloadChunkMesh(cx,cz){
+  const grp=chunkMeshMap.get(chunkKey(cx,cz)); if(!grp) return;
+  if(grp.solid){Game.scene.remove(grp.solid);grp.solid.geometry.dispose();}
+  if(grp.water){Game.scene.remove(grp.water);grp.water.geometry.dispose();}
+  grp.torchLights.forEach(l=>Game.scene.remove(l));
+  chunkMeshMap.delete(chunkKey(cx,cz));
+}
+function updateChunks(dt){
+  const p=Game.player.position;
+  const pcx=Math.floor(p.x/CHUNK_SIZE),pcz=Math.floor(p.z/CHUNK_SIZE);
+  const rd=Game.settings.renderDistance;
+  chunkCooldown-=dt;
+  if(chunkCooldown<=0){
+    let bd=Infinity,bx=0,bz=0,found=false;
+    for(let dz=-rd;dz<=rd;dz++)for(let dx=-rd;dx<=rd;dx++){
+      const d2=dx*dx+dz*dz;
+      if(d2<=rd*rd&&!Game.world.chunks.has(chunkKey(pcx+dx,pcz+dz))&&d2<bd){bd=d2;bx=pcx+dx;bz=pcz+dz;found=true;}
+    }
+    if(found){
+      const cd=generateChunkData(bx,bz,Game.seed);
+      for(const[bk,bid] of Game.world.modifications){
+        const[mx,my,mz]=bk.split(',').map(Number);
+        if(Math.floor(mx/CHUNK_SIZE)===bx&&Math.floor(mz/CHUNK_SIZE)===bz){
+          const lx=((mx%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE,lz2=((mz%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE;
+          cd.data[idx(lx,my,lz2)]=bid;
+        }
+      }
+      Game.world.chunks.set(chunkKey(bx,bz),cd);
+      buildChunkMesh(bx,bz);
+      [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dz])=>remeshChunk(bx+dx,bz+dz));
+      chunkCooldown=0.025;
+    }
+  }
+  for(const key of [...Game.world.chunks.keys()]){
+    const[cx,cz]=key.split(',').map(Number);
+    if(Math.abs(cx-pcx)>rd+1||Math.abs(cz-pcz)>rd+1){unloadChunkMesh(cx,cz);Game.world.chunks.delete(key);}
+  }
+  if(Game.skyMesh)Game.skyMesh.position.copy(p);
+}
+
+/* ===================== PLAYER ===================== */
+function isSolid(wx,wy,wz){
+  if(wy<0)return true;if(wy>=WORLD_HEIGHT)return false;
+  const id=getBlock(wx,wy,wz);return id!==-1&&isSolidBlock(id);
+}
+function checkAABB(pos,rad,ht){
+  const x0=Math.floor(pos.x-rad),x1=Math.floor(pos.x+rad-0.001);
+  const y0=Math.floor(pos.y),y1=Math.floor(pos.y+ht-0.001);
+  const z0=Math.floor(pos.z-rad),z1=Math.floor(pos.z+rad-0.001);
+  for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++)for(let z=z0;z<=z1;z++)if(isSolid(x,y,z))return true;
+  return false;
+}
+function stepPlayer(dt){
+  const p=Game.player,inp=Game.input;
+  dt=Math.min(dt,0.08);
+  const sens=Game.settings.sensitivity*0.00085;
+  p.yaw+=(inp.mouseDX+inp.touchLookDX*3)*sens;
+  p.pitch=Math.max(-Math.PI/2+0.01,Math.min(Math.PI/2-0.01,p.pitch-(inp.mouseDY+inp.touchLookDY*3)*sens));
+  inp.mouseDX=inp.mouseDY=0;inp.touchLookDX*=0.75;inp.touchLookDY*=0.75;
+  const sinY=Math.sin(p.yaw),cosY=Math.cos(p.yaw);
+  p.inWater=getBlock(Math.floor(p.position.x),Math.floor(p.position.y+0.3),Math.floor(p.position.z))===BLOCKS.WATER;
+  p.headInWater=getBlock(Math.floor(p.position.x),Math.floor(p.position.y+p.eyeHeight),Math.floor(p.position.z))===BLOCKS.WATER;
+  let mx=inp.touchMoveX,mz=inp.touchMoveY;
+  if(inp.forward)mz-=1;if(inp.back)mz+=1;if(inp.left)mx-=1;if(inp.right)mx+=1;
+  const ml=Math.hypot(mx,mz);if(ml>1){mx/=ml;mz/=ml;}
+  const wishX=cosY*mx+sinY*(-mz),wishZ=sinY*mx-cosY*(-mz);
+  const spd=p.inWater?TUNING.swimSpeed:(p.sprinting?TUNING.sprintSpeed:(p.crouching?TUNING.crouchSpeed:TUNING.walkSpeed));
+  const ctrl=(p.onGround||p.inWater)?1.0:TUNING.airControl;
+  p.velocity.x=lerp(p.velocity.x,wishX*spd,ctrl*Math.min(1,dt*15));
+  p.velocity.z=lerp(p.velocity.z,wishZ*spd,ctrl*Math.min(1,dt*15));
+  if(p.sprinting&&ml>0.1&&!p.inWater){p.stats.stamina=Math.max(0,p.stats.stamina-dt*12);if(p.stats.stamina<=0)p.sprinting=false;}
+  if(p.inWater){p.velocity.y*=Math.pow(0.1,dt);if(inp.jump)p.velocity.y=Math.min(p.velocity.y+18*dt,TUNING.swimSpeed);else p.velocity.y-=4*dt;}
+  else{p.velocity.y-=TUNING.gravity*dt;if(p.onGround&&inp.jump&&p.stats.stamina>=8){p.velocity.y=TUNING.jumpVelocity;p.onGround=false;p.stats.stamina-=8;}}
+  if(!p.onGround&&!p.inWater&&p.velocity.y<-1&&!p.falling){p.falling=true;p.fallStart=p.position.y;}
+  const rad=p.crouching?p.radius*0.85:p.radius,ht=p.crouching?p.height*0.77:p.height;
+  p.position.x+=p.velocity.x*dt;if(checkAABB(p.position,rad,ht)){p.position.x-=p.velocity.x*dt;p.velocity.x=0;}
+  p.position.z+=p.velocity.z*dt;if(checkAABB(p.position,rad,ht)){p.position.z-=p.velocity.z*dt;p.velocity.z=0;}
+  p.position.y+=p.velocity.y*dt;
+  if(checkAABB(p.position,rad,ht)){
+    if(p.velocity.y<0){p.onGround=true;if(p.falling){const fell=p.fallStart-p.position.y;if(fell>TUNING.fallDamageThreshold)takeDamage(Math.max(0,fell-TUNING.fallDamageThreshold)*7,'fall');p.falling=false;}}
+    else p.onGround=false;
+    p.position.y-=p.velocity.y*dt;p.velocity.y=0;
+  }else if(p.velocity.y<0&&!p.inWater)p.onGround=false;
+  p.position.y=Math.max(1.0,p.position.y);
+  if(p.headInWater){p.breath=Math.max(0,p.breath-dt);if(p.breath<=0)takeDamage(2*dt,'drown');}
+  else p.breath=Math.min(p.maxBreath,p.breath+dt*3);
+  if(p.onGround&&Math.hypot(p.velocity.x,p.velocity.z)>1.5)playFootstep(dt);
+  const eyeH=p.crouching?p.eyeHeight*0.77:p.eyeHeight;
+  Game.camera.position.set(p.position.x,p.position.y+eyeH,p.position.z);
+  Game.camera.rotation.order='YXZ';Game.camera.rotation.y=-p.yaw;Game.camera.rotation.x=p.pitch;
+}
+
+/* ===================== INPUT ===================== */
+function initInput(){
+  const canvas=document.getElementById('game-canvas');
+  canvas.addEventListener('click',()=>{if(Game.started&&!Game.paused&&!Game.ui.activeModal)canvas.requestPointerLock();});
+  document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&Game.started&&!Game.paused&&!Game.ui.activeModal){showModal('pause-modal');Game.paused=true;}});
+  document.addEventListener('mousemove',e=>{if(document.pointerLockElement===canvas){Game.input.mouseDX+=e.movementX;Game.input.mouseDY+=e.movementY;}});
+  document.addEventListener('mousedown',e=>{if(document.pointerLockElement!==canvas)return;if(e.button===0)Game.input.leftDown=true;if(e.button===2){Game.input.rightDown=true;onRightClick();}});
+  document.addEventListener('mouseup',e=>{if(e.button===0){Game.input.leftDown=false;stopMining();}if(e.button===2)Game.input.rightDown=false;});
+  canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  document.addEventListener('keydown',e=>{
+    if(!Game.started)return;
+    switch(e.code){
+      case'KeyW':Game.input.forward=true;break;case'KeyS':Game.input.back=true;break;
+      case'KeyA':Game.input.left=true;break;case'KeyD':Game.input.right=true;break;
+      case'Space':e.preventDefault();Game.input.jump=true;break;
+      case'ShiftLeft':Game.input.sprint=true;Game.player.sprinting=true;break;
+      case'ControlLeft':e.preventDefault();Game.input.crouch=true;Game.player.crouching=true;break;
+      case'KeyR':Game.input.drink=true;break;
+      case'KeyE':toggleInventory();break;
+      case'F3':Game.debug=!Game.debug;document.getElementById('debug-overlay').classList.toggle('show',Game.debug);break;
+      case'Escape':if(Game.ui.activeModal)hideAllModals();else{showModal('pause-modal');Game.paused=true;document.exitPointerLock();}break;
+      default:if(e.code.startsWith('Digit')){const n=parseInt(e.code[5])-1;if(n>=0&&n<9){Game.player.selectedSlot=n;updateHotbarSelection();}}
+    }
+  });
+  document.addEventListener('keyup',e=>{
+    switch(e.code){
+      case'KeyW':Game.input.forward=false;break;case'KeyS':Game.input.back=false;break;
+      case'KeyA':Game.input.left=false;break;case'KeyD':Game.input.right=false;break;
+      case'Space':Game.input.jump=false;break;
+      case'ShiftLeft':Game.input.sprint=false;Game.player.sprinting=false;break;
+      case'ControlLeft':Game.input.crouch=false;Game.player.crouching=false;break;
+      case'KeyR':Game.input.drink=false;break;
+    }
+  });
+  canvas.addEventListener('wheel',e=>{Game.player.selectedSlot=(Game.player.selectedSlot+Math.sign(e.deltaY)+9)%9;updateHotbarSelection();},{passive:true});
+  if('ontouchstart' in window)initTouchControls();
+}
+function initTouchControls(){
+  document.getElementById('touch-controls').classList.add('active');
+  const lookZone=document.getElementById('touch-look'),knob=document.getElementById('joystick-knob');
+  let lid=null,mid=null,llx=0,lly=0;
+  lookZone.addEventListener('touchstart',e=>{for(const t of e.changedTouches)if(lid===null){lid=t.identifier;llx=t.clientX;lly=t.clientY;}},{passive:true});
+  lookZone.addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===lid){Game.input.touchLookDX=t.clientX-llx;Game.input.touchLookDY=t.clientY-lly;llx=t.clientX;lly=t.clientY;}},{passive:true});
+  lookZone.addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===lid){lid=null;Game.input.touchLookDX=Game.input.touchLookDY=0;}},{passive:true});
+  const jb=document.getElementById('joystick-base');
+  const mz=document.getElementById('touch-move');
+  mz.addEventListener('touchstart',e=>{for(const t of e.changedTouches)if(mid===null)mid=t.identifier;},{passive:true});
+  mz.addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===mid){const r=jb.getBoundingClientRect(),dx=t.clientX-(r.left+r.width/2),dy=t.clientY-(r.top+r.height/2),len=Math.min(42,Math.hypot(dx,dy)),ang=Math.atan2(dy,dx),nx=Math.cos(ang)*len/42,ny=Math.sin(ang)*len/42;Game.input.touchMoveX=nx;Game.input.touchMoveY=ny;knob.style.transform=`translate(${nx*28}px,${ny*28}px)`;}},{passive:true});
+  mz.addEventListener('touchend',e=>{for(const t of e.changedTouches)if(t.identifier===mid){mid=null;Game.input.touchMoveX=Game.input.touchMoveY=0;knob.style.transform='';}},{passive:true});
+  document.getElementById('btn-jump').addEventListener('touchstart',()=>Game.input.jump=true,{passive:true});
+  document.getElementById('btn-jump').addEventListener('touchend',()=>Game.input.jump=false,{passive:true});
+  document.getElementById('btn-break').addEventListener('touchstart',()=>Game.input.leftDown=true,{passive:true});
+  document.getElementById('btn-break').addEventListener('touchend',()=>{Game.input.leftDown=false;stopMining();},{passive:true});
+  document.getElementById('btn-place').addEventListener('touchstart',()=>onRightClick(),{passive:true});
+  document.getElementById('btn-inv').addEventListener('touchstart',()=>toggleInventory(),{passive:true});
+}
+
+/* ===================== INTERACTION ===================== */
+let _mineTimer=0,_mineTarget=null;
+function castRay(maxDist){
+  const dir=new THREE.Vector3(0,0,-1).applyEuler(Game.camera.rotation);
+  const orig=Game.camera.position.clone();
+  let prev=null;
+  for(let t=0.07;t<maxDist;t+=0.065){
+    const px=Math.floor(orig.x+dir.x*t),py=Math.floor(orig.y+dir.y*t),pz=Math.floor(orig.z+dir.z*t);
+    const b=getBlock(px,py,pz);
+    if(b>0&&b!==BLOCKS.WATER){
+      let face='py';
+      if(prev){const[pdx,pdy,pdz]=[px-prev[0],py-prev[1],pz-prev[2]];if(pdy===1)face='ny';else if(pdy===-1)face='py';else if(pdx===1)face='nx';else if(pdx===-1)face='px';else if(pdz===1)face='nz';else face='pz';}
+      return{x:px,y:py,z:pz,block:b,face,dist:t};
+    }
+    if(b!==-1)prev=[px,py,pz];
+  }
+  return null;
+}
+function faceOff(f){{const m={px:[1,0,0],nx:[-1,0,0],py:[0,1,0],ny:[0,-1,0],pz:[0,0,1],nz:[0,0,-1]};return m[f]||[0,1,0];}}
+function updateInteraction(dt){
+  const hit=castRay(TUNING.reach);Game.raycastHit=hit;
+  if(hit){
+    Game.selectionBox.position.set(hit.x+0.5,hit.y+0.5,hit.z+0.5);Game.selectionBox.visible=true;
+    document.getElementById('crosshair').classList.add('targeting');
+    if(Game.input.leftDown){
+      const heldItem=Game.player.inventory[Game.player.selectedSlot]?.item||null;
+      const same=_mineTarget&&_mineTarget.x===hit.x&&_mineTarget.y===hit.y&&_mineTarget.z===hit.z;
+      if(!same){_mineTarget=hit;_mineTimer=0;}
+      const mt=getMiningTime(hit.block,heldItem);
+      const bar=document.getElementById('mining-progress');
+      if(isFinite(mt)){_mineTimer+=dt;bar.classList.add('show');bar.querySelector('i').style.width=Math.min(100,_mineTimer/mt*100)+'%';
+        if(_mineTimer>=mt){breakBlock(hit.x,hit.y,hit.z,hit.block,heldItem);_mineTimer=0;_mineTarget=null;bar.classList.remove('show');}
+      }else bar.classList.remove('show');
+    }else stopMining();
+    const hn=ITEMS[blockToItem(hit.block)]?.name||'';
+    const ex=hit.block===BLOCKS.CRAFTING_TABLE?' — Right-click to craft':hit.block===BLOCKS.FURNACE?' — Right-click to smelt':hit.block===BLOCKS.BERRY_BUSH?' — Right-click to harvest':'';
+    if(hn){const hb=document.getElementById('hint-bar');hb.textContent=hn+ex;hb.classList.add('show');}
+  }else{Game.selectionBox.visible=false;document.getElementById('crosshair').classList.remove('targeting');document.getElementById('hint-bar').classList.remove('show');stopMining();}
+  if(Game.input.drink&&hit&&hit.block===BLOCKS.WATER){Game.player.drinkProgress=(Game.player.drinkProgress||0)+dt;if(Game.player.drinkProgress>=1.5){Game.player.stats.hydration=Math.min(100,Game.player.stats.hydration+40);Game.player.drinkProgress=0;showToast('💧 Refreshed');}}
+  else Game.player.drinkProgress=0;
+}
+function stopMining(){_mineTimer=0;_mineTarget=null;document.getElementById('mining-progress').classList.remove('show');}
+function breakBlock(wx,wy,wz,blockId,heldItem){
+  setBlock(wx,wy,wz,BLOCKS.AIR);
+  const drop=blockToItem(blockId);if(drop){addItem(Game.player.inventory,drop,1);showToast('+ '+ITEMS[drop].name);}
+  if(blockId===BLOCKS.COAL_ORE)addItem(Game.player.inventory,'coal',1+Math.floor(Math.random()*2));
+  if(blockId===BLOCKS.BERRY_BUSH)addItem(Game.player.inventory,'berries',2);
+  playMineSound(blockId);updateHotbar();
+}
+function onRightClick(){
+  resumeAudio();
+  const hit=Game.raycastHit;if(!hit)return;
+  if(hit.block===BLOCKS.CRAFTING_TABLE){openCrafting(true);return;}
+  if(hit.block===BLOCKS.FURNACE){openFurnaceUI(hit.x,hit.y,hit.z);return;}
+  if(hit.block===BLOCKS.BERRY_BUSH){addItem(Game.player.inventory,'berries',2);showToast('+ Berries');updateHotbar();return;}
+  const slot=Game.player.inventory[Game.player.selectedSlot];if(!slot)return;
+  const def=ITEMS[slot.item];
+  if(def?.food){eatItem(slot.item);return;}
+  const placeId=itemToBlock(slot.item);if(placeId===null)return;
+  const off=faceOff(hit.face),bx=hit.x+off[0],by=hit.y+off[1],bz=hit.z+off[2];
+  const pp=Game.player.position,r=Game.player.radius;
+  if(bx>=pp.x-r-1&&bx<pp.x+r+1&&by>=pp.y-0.1&&by<pp.y+Game.player.height+0.5&&bz>=pp.z-r-1&&bz<pp.z+r+1)return;
+  const cur=getBlock(bx,by,bz);
+  if(cur===BLOCKS.AIR||cur===BLOCKS.WATER){setBlock(bx,by,bz,placeId);removeItem(Game.player.inventory,slot.item,1);playPlaceSound(placeId);updateHotbar();}
+}
+function eatItem(itemId){const def=ITEMS[itemId];if(!def?.food)return;Game.player.stats.hunger=Math.min(100,Game.player.stats.hunger+def.food*12);removeItem(Game.player.inventory,itemId,1);showToast('Ate '+def.name);updateHotbar();}
+
+/* ===================== SURVIVAL ===================== */
+function updateSurvival(dt){
+  const s=Game.player.stats,t=Game.time.dayTime,isNight=t>0.75||t<0.25;
+  s.hunger=Math.max(0,s.hunger-0.7*dt);s.hydration=Math.max(0,s.hydration-0.9*dt);
+  s.stamina=Math.min(100,s.stamina+(s.hunger>30?8:2)*dt);
+  const biome=getBiome(Math.floor(Game.player.position.x),Math.floor(Game.player.position.z),Game.seed);
+  const baseTmp=[60,55,78,32][biome],hasL=Game.player.inventory.some(sl=>sl?.item==='voltium_lantern');
+  s.temperature=baseTmp+(isNight?-18:4)+(Game.weather.type==='rain'?-12:Game.weather.type==='snow'?-28:0)+(hasL?22:0);
+  if(s.hunger<=0)s.health=Math.max(0,s.health-2.5*dt);
+  if(s.hydration<=0)s.health=Math.max(0,s.health-1.8*dt);
+  if(s.temperature<8){s.health=Math.max(0,s.health-1.5*dt);if(Math.random()<0.005)showToast('❄ You are freezing!');}
+  if(s.temperature>95){s.health=Math.max(0,s.health-0.8*dt);if(Math.random()<0.005)showToast('🔥 Overheating!');}
+  if(s.hunger>60&&s.hydration>40)s.health=Math.min(s.maxHealth,s.health+1.2*dt);
+  const bx=Math.floor(Game.player.position.x),bz2=Math.floor(Game.player.position.z);
+  if(getBlock(bx,Math.floor(Game.player.position.y),bz2)===BLOCKS.CACTUS||getBlock(bx,Math.floor(Game.player.position.y+1),bz2)===BLOCKS.CACTUS)takeDamage(4*dt,'cactus');
+  if(s.health<=0)handleDeath();
+}
+function takeDamage(amt,src){
+  const now=performance.now()/1000;
+  if(src!=='drown'&&src!=='cactus'&&now-Game.player.lastHitTime<0.4)return;
+  Game.player.lastHitTime=now;Game.player.stats.health=Math.max(0,Game.player.stats.health-amt);
+  const cv=document.getElementById('game-canvas');cv.style.boxShadow='inset 0 0 70px rgba(200,30,30,0.6)';setTimeout(()=>cv.style.boxShadow='',180);
+  if(src==='mob')playDamageSound();
+}
+function handleDeath(){if(document.getElementById('death-screen').classList.contains('show'))return;Game.paused=true;document.exitPointerLock();showModal('death-screen');}
+function respawn(){const s=Game.player.stats;s.health=s.maxHealth;s.hunger=70;s.stamina=80;s.hydration=60;Game.player.position.set(Game.world.spawn.x,Game.world.spawn.y,Game.world.spawn.z);Game.player.velocity.set(0,0,0);Game.player.onGround=false;Game.player.falling=false;Game.player.breath=Game.player.maxBreath;hideAllModals();Game.paused=false;document.getElementById('game-canvas').requestPointerLock();}
+
+/* ===================== DAY/NIGHT ===================== */
+const _ZEN=[new THREE.Color(0x2060b0),new THREE.Color(0x1a3060),new THREE.Color(0x060820)];
+const _HOR=[new THREE.Color(0x87ceeb),new THREE.Color(0xe87020),new THREE.Color(0x0a0c1a)];
+const _GRD=[new THREE.Color(0x182010),new THREE.Color(0x10100a),new THREE.Color(0x030408)];
+const _FOG=[new THREE.Color(0x87ceeb),new THREE.Color(0xd06020),new THREE.Color(0x0a0c1a)];
+const _fc=new THREE.Color();
+function advanceTime(dt){Game.time.dayTime+=dt/dayLengthSeconds();if(Game.time.dayTime>=1){Game.time.dayTime-=1;Game.time.totalDays++;Game.time.season=Math.floor(Game.time.totalDays/7)%4;}updateLighting();updateWeather(dt);}
+function updateLighting(){
+  const t=Game.time.dayTime;
+  const isNight=t>=0.82||t<0.21, isDawn=t>=0.21&&t<0.32, isDay=t>=0.32&&t<=0.72, isDusk=t>0.72&&t<0.82;
+  const sunAngle=(t-0.25)*Math.PI*2,sunDir=new THREE.Vector3(Math.sin(sunAngle),-Math.cos(sunAngle),0.25).normalize();
+  let skyLight,ambInt,fi;
+  if(isDay)  {skyLight=1.0;  ambInt=0.55; fi=0;}
+  else if(isNight){skyLight=0.20; ambInt=0.10; fi=2;}
+  else if(isDawn) {const f=Math.max(0,Math.min(1,(t-0.21)/0.11)); skyLight=lerp(0.20,1.0,f); ambInt=lerp(0.10,0.55,f); fi=1;}
+  else if(isDusk) {const f=Math.max(0,Math.min(1,(t-0.72)/0.10)); skyLight=lerp(1.0,0.20,f); ambInt=lerp(0.55,0.10,f); fi=1;}
+  else            {skyLight=0.20; ambInt=0.10; fi=2;} // safety fallback
+  Game.sunLight.intensity=Math.max(0,sunDir.y*1.1);Game.moonLight.intensity=isNight?0.12:0;Game.ambientLight.intensity=ambInt;
+  if(Game.materials.solid)Game.materials.solid.color.setScalar(skyLight);
+  const fd=(Game.settings.renderDistance+0.5)*CHUNK_SIZE*1.4;
+  _fc.copy(_FOG[fi]);Game.scene.fog.color.copy(_fc);Game.scene.fog.near=fd*0.28;Game.scene.fog.far=fd;Game.renderer.setClearColor(_fc);
+  if(Game.materials.water){const wu=Game.materials.water.uniforms;wu.uBright.value=skyLight;wu.fogColor.value.copy(_fc);wu.fogNear.value=fd*0.28;wu.fogFar.value=fd;}
+  if(Game.skyMesh){const u=Game.skyMesh.material.uniforms;u.uZenith.value.copy(_ZEN[fi]);u.uHorizon.value.copy(_HOR[fi]);u.uGround.value.copy(_GRD[fi]);u.uSunDir.value.copy(sunDir);u.uSunVis.value=sunDir.y<0.02?0:1;}
+  updateClockHUD(t);
+  const n=t>0.75||t<0.25;document.getElementById('weather-icon').textContent=n?'🌙':Game.weather.type==='rain'?'🌧':Game.weather.type==='snow'?'❄':'☀';
+}
+function updateWeather(dt){const w=Game.weather;w.timer-=dt;if(w.timer<=0){w.timer=60+Math.random()*180;const biome=getBiome(Math.floor(Game.player.position.x),Math.floor(Game.player.position.z),Game.seed),r=Math.random();w.type=r<0.55?'clear':(biome===BIOME.TUNDRA&&r<0.8?'snow':'rain');}}
+
+/* ===================== MOBS ===================== */
+const MOB_DEFS={deer:{type:'passive',health:16,r:0xc8a878,w:0.6,h:1.0,drops:['raw_meat']},fox:{type:'passive',health:10,r:0xe07030,w:0.4,h:0.6,drops:['raw_meat']},goblin:{type:'hostile',health:24,r:0x608040,w:0.5,h:1.1,drops:['stick','coal']},stone_golem:{type:'hostile',health:60,r:0x787878,w:0.9,h:1.8,drops:['cobblestone','iron_ore']}};
+function getGroundY(wx,wz){for(let y=WORLD_HEIGHT-1;y>=0;y--){const b=getBlock(Math.floor(wx),y,Math.floor(wz));if(b>0&&b!==BLOCKS.WATER)return y+1;}return 1;}
+function spawnMob(type,wx,wz){
+  const def=MOB_DEFS[type];if(!def)return;const wy=getGroundY(wx,wz);if(wy<SEA_LEVEL+1)return;
+  const geo=new THREE.BoxGeometry(def.w,def.h,def.w),mat=new THREE.MeshLambertMaterial({color:def.r}),mesh=new THREE.Mesh(geo,mat);
+  const eg=new THREE.BoxGeometry(def.w*0.28,def.h*0.14,0.08),em=new THREE.MeshBasicMaterial({color:0xff2222});
+  [-1,1].forEach(s=>{const e=new THREE.Mesh(eg,em);e.position.set(s*def.w*0.14,def.h*0.25,def.w*0.51);mesh.add(e);});
+  mesh.position.set(wx+0.5,wy+def.h/2,wz+0.5);Game.scene.add(mesh);
+  Game.mobs.push({mobType:type,def,mesh,x:wx+0.5,y:wy+def.h/2,z:wz+0.5,vy:0,health:def.health,maxHealth:def.health,type:def.type,state:'idle',attackCooldown:0,wanderTimer:0,wanderDirX:0,wanderDirZ:0,despawnTimer:90+Math.random()*90});
+}
+function updateMobs(dt){
+  const pp={x:Game.player.position.x,z:Game.player.position.z};
+  for(let i=Game.mobs.length-1;i>=0;i--){
+    const mob=Game.mobs[i];mob.despawnTimer-=dt;
+    if(mob.despawnTimer<=0||mob.health<=0){if(mob.health<=0){mob.def.drops.forEach(d=>addItem(Game.player.inventory,d,1));showToast('Defeated '+mob.mobType+'!');updateHotbar();}Game.scene.remove(mob.mesh);mob.mesh.geometry.dispose();Game.mobs.splice(i,1);continue;}
+    const ai=updateMobAI(mob,dt,pp);mob.x+=ai.vx*dt;mob.z+=ai.vz*dt;mob.vy-=18*dt;mob.y+=mob.vy*dt;
+    const gy=getGroundY(mob.x,mob.z);if(mob.y-mob.def.h/2<=gy){mob.y=gy+mob.def.h/2;mob.vy=0;}
+    mob.mesh.position.set(mob.x,mob.y,mob.z);if(Math.abs(ai.vx)+Math.abs(ai.vz)>0.1)mob.mesh.rotation.y=Math.atan2(ai.vx,ai.vz);
+    if(ai.didAttack)takeDamage(AI_TUNING.hostile.attackDamage,'mob');
+  }
+  if(Game.mobs.length<10&&Math.random()<dt*0.12)trySpawnMob();
+}
+function trySpawnMob(){const p=Game.player.position,ang=Math.random()*Math.PI*2,dist=20+Math.random()*15,sx=p.x+Math.cos(ang)*dist,sz=p.z+Math.sin(ang)*dist;const biome=getBiome(Math.floor(sx),Math.floor(sz),Game.seed),t=Game.time.dayTime,isNight=t>0.75||t<0.25;const pool=isNight?['goblin','goblin','stone_golem']:(biome===BIOME.FOREST?['deer','deer','fox']:biome===BIOME.PLAINS?['deer','fox']:['fox','goblin']);spawnMob(pool[Math.floor(Math.random()*pool.length)],Math.floor(sx),Math.floor(sz));}
+
+/* ===================== AUDIO ===================== */
+function initAudio(){if(!Game.settings.sound)return;try{Game.audio.ctx=new(window.AudioContext||window.webkitAudioContext)();Game.audio.master=Game.audio.ctx.createGain();Game.audio.master.gain.value=0.3;Game.audio.master.connect(Game.audio.ctx.destination);}catch(e){console.warn('Audio:',e);}}
+function resumeAudio(){if(Game.audio.ctx?.state==='suspended')Game.audio.ctx.resume();}
+function _note(freq,type,dur,vol,delay=0){const ctx=Game.audio.ctx;if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(Game.audio.master);o.type=type;o.frequency.value=freq;const t=ctx.currentTime+delay;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);o.start(t);o.stop(t+dur+0.02);}
+function _noise(dur,vol){const ctx=Game.audio.ctx;if(!ctx)return;const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource();s.buffer=buf;const g=ctx.createGain();g.gain.setValueAtTime(vol,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);s.connect(g);g.connect(Game.audio.master);s.start();s.stop(ctx.currentTime+dur+0.02);}
+let _stepAcc=0;
+function playFootstep(dt){_stepAcc+=dt;if(_stepAcc<0.34)return;_stepAcc=0;_noise(0.055,0.04);_note(85+Math.random()*18,'sine',0.07,0.025);}
+function playMineSound(bid){const st=new Set([BLOCKS.STONE,BLOCKS.COBBLESTONE,BLOCKS.IRON_ORE,BLOCKS.GOLD_ORE,BLOCKS.DIAMOND_ORE,BLOCKS.COAL_ORE,BLOCKS.ANCIENT_BRICK,BLOCKS.BEDROCK]);st.has(bid)?(_noise(0.04,0.1),_note(190,'square',0.04,0.03)):_note(280+Math.random()*80,'triangle',0.09,0.05);}
+function playPlaceSound(){_note(230,'triangle',0.06,0.07);_noise(0.025,0.03);}
+function playDamageSound(){_note(110,'sawtooth',0.10,0.13);_note(78,'square',0.07,0.07,0.05);}
+function playCraftSound(){_note(440,'sine',0.07,0.07);_note(550,'sine',0.07,0.07,0.07);_note(660,'sine',0.09,0.09,0.14);}
+
+/* ===================== INVENTORY UI ===================== */
+const furnaceStates=new Map();let activeFurnaceKey=null;
+function initInventoryGrid(){const grid=document.getElementById('inventory-grid');grid.innerHTML='';for(let i=0;i<36;i++){const el=document.createElement('div');el.className='slot';el.dataset.idx=i;el.innerHTML='<div class="icon"></div><div class="count"></div>';el.addEventListener('click',()=>onInvSlotClick(i));grid.appendChild(el);}}
+function updateInventoryGrid(){document.querySelectorAll('#inventory-grid .slot').forEach((el,i)=>{const s=Game.player.inventory[i];el.querySelector('.icon').style.backgroundImage=s?`url(${Game.itemIcons[s.item]||''})` :'';el.querySelector('.count').textContent=s&&s.count>1?s.count:'';});}
+function onInvSlotClick(i){const inv=Game.player.inventory,slot=inv[i];if(!slot)return;let tgt=-1;for(let j=0;j<9;j++)if(!inv[j]){tgt=j;break;}if(tgt===-1)tgt=i<9?9:0;if(tgt!==i){const tmp=inv[tgt];inv[tgt]=inv[i];inv[i]=tmp;}updateInventoryGrid();updateHotbar();}
+function toggleInventory(){if(Game.ui.activeModal==='inventory-modal'){hideAllModals();return;}updateInventoryGrid();showModal('inventory-modal');}
+function openCrafting(nearTable){Game.ui.nearCraftingTable=!!nearTable;document.getElementById('crafting-title').textContent=nearTable?'Crafting Table':'Crafting';buildCraftingUI();showModal('crafting-modal');}
+function buildCraftingUI(){
+  const tabs=document.getElementById('crafting-tabs'),list=document.getElementById('recipe-list');
+  const cats=[...new Set(RECIPES.map(r=>r.category))];
+  if(!cats.includes(Game.ui.craftingTab))Game.ui.craftingTab=cats[0];
+  tabs.innerHTML='';cats.forEach(cat=>{const t=document.createElement('div');t.className='tab'+(cat===Game.ui.craftingTab?' active':'');t.textContent=cat[0].toUpperCase()+cat.slice(1);t.addEventListener('click',()=>{Game.ui.craftingTab=cat;buildCraftingUI();});tabs.appendChild(t);});
+  list.innerHTML='';const nt=Game.ui.nearCraftingTable;
+  RECIPES.filter(r=>r.category===Game.ui.craftingTab).forEach(recipe=>{
+    const ok=canCraft(recipe,Game.player.inventory,nt);
+    const row=document.createElement('div');row.className='recipe'+(ok?' craftable':'');
+    const reqH=recipe.inputs.map(req=>{const have=countItem(Game.player.inventory,req.item)>=req.count;return `<span class="${have?'have':'missing'}">${req.count}× ${ITEMS[req.item]?.name||req.item}</span>`;}).join(', ');
+    row.innerHTML=`<div class="icon" style="background-image:url(${Game.itemIcons[recipe.output.item]||''})"></div><div class="info"><div class="name">${recipe.name} ×${recipe.output.count}</div><div class="reqs">${reqH}${recipe.requires?' <span style="color:var(--text-dim)">[Table]</span>':''}</div></div><button class="btn small${ok?'':' disabled'}">${ok?'Craft':'Locked'}</button>`;
+    row.querySelector('button').addEventListener('click',()=>{if(craft(recipe,Game.player.inventory,nt)){playCraftSound();showToast('Crafted '+recipe.output.count+'× '+recipe.name);buildCraftingUI();updateHotbar();}});
+    list.appendChild(row);
+  });
+}
+function openFurnaceUI(wx,wy,wz){activeFurnaceKey=blockKey(wx,wy,wz);if(!furnaceStates.has(activeFurnaceKey))furnaceStates.set(activeFurnaceKey,{input:null,inputCount:0,fuel:null,fuelCount:0,output:null,outputCount:0,progress:0,burnTimeLeft:0});refreshFurnaceUI();showModal('furnace-modal');}
+function refreshFurnaceUI(){
+  if(!activeFurnaceKey||!furnaceStates.has(activeFurnaceKey))return;
+  const f=furnaceStates.get(activeFurnaceKey);
+  const sr=(id,itemId,count)=>{const el=document.getElementById(id);el.querySelector('.icon').style.backgroundImage=itemId&&count>0?`url(${Game.itemIcons[itemId]||''})` :'';el.querySelector('.count').textContent=count>1?count:'';};
+  sr('furnace-input',f.input,f.inputCount);sr('furnace-fuel',f.fuel,f.fuelCount);sr('furnace-output',f.output,f.outputCount);
+  document.getElementById('furnace-progress').style.width=(f.input&&SMELT_RECIPES[f.input]?f.progress/SMELT_RECIPES[f.input].time*100:0)+'%';
+  document.getElementById('furnace-input').onclick=()=>{const sl=Game.player.inventory[Game.player.selectedSlot];if(sl&&SMELT_RECIPES[sl.item]&&(!f.input||f.input===sl.item)){const mv=Math.min(sl.count,64-f.inputCount);f.input=sl.item;f.inputCount+=mv;removeItem(Game.player.inventory,sl.item,mv);refreshFurnaceUI();updateHotbar();}};
+  document.getElementById('furnace-fuel').onclick=()=>{const sl=Game.player.inventory[Game.player.selectedSlot];if(sl&&ITEMS[sl.item]?.fuel&&(!f.fuel||f.fuel===sl.item)){const mv=Math.min(sl.count,64-f.fuelCount);f.fuel=sl.item;f.fuelCount+=mv;removeItem(Game.player.inventory,sl.item,mv);refreshFurnaceUI();updateHotbar();}};
+  document.getElementById('furnace-output').onclick=()=>{if(f.output&&f.outputCount>0){addItem(Game.player.inventory,f.output,f.outputCount);f.output=null;f.outputCount=0;showToast('Collected output');refreshFurnaceUI();updateHotbar();}};
+}
+function tickFurnaces(dt){for(const f of furnaceStates.values())updateFurnace(f,dt);if(activeFurnaceKey&&furnaceStates.has(activeFurnaceKey))refreshFurnaceUI();}
+
+/* ===================== HUD ===================== */
+function initHotbar(){const hb=document.getElementById('hotbar');hb.innerHTML='';for(let i=0;i<9;i++){const el=document.createElement('div');el.className='slot'+(i===0?' selected':'');el.dataset.slot=i;el.innerHTML=`<div class="key">${i+1}</div><div class="icon"></div><div class="count"></div>`;el.addEventListener('click',()=>{Game.player.selectedSlot=i;updateHotbarSelection();});hb.appendChild(el);}}
+function updateHotbar(){document.querySelectorAll('#hotbar .slot').forEach((el,i)=>{const s=Game.player.inventory[i];el.querySelector('.icon').style.backgroundImage=s?`url(${Game.itemIcons[s.item]||''})` :'';el.querySelector('.count').textContent=s&&s.count>1?s.count:'';});}
+function updateHotbarSelection(){document.querySelectorAll('#hotbar .slot').forEach((el,i)=>el.classList.toggle('selected',i===Game.player.selectedSlot));}
+function updateStatsHUD(){
+  const s=Game.player.stats;
+  const sb=(cls,val,mx=100)=>{const el=document.querySelector('.statbar.'+cls+' i');if(el)el.style.width=Math.max(0,Math.min(100,val/mx*100))+'%';};
+  sb('health',s.health,s.maxHealth);sb('hunger',s.hunger);sb('stamina',s.stamina);sb('hydration',s.hydration);
+  const tm=document.getElementById('temp-marker');if(tm)tm.style.left=Math.max(0,Math.min(100,s.temperature))+'%';
+  const br=document.getElementById('breath-row'),bb=document.getElementById('breath-bar');
+  if(Game.player.headInWater){br?.classList.add('show');if(bb)bb.style.width=(Game.player.breath/Game.player.maxBreath*100)+'%';}
+  else br?.classList.remove('show');
+}
+function updateClockHUD(t){const face=document.getElementById('clock-face');if(!face)return;const hr=(t*24)|0,mn=((t*24*60)|0)%60,ang=(t-0.25)*Math.PI*2,hx=(23+Math.sin(ang)*10).toFixed(1),hy=(23-Math.cos(ang)*10).toFixed(1);face.innerHTML=`<line x1="23" y1="23" x2="${hx}" y2="${hy}" stroke="#e0a847" stroke-width="2.5" stroke-linecap="round"/><text x="23" y="42" text-anchor="middle" fill="#8a96a0" font-size="6.5">${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}</text>`;}
+function updateDebugHUD(){if(!Game.debug)return;const p=Game.player.position,cx=Math.floor(p.x/CHUNK_SIZE),cz=Math.floor(p.z/CHUNK_SIZE);document.getElementById('debug-overlay').textContent=[`Pos: ${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}`,`Chunk: ${cx},${cz}  Biome: ${BIOME_NAMES[getBiome(p.x|0,p.z|0,Game.seed)]}`,`Loaded: ${Game.world.chunks.size} chunks  Mobs: ${Game.mobs.length}`,`Day: ${Game.time.totalDays}  Time: ${(Game.time.dayTime*24).toFixed(1)}h`,`HP:${Game.player.stats.health.toFixed(0)} HG:${Game.player.stats.hunger.toFixed(0)} HY:${Game.player.stats.hydration.toFixed(0)}`,`Temp: ${Game.player.stats.temperature.toFixed(0)}°  Weather: ${Game.weather.type}`,`FPS: ${(1/(Game._lastDt||0.016)).toFixed(0)}`].join('\n');}
+let _toastTmr=null;
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.opacity='1';clearTimeout(_toastTmr);_toastTmr=setTimeout(()=>el.style.opacity='0',2600);}
+
+/* ===================== SAVE / LOAD ===================== */
+const SAVE_KEY='voxelore_v1';
+function saveWorld(){if(!Game.started)return;const data={seed:Game.seed,player:{pos:[Game.player.position.x,Game.player.position.y,Game.player.position.z],yaw:Game.player.yaw,pitch:Game.player.pitch,inventory:Game.player.inventory,stats:Game.player.stats,slot:Game.player.selectedSlot},time:Game.time,weather:{type:Game.weather.type},mods:Array.from(Game.world.modifications.entries())};try{localStorage.setItem(SAVE_KEY,JSON.stringify(data));showToast('World saved ✓');}catch(e){showToast('Save failed');}}
+function hasSave(){return!!localStorage.getItem(SAVE_KEY);}
+function loadSave(){try{return JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch{return null;}}
+function applyLoadedSave(data){Game.seed=data.seed;const pp=data.player;Game.player.position.set(...pp.pos);Game.player.yaw=pp.yaw;Game.player.pitch=pp.pitch;Game.player.inventory=pp.inventory;Game.player.stats=pp.stats;Game.player.selectedSlot=pp.slot||0;Game.time={...Game.time,...data.time};if(data.weather)Game.weather.type=data.weather.type;if(data.mods)Game.world.modifications=new Map(data.mods);}
+
+/* ===================== MENUS ===================== */
+function showModal(id){hideAllModals();document.getElementById(id)?.classList.add('show');Game.ui.activeModal=id;}
+function hideAllModals(){document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'));Game.ui.activeModal=null;}
+function hashStr(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return(h>>>0);}
+function initMenus(){
+  document.getElementById('btn-new-world').addEventListener('click',()=>{const sv=document.getElementById('seed-input').value.trim();startGame(sv?hashStr(sv):(Math.random()*0xffffff|0),null);});
+  document.getElementById('btn-continue').addEventListener('click',()=>{const data=loadSave();if(data)startGame(data.seed,data);});
+  document.getElementById('btn-controls').addEventListener('click',()=>showModal('controls-modal'));
+  document.getElementById('controls-close').addEventListener('click',()=>hideAllModals());
+  document.getElementById('btn-resume').addEventListener('click',()=>{hideAllModals();Game.paused=false;document.getElementById('game-canvas').requestPointerLock();});
+  document.getElementById('btn-save').addEventListener('click',()=>saveWorld());
+  document.getElementById('btn-settings').addEventListener('click',()=>showModal('settings-modal'));
+  document.getElementById('btn-pause-controls').addEventListener('click',()=>showModal('controls-modal'));
+  document.getElementById('btn-title').addEventListener('click',()=>location.reload());
+  document.getElementById('inv-close').addEventListener('click',()=>hideAllModals());
+  document.getElementById('craft-close').addEventListener('click',()=>hideAllModals());
+  document.getElementById('furnace-close').addEventListener('click',()=>hideAllModals());
+  document.getElementById('settings-close').addEventListener('click',()=>{hideAllModals();if(Game.started&&!Game.paused)document.getElementById('game-canvas').requestPointerLock();});
+  document.getElementById('btn-respawn').addEventListener('click',()=>respawn());
+  const sl=(id,key,cb)=>{const e=document.getElementById(id);e.value=Game.settings[key];e.addEventListener('input',()=>{Game.settings[key]=+e.value;if(cb)cb();});};
+  const tg=(id,key,cb)=>{const e=document.getElementById(id);if(Game.settings[key])e.classList.add('on');e.addEventListener('click',()=>{Game.settings[key]=!Game.settings[key];e.classList.toggle('on',Game.settings[key]);if(cb)cb();});};
+  sl('set-renderdist','renderDistance',()=>{const fd=(Game.settings.renderDistance+0.5)*CHUNK_SIZE*1.4;if(Game.scene?.fog){Game.scene.fog.near=fd*0.28;Game.scene.fog.far=fd;}});
+  tg('set-shadows','shadows');tg('set-weather','weatherFx');tg('set-waves','waterWaves');tg('set-sound','sound');
+  sl('set-daylength','dayLengthMinutes');sl('set-sensitivity','sensitivity');
+  if(hasSave())document.getElementById('btn-continue').removeAttribute('disabled');
+}
+function findSpawn(){const cd=generateChunkData(0,0,Game.seed);const h=cd.heights[8+8*CHUNK_SIZE];return new THREE.Vector3(8.5,h+1.2,8.5);}
+function startGame(seed,savedData){
+  Game.seed=seed;if(savedData)applyLoadedSave(savedData);
+  buildAtlasTexture();initRenderer();initInput();initHotbar();initInventoryGrid();initAudio();
+  if(!savedData){const sp=findSpawn();Game.player.position.copy(sp);Game.world.spawn.x=sp.x;Game.world.spawn.y=sp.y;Game.world.spawn.z=sp.z;addItem(Game.player.inventory,'planks',8);addItem(Game.player.inventory,'dirt',16);addItem(Game.player.inventory,'coal',4);addItem(Game.player.inventory,'stick',4);addItem(Game.player.inventory,'berries',6);}
+  document.getElementById('title-screen').classList.add('hidden');document.getElementById('hud').classList.add('active');
+  Game.started=true;Game.paused=false;updateHotbar();updateHotbarSelection();
+  Game.clock.start();requestAnimationFrame(gameLoop);
+  setTimeout(()=>document.getElementById('game-canvas').requestPointerLock(),400);
+}
+
+/* ===================== MAIN LOOP ===================== */
+Game._lastDt=0.016;
+function gameLoop(){
+  requestAnimationFrame(gameLoop);
+  if(!Game.started)return;
+  const dt=Math.min(Game.clock.getDelta(),0.1);
+  Game._lastDt=dt;
+  if(Game.paused){Game.renderer?.render(Game.scene,Game.camera);return;}
+  resumeAudio();
+  updateChunks(dt);
+  stepPlayer(dt);
+  updateInteraction(dt);
+  updateSurvival(dt);
+  advanceTime(dt);
+  updateMobs(dt);
+  tickFurnaces(dt);
+  if(Game.materials.water)Game.materials.water.uniforms.uTime.value+=dt;
+  updateStatsHUD();updateDebugHUD();
+  Game.renderer.render(Game.scene,Game.camera);
+}
+window.addEventListener('DOMContentLoaded',()=>{initMenus();console.log('Voxelore ready ✓');});
+</script>
+</body>
+</html>

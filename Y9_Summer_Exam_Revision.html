@@ -521,53 +521,102 @@ EXAMS.forEach(e => {
 // ══════════════════════════════
 const today = new Date(); today.setHours(0,0,0,0);
 
+// school days: only free after ~4:30–5pm. Weekends: all day free.
+// Exam days: exams happen at school, revision slots are around them.
 const PLAN = [
-  {date:'2026-06-17',label:'Today (if applicable)',sessions:[
-    {t:'Morning',dot:'var(--bio)',title:'Biology — Cell Biology (most urgent exam!)',desc:'Cell structure, specialised cells, microscopy, diffusion, osmosis, active transport'},
-    {t:'Afternoon',dot:'var(--ma)',title:'Maths Paper 1 — Number & Algebra',desc:'Fractions, surds, standard form, expanding & factorising, solving equations'},
-    {t:'Evening',dot:'#888',title:'Light review — Biology flashcards',desc:'Write out the photosynthesis and respiration equations from memory'},
+  // ── Wed 17 Jun (school day) ──────────────────────────────────────────
+  {date:'2026-06-17', schoolDay:true, label:'', sessions:[
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Snack & wind-down',desc:'Short break after school before starting revision.'},
+    {t:'5:00 – 6:00pm',dot:'var(--bio)',title:'Biology — Cell Biology',desc:'Animal, plant & bacterial cell structures; specialised cells (red blood cells, sperm, root hair); microscopy & magnification formula.'},
+    {t:'6:00 – 7:00pm',dot:'var(--bio)',title:'Biology — Photosynthesis & Respiration',desc:'Both equations, limiting factors of photosynthesis, aerobic vs anaerobic respiration, fermentation in yeast.'},
+    {t:'7:00 – 7:30pm',dot:'#888',title:'Break / dinner',desc:''},
+    {t:'7:30 – 8:30pm',dot:'var(--ma)',title:'Maths — Algebra (Paper 1 prep)',desc:'Expanding double brackets, factorising quadratics, solving linear & quadratic equations. Write out the quadratic formula.'},
+    {t:'8:30 – 9:00pm',dot:'var(--bio)',title:'Quick recall quiz — Biology only',desc:'Use the quiz tab: set to Biology and do 10–15 questions to lock in today\'s learning.'},
   ]},
-  {date:'2026-06-18',label:'',sessions:[
-    {t:'Morning',dot:'var(--bio)',title:'Biology — Genetics & Evolution',desc:'DNA structure, inheritance (Punnett squares), mitosis vs meiosis, evolution'},
-    {t:'Afternoon',dot:'var(--ma)',title:'Maths Paper 1 — Timed Practice Paper',desc:'Full non-calculator paper under exam conditions (60 mins), then mark it'},
-    {t:'Evening',dot:'var(--ph)',title:'Physics intro — Forces & Motion',desc:"Newton's three laws, F=ma, weight, velocity-time graphs"},
+  // ── Thu 18 Jun (school day) ──────────────────────────────────────────
+  {date:'2026-06-18', schoolDay:true, label:'', sessions:[
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Snack & wind-down',desc:''},
+    {t:'5:00 – 6:00pm',dot:'var(--bio)',title:'Biology — Genetics & Inheritance',desc:'DNA structure, genes vs alleles, dominant/recessive, Punnett squares, genotype vs phenotype, codominance.'},
+    {t:'6:00 – 7:00pm',dot:'var(--bio)',title:'Biology — Disease & Immunity',desc:'Types of pathogen, phagocytosis, lymphocytes & antibodies, vaccines, antibiotics vs antivirals, antibiotic resistance.'},
+    {t:'7:00 – 7:30pm',dot:'#888',title:'Break / dinner',desc:''},
+    {t:'7:30 – 8:30pm',dot:'var(--ma)',title:'Maths — Number & Sequences (Paper 1 prep)',desc:'Surds (simplify & rationalise), standard form, nth term of arithmetic sequences, fractions & percentages without a calculator.'},
+    {t:'8:30 – 9:00pm',dot:'var(--ph)',title:'Physics — first look at Forces',desc:'Quick read of Forces & Motion notes: F=ma, Newton\'s three laws, velocity-time graphs. Just get familiar — full revision Friday.'},
   ]},
-  {date:'2026-06-19',label:'',sessions:[
-    {t:'Morning',dot:'var(--bio)',title:'Biology — Disease, Immunity & Ecosystems',desc:'Pathogens, white blood cells, vaccines, antibiotics, food chains, biodiversity'},
-    {t:'Afternoon',dot:'var(--ma)',title:'Maths Paper 2 — Calculator Topics',desc:'Statistics, probability, trigonometry, quadratic graphs, ratio & proportion'},
-    {t:'Evening',dot:'var(--ph)',title:'Physics — Electricity & Waves',desc:'V=IR, series/parallel circuits, wave speed equation, EM spectrum'},
+  // ── Fri 19 Jun (school day) ──────────────────────────────────────────
+  {date:'2026-06-19', schoolDay:true, label:'', sessions:[
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Snack & wind-down',desc:''},
+    {t:'5:00 – 6:00pm',dot:'var(--bio)',title:'Biology — Evolution & Ecosystems',desc:'Natural selection (4 steps), Darwin vs Lamarck, speciation, food chains, biodiversity, threats to ecosystems.'},
+    {t:'6:00 – 7:00pm',dot:'var(--ph)',title:'Physics — Forces & Motion (deep dive)',desc:'F=ma calculations, weight vs mass, momentum p=mv, v-t & d-t graphs, equations of motion (v=u+at, v²=u²+2as).'},
+    {t:'7:00 – 7:30pm',dot:'#888',title:'Break / dinner',desc:''},
+    {t:'7:30 – 8:30pm',dot:'var(--ma)',title:'Maths — Geometry & Trigonometry (Paper 2 prep)',desc:'Area & circumference of circles, volume of cylinders/cones/spheres, Pythagoras, SOH CAH TOA, angle rules.'},
+    {t:'8:30 – 9:00pm',dot:'var(--bio)',title:'Biology flashcard sprint',desc:'Write out from memory: photosynthesis equation, respiration equation, mitosis vs meiosis, 3 types of pathogen. Check your answers.'},
   ]},
-  {date:'2026-06-20',label:'',sessions:[
-    {t:'Morning',dot:'var(--ch)',title:'Chemistry — Atoms, Bonding & Periodic Table',desc:'Electron configuration, ionic/covalent/metallic bonding, group trends'},
-    {t:'Afternoon',dot:'var(--ma)',title:'Maths — Geometry & Trigonometry',desc:'Area, volume, SOH CAH TOA, Pythagoras, circle theorems'},
-    {t:'Evening',dot:'var(--ph)',title:'Physics — Energy & Radioactivity',desc:'GPE, KE, efficiency, alpha/beta/gamma, half-life'},
+  // ── Sat 20 Jun (FREE ALL DAY — big revision day) ─────────────────────
+  {date:'2026-06-20', weekend:true, label:'Weekend — full day free', sessions:[
+    {t:'9:00 – 10:30am',dot:'var(--ph)',title:'Physics — Electricity & Circuits',desc:'V=IR, P=IV, series vs parallel resistors, component symbols & behaviour (LDR, thermistor, diode). Practice calculations.'},
+    {t:'10:30 – 11:00am',dot:'#888',title:'Break',desc:''},
+    {t:'11:00am – 12:30pm',dot:'var(--ph)',title:'Physics — Waves, Energy & Space',desc:'v=fλ, EM spectrum, transverse vs longitudinal, GPE=mgh, KE=½mv², efficiency, half-life, radioactive decay types, Big Bang evidence.'},
+    {t:'12:30 – 1:30pm',dot:'#888',title:'Lunch',desc:''},
+    {t:'1:30 – 3:00pm',dot:'var(--ma)',title:'Maths — Full Timed Practice Paper (non-calculator)',desc:'Do a complete Paper 1 under exam conditions (60 mins), then spend 30 mins going through every mistake carefully.'},
+    {t:'3:00 – 3:30pm',dot:'#888',title:'Break',desc:''},
+    {t:'3:30 – 5:00pm',dot:'var(--ch)',title:'Chemistry — Atoms, Periodic Table & Bonding',desc:'Atomic structure, electron configuration, group/period trends, Group 1 & 7 reactivity, ionic/covalent/metallic bonding.'},
+    {t:'5:00 – 6:00pm',dot:'#888',title:'Dinner & proper break',desc:'No revision during dinner. Relax.'},
+    {t:'6:00 – 7:00pm',dot:'var(--ph)',title:'Physics quiz sprint',desc:'Quiz tab → Physics only. Aim for 20 questions. Write down any equations you got wrong.'},
+    {t:'7:00 – 8:00pm',dot:'var(--bio)',title:'Biology — weak spot review',desc:'Look back at anything from this week that felt shaky. Re-read those notes sections only.'},
   ]},
-  {date:'2026-06-21',label:'',sessions:[
-    {t:'Morning',dot:'var(--ch)',title:'Chemistry — Rates, Energy Changes & Organic Chem',desc:'Four factors affecting rate, exo/endothermic, alkanes vs alkenes, cracking'},
-    {t:'Afternoon',dot:'var(--ph)',title:'Physics — Full Past Paper Practice',desc:'Timed practice: all topics. Focus on equation recall without notes.'},
-    {t:'Evening',dot:'#888',title:'Light review only — early night!',desc:'Biology exam tomorrow morning. Quick glance over key biology facts only.'},
+  // ── Sun 21 Jun (FREE ALL DAY — final push before exams) ─────────────
+  {date:'2026-06-21', weekend:true, label:'Weekend — full day free', sessions:[
+    {t:'9:00 – 10:30am',dot:'var(--ch)',title:'Chemistry — Rates of Reaction & Energy Changes',desc:'Four factors, activation energy, catalyst mechanism, exo vs endothermic reactions, energy profile diagrams, bond energies.'},
+    {t:'10:30 – 11:00am',dot:'#888',title:'Break',desc:''},
+    {t:'11:00am – 12:30pm',dot:'var(--ch)',title:'Chemistry — Organic Chemistry & Electrolysis',desc:'Alkanes vs alkenes (CₙH₂ₙ₊₂ vs CₙH₂ₙ), cracking, bromine water test, combustion, electrolysis of brine, OIL RIG.'},
+    {t:'12:30 – 1:30pm',dot:'#888',title:'Lunch',desc:''},
+    {t:'1:30 – 3:00pm',dot:'var(--ma)',title:'Maths — Statistics, Probability & Graphs (Paper 2 prep)',desc:'Mean/median/mode/IQR, probability rules, tree diagrams (with/without replacement), direct & inverse proportion, quadratic graphs.'},
+    {t:'3:00 – 3:30pm',dot:'#888',title:'Break',desc:''},
+    {t:'3:30 – 4:30pm',dot:'var(--bio)',title:'Biology — Final Revision & Equation Recall',desc:'Write out ALL key biology equations from memory. Do a 15-question biology quiz. Fix any gaps.'},
+    {t:'4:30 – 5:30pm',dot:'var(--ch)',title:'Chemistry quiz sprint',desc:'Quiz tab → Chemistry only. 20 questions. Pay attention to the explanations for any you miss.'},
+    {t:'5:30pm+',dot:'#888',title:'Rest — light evening only',desc:'Biology exam tomorrow at 10:15! Quick read of cell biology notes after dinner, then relax. Early night — sleep is revision too.'},
   ]},
-  {date:'2026-06-22',label:'🎯 BIOLOGY EXAM DAY',isExam:true,badge:'Biology · Period 2 · 10:15',sessions:[
-    {t:'Pre-exam',dot:'var(--bio)',title:'Biology exam — Room depends on set, 10:15–11:00',desc:'No cramming. Read over key equations once. Good breakfast. You\'ve got this!'},
-    {t:'Afternoon',dot:'var(--ma)',title:'Maths Paper 1 — final prep (exam tomorrow)',desc:'Algebra, sequences, surds — quick revision and write out key formulas'},
+  // ── Mon 22 Jun — BIOLOGY EXAM + school day ──────────────────────────
+  {date:'2026-06-22', isExam:true, badge:'Biology · 10:15am', label:'🎯 BIOLOGY EXAM', sessions:[
+    {t:'Before school',dot:'var(--bio)',title:'Quick read only — no cramming',desc:'Glance over photosynthesis/respiration equations and key biology facts. Good breakfast. Leave home in plenty of time.'},
+    {t:'10:15 – 11:00am',dot:'var(--bio)',title:'Biology exam · Period 2',desc:'Room depends on your set. Read each question carefully. Include units. Check your work if time allows.'},
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Snack & proper rest after exam',desc:'You\'ve done the hard work. Short break before evening revision.'},
+    {t:'5:00 – 6:30pm',dot:'var(--ma)',title:'Maths Paper 1 — final prep (exam tomorrow 9:10)',desc:'Non-calculator methods: algebra, surds, sequences, fractions. Write out key formulas from memory. Do 10 practice questions.'},
+    {t:'6:30 – 7:00pm',dot:'#888',title:'Dinner',desc:''},
+    {t:'7:00 – 8:00pm',dot:'var(--ph)',title:'Physics — equation sheet from memory',desc:'Write out: F=ma, V=IR, v=fλ, GPE=mgh, KE=½mv², P=IV, p=mv, efficiency formula. Check against notes. Physics exam is also tomorrow!'},
+    {t:'8:00 – 8:30pm',dot:'#888',title:'Wind down — early night',desc:'Two exams tomorrow. Get to bed by 9:30pm at the latest.'},
   ]},
-  {date:'2026-06-23',label:'🎯 MATHS P1 + PHYSICS EXAM DAY',isExam:true,badge:'Maths P1 · 9:10 · Physics · 14:35',sessions:[
-    {t:'Before P1',dot:'var(--ma)',title:'Maths Paper 1 exam · 9:10–10:10',desc:'Non-calculator. Show all working. Check answers if time allows.'},
-    {t:'Between',dot:'var(--ph)',title:'Light physics review between exams',desc:'Key equations only: F=ma, V=IR, v=fλ, GPE=mgh, KE=½mv²'},
-    {t:'P5',dot:'var(--ph)',title:'Physics exam · 14:35–15:20',desc:'Read questions carefully. Include units in every answer.'},
+  // ── Tue 23 Jun — MATHS P1 + PHYSICS (school/exam day) ──────────────
+  {date:'2026-06-23', isExam:true, badge:'Maths P1 · 9:10 · Physics · 14:35', label:'🎯 MATHS P1 + PHYSICS EXAM', sessions:[
+    {t:'Before school',dot:'var(--ma)',title:'Maths Paper 1 — last glance only',desc:'Read over your formula sheet notes. Eat a good breakfast. Do NOT cram new topics now.'},
+    {t:'9:10 – 10:10am',dot:'var(--ma)',title:'Maths Paper 1 exam · non-calculator',desc:'Show all working — method marks count. If stuck, move on and come back. Check answers at the end.'},
+    {t:'Between exams',dot:'var(--ph)',title:'Light physics review only',desc:'Key equations on a small card: F=ma · V=IR · v=fλ · GPE=mgh · KE=½mv². Nothing new — just calm recall.'},
+    {t:'2:35 – 3:20pm',dot:'var(--ph)',title:'Physics exam · Period 5',desc:'Read questions carefully. Include units in every numerical answer. Don\'t leave blanks — attempt every question.'},
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Rest after double exam day — you deserve it!',desc:'Light snack, short walk, no revision until after 5pm.'},
+    {t:'5:00 – 6:30pm',dot:'var(--ch)',title:'Chemistry — atoms, bonding, periodic table recap',desc:'Quick run through: electron configuration, ionic/covalent/metallic bonding, Group 1 & 7 trends. Chemistry is in 2 days.'},
+    {t:'6:30pm+',dot:'#888',title:'Dinner & wind down',desc:'Early night — it\'s been a big day.'},
   ]},
-  {date:'2026-06-24',label:'',sessions:[
-    {t:'Morning',dot:'var(--ch)',title:'Chemistry — Electrolysis & Acids',desc:'Cathode/anode, products of brine electrolysis, neutralisation, pH scale'},
-    {t:'Afternoon',dot:'var(--ma)',title:'Maths Paper 2 — final run through',desc:'Statistics, probability tree diagrams, graphs, reverse percentages'},
-    {t:'Evening',dot:'#888',title:'Rest — lighter session',desc:'Quick chem equation practice. Early night before Chemistry exam tomorrow.'},
+  // ── Wed 24 Jun (school day, between exams) ──────────────────────────
+  {date:'2026-06-24', schoolDay:true, label:'', sessions:[
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Snack & wind-down',desc:''},
+    {t:'5:00 – 6:30pm',dot:'var(--ch)',title:'Chemistry — Rates, Energy & Organic Chemistry',desc:'Four factors for rate, exo/endothermic, alkanes vs alkenes, cracking, bromine water test, combustion types.'},
+    {t:'6:30 – 7:00pm',dot:'#888',title:'Break / dinner',desc:''},
+    {t:'7:00 – 8:00pm',dot:'var(--ch)',title:'Chemistry — Electrolysis & Acids',desc:'Cathode/anode products, electrolysis of brine (H₂, Cl₂, NaOH), neutralisation reactions, pH scale, acid + metal/carbonate equations.'},
+    {t:'8:00 – 8:30pm',dot:'var(--ch)',title:'Chemistry quiz sprint',desc:'Quiz tab → Chemistry. 15–20 questions. Write out any equations you got wrong. Early night — exam tomorrow afternoon.'},
   ]},
-  {date:'2026-06-25',label:'🎯 CHEMISTRY EXAM DAY',isExam:true,badge:'Chemistry · Period 5 · 14:35',sessions:[
-    {t:'Morning',dot:'var(--ch)',title:'Chemistry final prep',desc:'OIL RIG, cracking, alkanes vs alkenes, half-life, rates of reaction — last read through'},
-    {t:'P5',dot:'var(--ch)',title:'Chemistry exam · 14:35–15:20',desc:'Balance equations carefully. Check significant figures in calculations.'},
+  // ── Thu 25 Jun — CHEMISTRY EXAM + school day ────────────────────────
+  {date:'2026-06-25', isExam:true, badge:'Chemistry · 14:35', label:'🎯 CHEMISTRY EXAM', sessions:[
+    {t:'Morning (school)',dot:'var(--ch)',title:'Quick read only during any free time at school',desc:'OIL RIG, cracking, alkanes vs alkenes, rates of reaction factors. No new learning — just calm recall.'},
+    {t:'2:35 – 3:20pm',dot:'var(--ch)',title:'Chemistry exam · Period 5',desc:'Balance equations carefully. Show all working. Include units. Check significant figures in calculations.'},
+    {t:'4:30 – 5:00pm',dot:'#888',title:'Rest after exam',desc:''},
+    {t:'5:00 – 6:30pm',dot:'var(--ma)',title:'Maths Paper 2 — final prep (exam tomorrow)',desc:'Statistics, probability (tree diagrams), ratio & proportion, quadratic graphs, reverse percentages. Calculator paper — practise using it efficiently.'},
+    {t:'6:30pm+',dot:'#888',title:'Dinner & early night',desc:'Maths P2 first thing tomorrow. Sleep well.'},
   ]},
-  {date:'2026-06-26',label:'🎯 MATHS P2 EXAM DAY',isExam:true,badge:'Maths P2 · 9:10',sessions:[
-    {t:'Pre-exam',dot:'var(--ma)',title:'Maths Paper 2 exam · 9:10–10:10',desc:'Calculator paper. Show all working. Use your calculator efficiently.'},
-    {t:'After',dot:'#1D9E75',title:'Exams complete — celebrate! 🎉',desc:'All four science and maths exams done. Well done for all your hard work!'},
+  // ── Fri 26 Jun — MATHS P2 EXAM ──────────────────────────────────────
+  {date:'2026-06-26', isExam:true, badge:'Maths P2 · 9:10', label:'🎯 MATHS P2 EXAM', sessions:[
+    {t:'Before school',dot:'var(--ma)',title:'Maths Paper 2 — last glance',desc:'Check your calculator is working. Remind yourself: show all working, include units, check answers.'},
+    {t:'9:10 – 10:10am',dot:'var(--ma)',title:'Maths Paper 2 exam · calculator',desc:'Use your calculator wisely. Show all working even with a calculator — method marks count.'},
+    {t:'After',dot:'#1D9E75',title:'🎉 All exams complete — celebrate!',desc:'Biology, Maths P1, Physics, Chemistry, Maths P2 — all done. Well done for all your hard work this week!'},
   ]},
 ];
 
@@ -575,22 +624,48 @@ const grid = document.getElementById('plan-grid');
 PLAN.forEach(day => {
   const d = new Date(day.date); d.setHours(0,0,0,0);
   const diff = Math.round((d - today)/86400000);
-  if(diff < -1) return; // hide past days except yesterday
+  if(diff < -1) return; // hide days more than 1 day in the past
   const isPast = diff < 0;
   const isToday = diff === 0;
-  const labelText = isToday ? `Today — ${d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}` :
-    `${d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}${day.label ? ' — '+day.label.replace(/🎯 /,'') : ''}`;
-  const badge = day.badge ? `<span class="day-tag">${day.badge}</span>` : '';
+
+  // Build label
+  const dateStr = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const shortDateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  let labelText;
+  if(isToday) {
+    labelText = `Today — ${dateStr}`;
+  } else if(day.isExam) {
+    labelText = `${shortDateStr} — ${day.label.replace(/🎯 /,'')}`;
+  } else if(day.weekend) {
+    labelText = `${shortDateStr} — ${day.label}`;
+  } else {
+    labelText = shortDateStr;
+  }
+
+  // Sub-label chips
+  let chips = '';
+  if(day.schoolDay) chips += `<span style="font-size:11px;font-weight:500;padding:3px 9px;border-radius:4px;background:#F0EDE4;color:#666;margin-left:8px;">🏫 School day — revision from 4:30pm</span>`;
+  if(day.weekend) chips += `<span style="font-size:11px;font-weight:500;padding:3px 9px;border-radius:4px;background:#E6F5EE;color:#0A5C3A;margin-left:8px;">🟢 Full day free</span>`;
+  const badge = day.badge ? `<span class="day-tag" style="margin-left:auto;">${day.badge}</span>` : '';
+
   const pastClass = isPast ? ' day-past' : '';
-  const examStyle = day.isExam ? `style="border-color:var(--ph);background:var(--ph-l)"` : '';
-  let sesHTML = day.sessions.map(s => `
-    <div class="sess">
+  let hdStyle = '';
+  if(day.isExam) hdStyle = 'style="background:#E4F0FB;border-bottom-color:#b0d0ef;"';
+  else if(day.weekend) hdStyle = 'style="background:#E9F7F1;"';
+
+  let sesHTML = day.sessions.map(s => {
+    const descHTML = s.desc ? `<p class="s-desc">${s.desc}</p>` : '';
+    return `<div class="sess">
       <span class="s-t">${s.t}</span>
       <span class="s-dot" style="background:${s.dot}"></span>
-      <div><p class="s-title">${s.title}</p><p class="s-desc">${s.desc}</p></div>
-    </div>`).join('');
+      <div><p class="s-title">${s.title}</p>${descHTML}</div>
+    </div>`;
+  }).join('');
+
   grid.innerHTML += `<div class="day${pastClass}">
-    <div class="day-hd" ${examStyle}><span class="day-lbl">${labelText}</span>${badge}</div>
+    <div class="day-hd" ${hdStyle}>
+      <span class="day-lbl">${labelText}</span>${chips}${badge}
+    </div>
     <div class="sessions">${sesHTML}</div>
   </div>`;
 });

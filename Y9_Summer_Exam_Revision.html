@@ -3,1068 +3,529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Year 9 Revision — King David High School 2026</title>
+<title>Year 9 AQA Revision Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bio:#1D9E75;--bio-l:#E1F5EE;--bio-d:#064535;
-  --ma:#5346B0;--ma-l:#EEEDFE;--ma-d:#221C5A;
-  --ph:#1660A8;--ph-l:#E4F0FB;--ph-d:#072E5A;
-  --ch:#CC5225;--ch-l:#FAEAE4;--ch-d:#4A180A;
-  --ink:#181818;--ink2:#4A4A4A;--ink3:#888;
-  --bg:#F4F3EF;--card:#fff;--border:#E0DDD4;
-  --r:10px;--rs:6px
-}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65}
-.hdr{background:var(--ink);color:#fff;padding:2.5rem 2rem 1.8rem;position:relative;overflow:hidden}
-.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--bio),var(--ma),var(--ph),var(--ch))}
-.hdr-inner{max-width:980px;margin:0 auto}
-.hdr-eye{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:6px}
-.hdr h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;line-height:1.15}
-.hdr-sub{color:#bbb;font-size:13px;margin-top:6px}
-.countdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px}
-.cd-item{border-radius:var(--r);padding:12px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1)}
-.cd-subj{font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;font-weight:600}
-.cd-days{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;line-height:1}
-.cd-date{font-size:12px;color:#aaa;margin-top:3px}
-.nav{background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.nav-inner{max-width:980px;margin:0 auto;display:flex;overflow-x:auto}
-.nb{padding:13px 18px;font-size:14px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--ink3);border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
-.nb:hover{color:var(--ink)}.nb.on{color:var(--ink);border-bottom-color:var(--ink)}
-.main{max-width:980px;margin:0 auto;padding:2rem 1.5rem 5rem}
-.panel{display:none}.panel.on{display:block}
+  :root {
+    --bio: #16a34a; --bio-light: #dcfce7; --bio-mid: #bbf7d0;
+    --phy: #2563eb; --phy-light: #dbeafe; --phy-mid: #bfdbfe;
+    --chem: #d97706; --chem-light: #fef3c7; --chem-mid: #fde68a;
+    --math: #7c3aed; --math-light: #ede9fe; --math-mid: #ddd6fe;
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #232323; --border: #2e2e2e;
+    --text: #f0f0f0; --muted: #888; --accent: #f0f0f0;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; padding: 2rem 1rem 4rem; }
+  
+  .hub-header { text-align: center; margin-bottom: 2.5rem; }
+  .hub-title { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .hub-sub { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
 
-/* ── PLAN ── */
-.plan-grid{display:flex;flex-direction:column;gap:14px}
-.day{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.day-hd{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:13px 18px;border-bottom:1px solid var(--border);background:#fafaf8}
-.day-lbl{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700}
-.day-chip{font-size:11px;font-weight:500;padding:3px 9px;border-radius:4px}
-.day-past{opacity:.5}
-.sessions{padding:0 18px}
-.sess{display:grid;grid-template-columns:110px 10px 1fr;gap:10px;align-items:start;padding:11px 0;border-bottom:1px solid var(--border)}
-.sess:last-child{border-bottom:none}
-.s-t{font-size:12px;color:var(--ink3);padding-top:2px}
-.s-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
-.s-title{font-weight:500;font-size:14px}
-.s-desc{font-size:13px;color:var(--ink2);margin-top:2px}
+  .countdown { display: inline-block; margin: 1.2rem auto 0; font-family: 'Space Mono', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 18px; color: var(--muted); }
+  .countdown span { color: var(--text); font-weight: 700; }
 
-/* ── ACTIVITY NAV ── */
-.act-tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
-.at{padding:8px 16px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:var(--card);color:var(--ink2);transition:all .15s}
-.at.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.act-panel{display:none}.act-panel.on{display:block}
+  .subject-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tab { padding: 10px 22px; border-radius: 40px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .tab:hover { color: var(--text); border-color: #555; }
+  .tab.active[data-s="biology"]  { background: var(--bio-light); border-color: var(--bio); color: #14532d; }
+  .tab.active[data-s="physics"]  { background: var(--phy-light); border-color: var(--phy); color: #1e3a8a; }
+  .tab.active[data-s="chemistry"]{ background: var(--chem-light); border-color: var(--chem); color: #78350f; }
+  .tab.active[data-s="maths"]    { background: var(--math-light); border-color: var(--math); color: #3b0764; }
 
-/* ── SUBJECT PILLS (shared) ── */
-.subj-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.sp{padding:7px 16px;border-radius:99px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:var(--card);color:var(--ink2);transition:all .15s}
-.sp.on,.sp:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .mode-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 2rem; }
+  .mode-btn { padding: 7px 20px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .mode-btn.active { background: var(--surface2); border-color: #555; color: var(--text); }
 
-/* ── NOTES ── */
-.note-subj{display:none}.note-subj.on{display:block}
-.section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
-.sec-hd{padding:13px 18px;border-bottom:1px solid var(--border);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
-.sec-body{padding:16px 18px}
-.sec-body p{font-size:14px;line-height:1.75;color:var(--ink2);margin-bottom:10px}
-.sec-body p:last-child{margin-bottom:0}
-.sec-body h4{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:14px 0 8px;font-weight:600}
-.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:6px}
-.eq-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;font-size:13px;line-height:1.55}
-.eq-box strong{display:block;font-family:'Courier New',monospace;font-size:14px;margin-bottom:3px;color:var(--ink)}
-.eq-box span{color:var(--ink2)}
-.kl{list-style:none;display:flex;flex-direction:column;gap:6px}
-.kl li{font-size:14px;padding:8px 12px;background:var(--bg);border-radius:var(--rs);color:var(--ink2);line-height:1.55}
-.kl li b{color:var(--ink);font-weight:500}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.warn{background:#FFFBEA;border:1px solid #F0D060;border-radius:var(--rs);padding:10px 14px;font-size:13px;color:#6B5800;margin-top:10px;line-height:1.55}
+  .container { max-width: 600px; margin: 0 auto; }
 
-/* ── FLASHCARDS ── */
-.fc-controls{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-.fc-count{font-size:13px;color:var(--ink3)}
-.fc-btn{padding:8px 18px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--card);color:var(--ink);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
-.fc-btn:hover{background:var(--bg)}
-.fc-btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
-.fc-arena{perspective:1000px;margin-bottom:20px}
-.fc-card{width:100%;max-width:600px;height:220px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s;border-radius:var(--r)}
-.fc-card.flipped{transform:rotateY(180deg)}
-.fc-front,.fc-back{position:absolute;inset:0;border-radius:var(--r);backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:28px;text-align:center;border:1.5px solid var(--border)}
-.fc-front{background:var(--card)}
-.fc-back{background:var(--ink);color:#fff;transform:rotateY(180deg)}
-.fc-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;opacity:.6;font-weight:600}
-.fc-text{font-size:17px;font-weight:500;line-height:1.5}
-.fc-hint{font-size:12px;margin-top:14px;opacity:.5}
-.fc-nav{display:flex;gap:10px;align-items:center}
-.fc-dot-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:14px;max-width:600px}
-.fc-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .2s;cursor:pointer}
-.fc-dot.seen{background:var(--ink3)}.fc-dot.cur{background:var(--ink)}
+  /* FLASHCARDS */
+  .fc-wrap { perspective: 1000px; margin-bottom: 1.5rem; }
+  .fc-inner { position: relative; min-height: 220px; transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(.4,0,.2,1); cursor: pointer; }
+  .fc-inner.flipped { transform: rotateY(180deg); }
+  .fc-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .fc-back { transform: rotateY(180deg); }
+  .fc-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .fc-text { font-size: 16px; line-height: 1.65; color: var(--text); }
+  .fc-hint { margin-top: 1.25rem; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+  .fc-answer { font-size: 15px; line-height: 1.7; color: #d0ffd0; }
 
-/* ── FILL IN THE BLANK ── */
-.fitb-q{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
-.fitb-text{font-size:15px;line-height:2;margin-bottom:12px}
-.fitb-inp{border:none;border-bottom:2px solid var(--border);background:transparent;font-size:15px;font-family:'Inter',sans-serif;padding:2px 6px;width:120px;outline:none;color:var(--ink);transition:border-color .2s}
-.fitb-inp:focus{border-color:var(--ink)}
-.fitb-inp.ok{border-color:var(--bio);color:var(--bio-d)}
-.fitb-inp.no{border-color:#c0392b;color:#6B1515}
-.fitb-check{padding:8px 18px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
-.fitb-check:hover{background:var(--bg)}
-.fitb-fb{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:var(--rs);background:var(--bg);display:none;line-height:1.6}
-.fitb-score{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
+  .prog-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin-bottom: 1.25rem; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+  .fill-bio  { background: var(--bio); }
+  .fill-phy  { background: var(--phy); }
+  .fill-chem { background: var(--chem); }
+  .fill-math { background: var(--math); }
 
-/* ── MATCHING ── */
-.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.match-col{display:flex;flex-direction:column;gap:8px}
-.match-item{padding:10px 14px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--card);font-size:14px;cursor:pointer;transition:all .15s;user-select:none;line-height:1.4}
-.match-item:hover{border-color:var(--ink3)}
-.match-item.selected{border-color:var(--ink);background:var(--bg);font-weight:500}
-.match-item.matched-ok{border-color:var(--bio);background:var(--bio-l);color:var(--bio-d);cursor:default}
-.match-item.matched-no{border-color:#c0392b;background:#FCEBEB;animation:shake .3s;cursor:default}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.match-score{font-size:14px;color:var(--ink2);margin-bottom:12px}
+  .fc-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .shuffle-btn { font-family: 'Space Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; letter-spacing: 0.05em; }
+  .shuffle-btn:hover { background: var(--surface2); color: var(--text); border-color: #555; }
+  .shuffle-btn.on { background: var(--surface2); border-color: #555; color: var(--text); }
+  .fc-progress-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
 
-/* ── EQUATION PRACTICE ── */
-.eq-prac{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
-.eq-q{font-size:16px;font-weight:500;margin-bottom:6px}
-.eq-context{font-size:13px;color:var(--ink2);margin-bottom:14px;font-style:italic}
-.eq-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.eq-input{border:1.5px solid var(--border);border-radius:var(--rs);padding:9px 13px;font-size:15px;font-family:'Courier New',monospace;width:140px;outline:none;transition:border-color .2s}
-.eq-input:focus{border-color:var(--ink)}
-.eq-input.ok{border-color:var(--bio);background:var(--bio-l)}
-.eq-input.no{border-color:#c0392b;background:#FCEBEB}
-.eq-unit{font-size:13px;color:var(--ink3)}
-.eq-check{padding:9px 18px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:500;cursor:pointer}
-.eq-check:hover{background:var(--bg)}
-.eq-fb{font-size:13px;margin-top:10px;padding:9px 13px;border-radius:var(--rs);background:var(--bg);display:none;line-height:1.6}
+  .nav-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 1rem; }
+  .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .nav-btn:hover { background: var(--surface2); }
+  .nav-counter { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); min-width: 60px; text-align: center; }
 
-/* ── QUIZ ── */
-.quiz-wrap{max-width:640px}
-.qf-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.qf{padding:7px 16px;border-radius:99px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:var(--card);color:var(--ink2);transition:all .15s}
-.qf.on,.qf:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-.q-meta{display:flex;align-items:center;gap:14px;margin-bottom:16px;font-size:13px;color:var(--ink3)}
-.q-score{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--ink)}
-.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px}
-.q-tag{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;padding:3px 8px;border-radius:4px;display:inline-block}
-.q-text{font-size:16px;font-weight:500;margin-bottom:18px;line-height:1.5}
-.q-opts{display:flex;flex-direction:column;gap:9px}
-.q-opt{padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--rs);cursor:pointer;font-size:14px;background:#fafaf8;color:var(--ink);text-align:left;transition:border-color .15s,background .15s}
-.q-opt:hover:not(:disabled){border-color:#999;background:var(--card)}
-.q-opt.ok{background:#EAF3DE;border-color:#3B6D11;color:#1E4A08}
-.q-opt.no{background:#FCEBEB;border-color:#A32D2D;color:#6B1515}
-.q-opt:disabled{cursor:default}
-.q-fb{margin-top:14px;padding:12px 14px;border-radius:var(--rs);font-size:13px;background:var(--bg);color:var(--ink2);display:none;line-height:1.6}
-.q-next{display:none;margin-top:14px;padding:10px 22px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--card);color:var(--ink);font-size:14px;font-weight:500;cursor:pointer}
-.q-next:hover{background:var(--bg)}
-.q-prog{font-size:12px;color:var(--ink3)}
+  .key-hints { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .key-hint { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .key { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 20px; padding: 0 5px; border-radius: 4px; border: 1px solid #3a3a3a; background: #222; color: #aaa; font-size: 9px; font-family: 'Space Mono', monospace; }
 
-/* ── TIMELINE ── */
-.timeline{position:relative;padding-left:28px;margin-top:8px}
-.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
-.tl-item{position:relative;margin-bottom:18px}
-.tl-item::before{content:'';position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--card)}
-.tl-item.active::before{background:var(--ink);border-color:var(--ink)}
-.tl-title{font-weight:500;font-size:14px}
-.tl-body{font-size:13px;color:var(--ink2);margin-top:3px;line-height:1.55}
+  .nav-btn.flash { animation: flash-ring 0.18s ease; }
+  @keyframes flash-ring { 0%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)} 100%{box-shadow:0 0 0 6px rgba(255,255,255,0)} }
 
-/* ── DIAGRAM LABELS ── */
-.diag-wrap{position:relative;display:inline-block;max-width:100%;margin:12px 0}
-.diag-wrap svg{max-width:100%;height:auto}
+  .fc-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .shuffle-btn { font-family: 'Space Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px; }
+  .shuffle-btn:hover { background: var(--surface2); color: var(--text); border-color: #555; }
+  .shuffle-btn.on { background: var(--surface2); border-color: #aaa; color: var(--text); }
+  .shuffle-badge { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
 
-@media(max-width:620px){.two-col{grid-template-columns:1fr}.eq-grid{grid-template-columns:1fr}.match-grid{grid-template-columns:1fr}.main{padding:1.2rem 1rem 4rem}.sess{grid-template-columns:90px 10px 1fr}}
+  .key-hints { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 0.85rem; }
+  .key-hint { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .key { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 20px; padding: 0 5px; border-radius: 4px; border: 1px solid #3a3a3a; background: #222; color: #bbb; font-size: 9px; font-family: 'Space Mono', monospace; }
+  .key.lit { border-color: #666; background: #2e2e2e; color: var(--text); transition: all 0.1s; }
+
+  /* PRACTICE */
+  .pq-controls { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+  .pq-ctrl-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+  .pq-size-btns { display: flex; gap: 5px; }
+  .pq-size-btn { padding: 5px 13px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+  .pq-size-btn:hover { background: var(--surface2); color: var(--text); }
+  .pq-size-btn.active { background: var(--surface2); border-color: #888; color: var(--text); }
+  .score-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .score-pill { font-family: 'Space Mono', monospace; font-size: 11px; padding: 5px 14px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+  .score-pill.good { background: #052e16; border-color: var(--bio); color: #4ade80; }
+  .score-pill.bad  { background: #2d0000; border-color: #dc2626; color: #f87171; }
+
+  .pq-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+  .pq-q { font-size: 16px; line-height: 1.65; margin-bottom: 1.5rem; font-weight: 600; }
+  .pq-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .pq-opt { padding: 11px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; text-align: left; cursor: pointer; transition: all 0.15s; }
+  .pq-opt:hover:not(:disabled) { border-color: #555; background: #2a2a2a; }
+  .pq-opt.correct { background: #052e16; border-color: #16a34a; color: #4ade80; }
+  .pq-opt.wrong   { background: #2d0000; border-color: #dc2626; color: #f87171; }
+  .pq-opt:disabled { cursor: default; }
+  .pq-exp { font-size: 13px; line-height: 1.6; color: #aaa; background: #111; border-left: 3px solid #444; border-radius: 4px; padding: 12px 14px; margin-bottom: 1rem; display: none; font-family: 'Space Mono', monospace; }
+  .pq-exp.show { display: block; }
+  .pq-next { padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: none; transition: background 0.15s; }
+  .pq-next:hover { background: #2a2a2a; }
+  .pq-next.show { display: inline-block; }
+
+  .finish-box { text-align: center; padding: 2rem; }
+  .finish-score { font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .finish-label { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 1.5rem; }
+  .retry-btn { padding: 10px 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  .section-hidden { display: none; }
+
+  @media (max-width: 500px) {
+    .tab { padding: 8px 14px; font-size: 13px; }
+    body { padding: 1.25rem 0.75rem 3rem; }
+  }
 </style>
 </head>
 <body>
 
-<header class="hdr">
-  <div class="hdr-inner">
-    <p class="hdr-eye">King David High School · Year 9 · Summer Exams 2026</p>
-    <h1>Science &amp; Maths Revision</h1>
-    <p class="hdr-sub">Flashcards · Fill-in-the-blank · Matching · Equation practice · Quiz · Notes</p>
-    <div class="countdown" id="countdown"></div>
-  </div>
-</header>
-
-<nav class="nav"><div class="nav-inner">
-  <button class="nb on" onclick="showPanel('plan',this)">📅 Plan</button>
-  <button class="nb" onclick="showPanel('act',this)">🧠 Revision Activities</button>
-  <button class="nb" onclick="showPanel('notes',this)">📖 Full Notes</button>
-  <button class="nb" onclick="showPanel('quiz',this)">🎯 Quiz</button>
-</div></nav>
-
-<main class="main">
-
-<!-- ══════════════════════════════════════ PLAN ══════════════════════════════════════ -->
-<div id="panel-plan" class="panel on">
-  <div class="plan-grid" id="plan-grid"></div>
+<div class="hub-header">
+  <div class="hub-title">Year 9 Revision</div>
+  <div class="hub-sub">AQA — Biology · Physics · Chemistry · Maths</div>
+  <div class="countdown">Exam week starts in <span id="days-left">—</span> days</div>
 </div>
 
-<!-- ══════════════════════════════════════ ACTIVITIES ══════════════════════════════════════ -->
-<div id="panel-act" class="panel">
-  <div class="act-tabs">
-    <button class="at on"  onclick="showAct('flashcards',this)">🃏 Flashcards</button>
-    <button class="at"     onclick="showAct('fitb',this)">✏️ Fill in the Blank</button>
-    <button class="at"     onclick="showAct('matching',this)">🔗 Matching</button>
-    <button class="at"     onclick="showAct('eqprac',this)">🔢 Equation Practice</button>
+<div class="container">
+  <div class="subject-tabs">
+    <button class="tab active" data-s="biology"   onclick="switchSubject('biology')">🌿 Biology</button>
+    <button class="tab"        data-s="physics"   onclick="switchSubject('physics')">⚛️ Physics</button>
+    <button class="tab"        data-s="chemistry" onclick="switchSubject('chemistry')">🧪 Chemistry</button>
+    <button class="tab"        data-s="maths"     onclick="switchSubject('maths')">📐 Maths</button>
+  </div>
+  <div class="mode-row">
+    <button class="mode-btn active" onclick="switchMode('flash', this)">Flashcards</button>
+    <button class="mode-btn"        onclick="switchMode('practice', this)">Practice Questions</button>
   </div>
 
-  <!-- ── FLASHCARDS ── -->
-  <div id="act-flashcards" class="act-panel on">
-    <div class="subj-pills">
-      <button class="sp on" onclick="loadFC('all',this)">All subjects</button>
-      <button class="sp" onclick="loadFC('bio',this)">🧬 Biology</button>
-      <button class="sp" onclick="loadFC('maths',this)">📐 Maths</button>
-      <button class="sp" onclick="loadFC('phys',this)">⚡ Physics</button>
-      <button class="sp" onclick="loadFC('chem',this)">🧪 Chemistry</button>
-    </div>
+  <!-- FLASHCARD SECTION -->
+  <div id="flash-section">
     <div class="fc-controls">
-      <span class="fc-count" id="fc-count">Card 1 of 0</span>
-      <button class="fc-btn" onclick="prevFC()">← Prev</button>
-      <button class="fc-btn" onclick="nextFC()">Next →</button>
-      <button class="fc-btn primary" onclick="shuffleFC()">🔀 Shuffle</button>
+      <button class="shuffle-btn" id="shuffle-btn" onclick="toggleShuffle()">⇄ Shuffle</button>
+      <span class="shuffle-badge" id="shuffle-badge"></span>
     </div>
-    <div class="fc-arena">
-      <div class="fc-card" id="fc-card" onclick="flipFC()">
-        <div class="fc-front">
-          <div class="fc-label" id="fc-subj-label">Subject</div>
-          <div class="fc-text" id="fc-front-text">Loading…</div>
-          <div class="fc-hint">Tap to reveal answer</div>
+    <div class="prog-bar"><div class="prog-fill" id="pf"></div></div>
+    <div class="fc-wrap" onclick="flipCard()">
+      <div class="fc-inner" id="fc-inner">
+        <div class="fc-face fc-front">
+          <div class="fc-label">Question</div>
+          <div class="fc-text" id="fc-q"></div>
+          <div class="fc-hint">click / space to reveal answer</div>
         </div>
-        <div class="fc-back">
+        <div class="fc-face fc-back">
           <div class="fc-label">Answer</div>
-          <div class="fc-text" id="fc-back-text"></div>
+          <div class="fc-answer" id="fc-a"></div>
+          <div class="fc-hint">click / space to go back</div>
         </div>
       </div>
     </div>
-    <div class="fc-dot-row" id="fc-dots"></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="btn-prev" onclick="prevCard()">&#8592;</button>
+      <span class="nav-counter" id="fc-counter">1 / 10</span>
+      <button class="nav-btn" id="btn-next" onclick="nextCard()">&#8594;</button>
+    </div>
+    <div class="key-hints">
+      <span class="key-hint"><kbd class="key" id="k-left">A / ←</kbd> prev</span>
+      <span class="key-hint"><kbd class="key" id="k-space">Space</kbd> flip</span>
+      <span class="key-hint"><kbd class="key" id="k-right">D / →</kbd> next</span>
+    </div>
   </div>
 
-  <!-- ── FILL IN THE BLANK ── -->
-  <div id="act-fitb" class="act-panel">
-    <div class="subj-pills">
-      <button class="sp on" onclick="loadFITB('all',this)">All subjects</button>
-      <button class="sp" onclick="loadFITB('bio',this)">🧬 Biology</button>
-      <button class="sp" onclick="loadFITB('maths',this)">📐 Maths</button>
-      <button class="sp" onclick="loadFITB('phys',this)">⚡ Physics</button>
-      <button class="sp" onclick="loadFITB('chem',this)">🧪 Chemistry</button>
+  <!-- PRACTICE SECTION -->
+  <div id="practice-section" class="section-hidden">
+    <div class="pq-controls">
+      <span class="pq-ctrl-label">Questions per round:</span>
+      <div class="pq-size-btns">
+        <button class="pq-size-btn" onclick="setRoundSize(5,this)">5</button>
+        <button class="pq-size-btn active" onclick="setRoundSize(10,this)">10</button>
+        <button class="pq-size-btn" onclick="setRoundSize(15,this)">All 15</button>
+      </div>
     </div>
-    <div style="margin-bottom:14px;display:flex;align-items:center;gap:16px">
-      <span style="font-size:13px;color:var(--ink3)">Score: <span class="fitb-score" id="fitb-score">0</span> / <span id="fitb-total">0</span></span>
-      <button class="fc-btn" onclick="loadFITB(currentFITBSubj, document.querySelector('.subj-pills .sp.on'))">🔄 New set</button>
+    <div class="score-row">
+      <span class="score-pill good" id="sc-correct">✓ Correct: 0</span>
+      <span class="score-pill bad"  id="sc-wrong">✗ Wrong: 0</span>
+      <span class="score-pill"      id="sc-prog">Q 1 of 10</span>
     </div>
-    <div id="fitb-container"></div>
-    <button class="fc-btn primary" onclick="checkAllFITB()" style="margin-top:6px">Check all answers</button>
-  </div>
-
-  <!-- ── MATCHING ── -->
-  <div id="act-matching" class="act-panel">
-    <div class="subj-pills">
-      <button class="sp on" onclick="loadMatch('all',this)">All subjects</button>
-      <button class="sp" onclick="loadMatch('bio',this)">🧬 Biology</button>
-      <button class="sp" onclick="loadMatch('maths',this)">📐 Maths</button>
-      <button class="sp" onclick="loadMatch('phys',this)">⚡ Physics</button>
-      <button class="sp" onclick="loadMatch('chem',this)">🧪 Chemistry</button>
-    </div>
-    <p style="font-size:13px;color:var(--ink2);margin-bottom:14px">Click a term on the left, then its definition on the right.</p>
-    <div class="match-score">Matched: <span id="match-score">0</span> / <span id="match-total">0</span></div>
-    <div class="match-grid">
-      <div class="match-col" id="match-left"></div>
-      <div class="match-col" id="match-right"></div>
-    </div>
-    <button class="fc-btn" onclick="loadMatch(currentMatchSubj, document.querySelector('#act-matching .sp.on'))" style="margin-top:4px">🔄 New round</button>
-  </div>
-
-  <!-- ── EQUATION PRACTICE ── -->
-  <div id="act-eqprac" class="act-panel">
-    <div class="subj-pills">
-      <button class="sp on" onclick="loadEQ('all',this)">All subjects</button>
-      <button class="sp" onclick="loadEQ('phys',this)">⚡ Physics</button>
-      <button class="sp" onclick="loadEQ('chem',this)">🧪 Chemistry</button>
-      <button class="sp" onclick="loadEQ('maths',this)">📐 Maths</button>
-      <button class="sp" onclick="loadEQ('bio',this)">🧬 Biology</button>
-    </div>
-    <div style="margin-bottom:14px;font-size:13px;color:var(--ink2)">Work out the answer and type it in. Units are shown — just enter the number.</div>
-    <div id="eq-container"></div>
-    <button class="fc-btn primary" onclick="loadEQ(currentEQSubj, document.querySelector('#act-eqprac .sp.on'))" style="margin-top:8px">🔄 New questions</button>
+    <div id="pq-area"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════ NOTES ══════════════════════════════════════ -->
-<div id="panel-notes" class="panel">
-  <div class="subj-pills">
-    <button class="sp on" onclick="showNoteSubj('bio',this)">🧬 Biology</button>
-    <button class="sp" onclick="showNoteSubj('maths',this)">📐 Maths</button>
-    <button class="sp" onclick="showNoteSubj('phys',this)">⚡ Physics</button>
-    <button class="sp" onclick="showNoteSubj('chem',this)">🧪 Chemistry</button>
-  </div>
-
-  <div id="note-bio" class="note-subj on">
-    <div class="section"><div class="sec-hd" style="color:var(--bio)">🔬 Cell Biology</div><div class="sec-body">
-      <p><b>Animal cells:</b> nucleus, cytoplasm, cell membrane, mitochondria, ribosomes.</p>
-      <p><b>Plant cells:</b> all of the above PLUS cell wall (cellulose), large vacuole, chloroplasts.</p>
-      <p><b>Bacterial cells (prokaryotic):</b> no membrane-bound nucleus. Have: cell wall, cell membrane, cytoplasm, ribosomes, plasmids, chromosomal DNA free in cytoplasm.</p>
-      <h4>Specialised cells</h4>
-      <ul class="kl">
-        <li><b>Red blood cells:</b> biconcave disc (↑ surface area), no nucleus (more haemoglobin), flexible to squeeze through capillaries</li>
-        <li><b>Sperm cells:</b> tail for movement, many mitochondria (energy), acrosome (enzymes to penetrate egg)</li>
-        <li><b>Nerve cells:</b> long axon (fast signals), myelin sheath (insulation), many dendrites</li>
-        <li><b>Root hair cells:</b> long extension (↑ surface area for absorption), no chloroplasts (underground)</li>
-      </ul>
-      <h4>Magnification</h4>
-      <div class="eq-grid"><div class="eq-box"><strong>Magnification = Image size ÷ Actual size</strong><span>Light microscope: up to ×2000. Electron microscope: up to ×2,000,000 — far higher resolution but kills cells.</span></div></div>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--bio)">🌿 Photosynthesis &amp; Respiration</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</strong><span>Photosynthesis — needs light &amp; chlorophyll. In chloroplasts.</span></div>
-        <div class="eq-box"><strong>C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP</strong><span>Aerobic respiration — in mitochondria. Lots of energy.</span></div>
-        <div class="eq-box"><strong>Glucose → Lactic acid + small ATP</strong><span>Anaerobic (animals) — builds up, causes cramp.</span></div>
-        <div class="eq-box"><strong>Glucose → Ethanol + CO₂ + small ATP</strong><span>Anaerobic (yeast/plants) — fermentation.</span></div>
-      </div>
-      <h4>Limiting factors of photosynthesis</h4>
-      <ul class="kl">
-        <li><b>Light intensity:</b> more light → faster rate (up to a point). At night = 0.</li>
-        <li><b>CO₂ concentration:</b> more CO₂ → faster (up to a point).</li>
-        <li><b>Temperature:</b> optimum ~25–35°C. Too hot → enzymes denature. Too cold → enzymes slow.</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--bio)">🧬 Genetics &amp; Inheritance</div><div class="sec-body">
-      <p>DNA is a double helix. A pairs with T; C pairs with G. A <b>gene</b> codes for a specific protein.</p>
-      <ul class="kl">
-        <li><b>Allele:</b> a version of a gene. Dominant (capital) always shown; recessive (lowercase) needs two copies.</li>
-        <li><b>Homozygous:</b> two identical alleles (AA or aa). <b>Heterozygous:</b> two different alleles (Aa).</li>
-        <li><b>Mitosis:</b> 2 identical diploid cells — growth &amp; repair.</li>
-        <li><b>Meiosis:</b> 4 non-identical haploid cells — sex cells (gametes).</li>
-      </ul>
-      <div class="warn">⚠️ Punnett square Aa × Aa → 25% AA : 50% Aa : 25% aa. Probability of recessive phenotype = 25%.</div>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--bio)">🦠 Disease &amp; Immunity</div><div class="sec-body">
-      <ul class="kl">
-        <li><b>Bacteria:</b> prokaryote, produce toxins, treated with antibiotics. e.g. Salmonella, TB.</li>
-        <li><b>Viruses:</b> not cells, hijack host DNA, no cure (antivirals only). e.g. Influenza, HIV.</li>
-        <li><b>Fungi:</b> e.g. athlete's foot. <b>Protists:</b> e.g. malaria (mosquito vector).</li>
-        <li><b>Phagocytes:</b> engulf &amp; destroy pathogens. <b>Lymphocytes:</b> produce specific antibodies.</li>
-        <li><b>Memory cells</b> remain after infection → faster response on re-exposure = immunity.</li>
-        <li><b>Vaccines:</b> introduce weakened/dead pathogen → antibody production + memory cells without disease.</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--bio)">🌍 Evolution &amp; Ecosystems</div><div class="sec-body">
-      <p><b>Natural selection (Darwin):</b> (1) Variation exists. (2) Better-adapted individuals survive &amp; reproduce more. (3) Traits passed to offspring. (4) Over generations → evolution.</p>
-      <p><b>Food chains:</b> Producer → Primary consumer → Secondary → Tertiary. ~10% energy transferred at each level.</p>
-      <div class="warn">⚠️ Evolution acts on POPULATIONS over generations — individual organisms don't evolve.</div>
-    </div></div>
-  </div>
-
-  <div id="note-maths" class="note-subj">
-    <div class="section"><div class="sec-hd" style="color:var(--ma)">🔢 Algebra &amp; Number</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>x = (−b ± √(b²−4ac)) / 2a</strong><span>Quadratic formula for ax²+bx+c=0</span></div>
-        <div class="eq-box"><strong>nth term = a + (n−1)d</strong><span>Arithmetic sequence: a=first term, d=common difference</span></div>
-      </div>
-      <ul class="kl">
-        <li><b>Expanding:</b> (x+3)(x−2) = x²−2x+3x−6 = x²+x−6. Use FOIL.</li>
-        <li><b>Factorising:</b> x²+5x+6 = (x+2)(x+3). Find two numbers × to 6, + to 5.</li>
-        <li><b>Surds:</b> √72 = √(36×2) = 6√2. Rationalise: multiply top &amp; bottom by surd.</li>
-        <li><b>Standard form:</b> a×10ⁿ where 1≤a&lt;10. e.g. 0.0034 = 3.4×10⁻³.</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ma)">📐 Geometry &amp; Trigonometry</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>Area = πr²,  C = 2πr</strong><span>Circle: area and circumference</span></div>
-        <div class="eq-box"><strong>a² + b² = c²</strong><span>Pythagoras — c is the hypotenuse</span></div>
-        <div class="eq-box"><strong>Sin θ = Opp/Hyp</strong><span>SOH</span></div>
-        <div class="eq-box"><strong>Cos θ = Adj/Hyp</strong><span>CAH</span></div>
-        <div class="eq-box"><strong>Tan θ = Opp/Adj</strong><span>TOA</span></div>
-        <div class="eq-box"><strong>Sector area = (θ/360)πr²</strong><span>Arc length = (θ/360)×2πr</span></div>
-      </div>
-      <ul class="kl">
-        <li><b>Interior angle sum:</b> (n−2)×180°. Regular polygon exterior angle = 360°/n.</li>
-        <li><b>Volume:</b> Cylinder=πr²h · Cone=⅓πr²h · Sphere=(4/3)πr³</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ma)">📊 Statistics &amp; Probability</div><div class="sec-body">
-      <ul class="kl">
-        <li><b>Mean</b>=sum÷n. <b>Median</b>=middle value. <b>Mode</b>=most common. <b>Range</b>=max−min. <b>IQR</b>=Q3−Q1.</li>
-        <li><b>P(A and B)</b>=P(A)×P(B) (independent). <b>P(A or B)</b>=P(A)+P(B) (mutually exclusive).</li>
-        <li><b>P(not A)</b>=1−P(A). Tree diagrams: multiply along branches, add between.</li>
-      </ul>
-      <div class="warn">⚠️ Without replacement: denominator decreases on second draw of tree diagram.</div>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ma)">📈 Graphs &amp; Proportion</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>y = mx + c</strong><span>m=gradient=(y₂−y₁)/(x₂−x₁), c=y-intercept</span></div>
-        <div class="eq-box"><strong>% change = (change/original)×100</strong><span>Always divide by the ORIGINAL value</span></div>
-      </div>
-      <ul class="kl">
-        <li><b>Direct proportion:</b> y=kx (straight line through origin). <b>Inverse:</b> y=k/x.</li>
-        <li><b>Reverse %:</b> divide by multiplier. e.g. after 20% rise = £120 → original = 120÷1.2 = £100.</li>
-      </ul>
-    </div></div>
-  </div>
-
-  <div id="note-phys" class="note-subj">
-    <div class="section"><div class="sec-hd" style="color:var(--ph)">💪 Forces &amp; Motion</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>F = ma</strong><span>Force (N) = mass (kg) × acceleration (m/s²)</span></div>
-        <div class="eq-box"><strong>W = mg</strong><span>Weight (N) = mass (kg) × g (10 N/kg on Earth)</span></div>
-        <div class="eq-box"><strong>v = u + at</strong><span>Final velocity = initial + acceleration × time</span></div>
-        <div class="eq-box"><strong>v² = u² + 2as</strong><span>Use when time unknown</span></div>
-        <div class="eq-box"><strong>p = mv</strong><span>Momentum (kg m/s) — conserved in collisions</span></div>
-      </div>
-      <ul class="kl">
-        <li><b>1st Law:</b> constant velocity (or rest) unless resultant force acts.</li>
-        <li><b>2nd Law:</b> F=ma. <b>3rd Law:</b> equal &amp; opposite reaction on different objects.</li>
-        <li><b>v-t graph:</b> gradient=acceleration; area=distance. <b>d-t graph:</b> gradient=speed.</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ph)">⚡ Electricity</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>V = IR</strong><span>Ohm's Law: Voltage (V) = Current (A) × Resistance (Ω)</span></div>
-        <div class="eq-box"><strong>P = IV = I²R</strong><span>Power (W)</span></div>
-        <div class="eq-box"><strong>E = Pt</strong><span>Energy (J) = Power × time (s)</span></div>
-        <div class="eq-box"><strong>Series: R = R₁+R₂</strong><span>Current same; voltage shared</span></div>
-        <div class="eq-box"><strong>Parallel: 1/R = 1/R₁+1/R₂</strong><span>Voltage same; current splits</span></div>
-      </div>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ph)">🌊 Waves &amp; Energy</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>v = fλ</strong><span>Wave speed (m/s) = frequency (Hz) × wavelength (m)</span></div>
-        <div class="eq-box"><strong>GPE = mgh</strong><span>g=10 N/kg on Earth</span></div>
-        <div class="eq-box"><strong>KE = ½mv²</strong><span>Kinetic energy (J)</span></div>
-        <div class="eq-box"><strong>Efficiency = useful output / total input</strong><span>×100 for %. Always ≤100%.</span></div>
-      </div>
-      <p>EM spectrum (low→high frequency): Radio · Micro · Infrared · Visible · UV · X-ray · Gamma. All at 3×10⁸ m/s in vacuum.</p>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ph)">☢️ Radioactivity &amp; Space</div><div class="sec-body">
-      <ul class="kl">
-        <li><b>Alpha (α):</b> 2p+2n. Stopped by paper. Most ionising. Atomic number −2, mass −4.</li>
-        <li><b>Beta (β):</b> fast electron. Stopped by aluminium. Atomic number +1.</li>
-        <li><b>Gamma (γ):</b> EM wave. Stopped by lead. Least ionising, most penetrating.</li>
-        <li><b>Half-life:</b> time for half the nuclei to decay. After 3 half-lives → ⅛ remains.</li>
-      </ul>
-      <p>Big Bang evidence: redshift (galaxies moving away) &amp; cosmic microwave background radiation.</p>
-    </div></div>
-  </div>
-
-  <div id="note-chem" class="note-subj">
-    <div class="section"><div class="sec-hd" style="color:var(--ch)">⚛️ Atomic Structure &amp; Periodic Table</div><div class="sec-body">
-      <p>Proton: +1, mass 1. Neutron: 0, mass 1. Electron: −1, negligible mass. Atomic number=protons. Mass number=protons+neutrons.</p>
-      <ul class="kl">
-        <li><b>Group number</b> = outer electrons. <b>Period number</b> = electron shells.</li>
-        <li><b>Group 1:</b> reactivity INCREASES down (outer electron further from nucleus, more shielded).</li>
-        <li><b>Group 7:</b> reactivity DECREASES down. More reactive halogen displaces less reactive one.</li>
-        <li><b>Transition metals:</b> high density/MP, form coloured compounds, good catalysts.</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ch)">🔗 Bonding</div><div class="sec-body">
-      <ul class="kl">
-        <li><b>Ionic:</b> metal+non-metal. Transfer of electrons. Giant lattice. High MP. Conducts when dissolved/molten.</li>
-        <li><b>Covalent:</b> non-metal+non-metal. Sharing electrons. Simple molecular (low MP) or giant covalent (very high MP).</li>
-        <li><b>Metallic:</b> positive ions in sea of delocalised electrons. High MP, conducts, malleable.</li>
-        <li><b>Graphite:</b> giant covalent BUT has delocalised electrons → conducts. Layers slide → lubricant.</li>
-      </ul>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ch)">⚗️ Rates, Energy &amp; Reactions</div><div class="sec-body">
-      <ul class="kl">
-        <li><b>Rate increases with:</b> higher temp · higher concentration · smaller particles · catalyst.</li>
-        <li><b>Exothermic:</b> releases heat (combustion, neutralisation, respiration). ΔH negative.</li>
-        <li><b>Endothermic:</b> absorbs heat (photosynthesis, thermal decomposition). ΔH positive.</li>
-        <li><b>Acid + metal carbonate →</b> salt + water + CO₂. <b>Acid + metal →</b> salt + H₂.</li>
-      </ul>
-      <div class="warn">⚠️ OIL RIG: Oxidation Is Loss of electrons. Reduction Is Gain.</div>
-    </div></div>
-    <div class="section"><div class="sec-hd" style="color:var(--ch)">🛢️ Organic Chemistry &amp; Electrolysis</div><div class="sec-body">
-      <div class="eq-grid">
-        <div class="eq-box"><strong>Alkanes: CₙH₂ₙ₊₂</strong><span>Saturated (single bonds only). e.g. methane CH₄.</span></div>
-        <div class="eq-box"><strong>Alkenes: CₙH₂ₙ</strong><span>Unsaturated (C=C double bond). Decolourises bromine water.</span></div>
-      </div>
-      <ul class="kl">
-        <li><b>Cracking:</b> breaks long alkanes → shorter alkanes + alkenes. Thermal (high temp) or catalytic (zeolite).</li>
-        <li><b>Electrolysis of brine:</b> cathode→H₂, anode→Cl₂, NaOH left in solution.</li>
-        <li><b>Cathode (−):</b> reduction (cations gain electrons). <b>Anode (+):</b> oxidation (anions lose electrons).</li>
-      </ul>
-    </div></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════ QUIZ ══════════════════════════════════════ -->
-<div id="panel-quiz" class="panel">
-  <div class="quiz-wrap">
-    <div class="qf-row">
-      <button class="qf on" onclick="setSubj('all',this)">All subjects</button>
-      <button class="qf" onclick="setSubj('bio',this)">🧬 Biology</button>
-      <button class="qf" onclick="setSubj('maths',this)">📐 Maths</button>
-      <button class="qf" onclick="setSubj('phys',this)">⚡ Physics</button>
-      <button class="qf" onclick="setSubj('chem',this)">🧪 Chemistry</button>
-    </div>
-    <div class="q-meta">Score: <span class="q-score" id="qscore">0</span>&nbsp;/&nbsp;<span id="qtotal">0</span><span class="q-prog" id="qprog"></span></div>
-    <div class="q-card">
-      <div class="q-tag" id="qtag"></div>
-      <p class="q-text" id="qtext">Loading…</p>
-      <div class="q-opts" id="qopts"></div>
-      <div class="q-fb" id="qfb"></div>
-      <button class="q-next" id="qnext" onclick="nextQ()">Next question →</button>
-    </div>
-  </div>
-</div>
-
-</main>
 <script>
-// ════════════════════════════════════════════════════
-// EXAMS & COUNTDOWN
-// ════════════════════════════════════════════════════
-const EXAMS=[
-  {label:'Biology',emoji:'🧬',color:'var(--bio)',date:'2026-06-22',time:'10:15'},
-  {label:'Maths P1',emoji:'📐',color:'var(--ma)',date:'2026-06-23',time:'09:10'},
-  {label:'Physics',emoji:'⚡',color:'var(--ph)',date:'2026-06-23',time:'14:35'},
-  {label:'Chemistry',emoji:'🧪',color:'var(--ch)',date:'2026-06-25',time:'14:35'},
-  {label:'Maths P2',emoji:'📐',color:'var(--ma)',date:'2026-06-26',time:'09:10'},
-];
-function daysUntil(ds){const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds);d.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
-function fmtDate(ds){return new Date(ds).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});}
-const cd=document.getElementById('countdown');
-EXAMS.forEach(e=>{
-  const d=daysUntil(e.date);
-  const txt=d<0?'Done ✓':d===0?'TODAY!':d+' day'+(d===1?'':'s');
-  cd.innerHTML+=`<div class="cd-item"><div class="cd-subj" style="color:${e.color}">${e.emoji} ${e.label}</div><div class="cd-days">${txt}</div><div class="cd-date">${fmtDate(e.date)} · ${e.time}</div></div>`;
-});
+const EXAM_DATE = new Date('2025-06-22');
+const today = new Date();
+const diff = Math.ceil((new Date('2026-06-22') - today) / 86400000);
+document.getElementById('days-left').textContent = diff > 0 ? diff : 0;
 
-// ════════════════════════════════════════════════════
-// PLAN
-// ════════════════════════════════════════════════════
-const today=new Date();today.setHours(0,0,0,0);
-const PLAN=[
-  {date:'2026-06-17',schoolDay:true,sessions:[
-    {t:'4:30–5:00pm',dot:'#888',title:'Snack & wind-down',desc:'Short break after school before starting.'},
-    {t:'5:00–6:00pm',dot:'var(--bio)',title:'Biology — Cell Biology',desc:'Animal, plant & bacterial structures; specialised cells; magnification formula.'},
-    {t:'6:00–7:00pm',dot:'var(--bio)',title:'Biology — Photosynthesis & Respiration',desc:'Both equations, limiting factors, aerobic vs anaerobic, fermentation.'},
-    {t:'7:00–7:30pm',dot:'#888',title:'Break / dinner',desc:''},
-    {t:'7:30–8:30pm',dot:'var(--ma)',title:'Maths — Algebra (Paper 1 prep)',desc:'Expanding brackets, factorising quadratics, solving equations, quadratic formula.'},
-    {t:'8:30–9:00pm',dot:'var(--bio)',title:'Biology flashcards',desc:'Activities tab → Flashcards → Biology. Do 15 cards.'},
-  ]},
-  {date:'2026-06-18',schoolDay:true,sessions:[
-    {t:'4:30–5:00pm',dot:'#888',title:'Snack & wind-down',desc:''},
-    {t:'5:00–6:00pm',dot:'var(--bio)',title:'Biology — Genetics & Inheritance',desc:'DNA, alleles, Punnett squares, mitosis vs meiosis.'},
-    {t:'6:00–7:00pm',dot:'var(--bio)',title:'Biology — Disease & Immunity',desc:'Pathogens, phagocytes, lymphocytes, vaccines, antibiotics.'},
-    {t:'7:00–7:30pm',dot:'#888',title:'Break / dinner',desc:''},
-    {t:'7:30–8:30pm',dot:'var(--ma)',title:'Maths — Number & Sequences',desc:'Surds, standard form, nth term, fractions without calculator.'},
-    {t:'8:30–9:00pm',dot:'var(--bio)',title:'Fill-in-the-blank — Biology',desc:'Activities → Fill in the Blank → Biology. Write answers before checking.'},
-  ]},
-  {date:'2026-06-19',schoolDay:true,sessions:[
-    {t:'4:30–5:00pm',dot:'#888',title:'Snack & wind-down',desc:''},
-    {t:'5:00–6:00pm',dot:'var(--bio)',title:'Biology — Evolution & Ecosystems',desc:'Natural selection steps, food chains, biodiversity.'},
-    {t:'6:00–7:00pm',dot:'var(--ph)',title:'Physics — Forces & Motion',desc:"F=ma, Newton's laws, momentum, v-t & d-t graphs."},
-    {t:'7:00–7:30pm',dot:'#888',title:'Break / dinner',desc:''},
-    {t:'7:30–8:30pm',dot:'var(--ma)',title:'Maths — Geometry & Trigonometry',desc:'Area, volume, Pythagoras, SOH CAH TOA, angle rules.'},
-    {t:'8:30–9:00pm',dot:'var(--bio)',title:'Biology matching game',desc:'Activities → Matching → Biology. Race against yourself.'},
-  ]},
-  {date:'2026-06-20',weekend:true,sessions:[
-    {t:'9:00–10:30am',dot:'var(--ph)',title:'Physics — Electricity & Circuits',desc:'V=IR, P=IV, series/parallel, component behaviour.'},
-    {t:'10:30–11:00am',dot:'#888',title:'Break',desc:''},
-    {t:'11:00am–12:30pm',dot:'var(--ph)',title:'Physics — Waves, Energy & Space',desc:'v=fλ, EM spectrum, GPE, KE, efficiency, radioactivity, half-life.'},
-    {t:'12:30–1:30pm',dot:'#888',title:'Lunch',desc:''},
-    {t:'1:30–3:00pm',dot:'var(--ma)',title:'Maths — Timed non-calculator practice paper',desc:'60 mins timed, then 30 mins reviewing every mistake carefully.'},
-    {t:'3:00–3:30pm',dot:'#888',title:'Break',desc:''},
-    {t:'3:30–5:00pm',dot:'var(--ch)',title:'Chemistry — Atoms, Periodic Table & Bonding',desc:'Electron config, group/period trends, ionic/covalent/metallic bonding.'},
-    {t:'5:00–6:00pm',dot:'#888',title:'Dinner & break',desc:''},
-    {t:'6:00–7:00pm',dot:'var(--ph)',title:'Physics equation practice',desc:'Activities → Equation Practice → Physics. Do every question.'},
-    {t:'7:00–8:00pm',dot:'var(--bio)',title:'Biology weak-spot review',desc:'Re-read any biology sections that felt unclear this week.'},
-  ]},
-  {date:'2026-06-21',weekend:true,sessions:[
-    {t:'9:00–10:30am',dot:'var(--ch)',title:'Chemistry — Rates, Energy & Organic',desc:'Four rate factors, exo/endo, alkanes vs alkenes, cracking, bromine water test.'},
-    {t:'10:30–11:00am',dot:'#888',title:'Break',desc:''},
-    {t:'11:00am–12:30pm',dot:'var(--ch)',title:'Chemistry — Electrolysis & Acids',desc:'OIL RIG, brine products, neutralisation, pH, acid + carbonate.'},
-    {t:'12:30–1:30pm',dot:'#888',title:'Lunch',desc:''},
-    {t:'1:30–3:00pm',dot:'var(--ma)',title:'Maths — Statistics, Probability & Graphs',desc:'Mean/median/IQR, tree diagrams, proportion, quadratic graphs.'},
-    {t:'3:00–3:30pm',dot:'#888',title:'Break',desc:''},
-    {t:'3:30–4:30pm',dot:'var(--bio)',title:'Biology — final equation recall sprint',desc:'Write ALL biology equations from memory. Check against notes.'},
-    {t:'4:30–5:30pm',dot:'var(--ch)',title:'Chemistry matching & flashcards',desc:'Activities tab — Chemistry cards then matching round.'},
-    {t:'5:30pm+',dot:'#888',title:'Rest — early night',desc:'Biology exam tomorrow 10:15. Light read after dinner, then sleep.'},
-  ]},
-  {date:'2026-06-22',isExam:true,badge:'Biology · 10:15am',label:'BIOLOGY EXAM',sessions:[
-    {t:'Before school',dot:'var(--bio)',title:'Quick read only',desc:'Glance over equations. Good breakfast. Leave on time.'},
-    {t:'10:15–11:00am',dot:'var(--bio)',title:'Biology exam · Period 2',desc:'Read each question. Include units. Check if time allows.'},
-    {t:'4:30–5:00pm',dot:'#888',title:'Rest — you deserve it',desc:'Short break before evening revision.'},
-    {t:'5:00–6:30pm',dot:'var(--ma)',title:'Maths Paper 1 — final prep',desc:'Non-calc: algebra, surds, sequences. Write key formulas from memory.'},
-    {t:'6:30–7:00pm',dot:'#888',title:'Dinner',desc:''},
-    {t:'7:00–8:00pm',dot:'var(--ph)',title:'Physics equation sheet from memory',desc:'F=ma · V=IR · v=fλ · GPE=mgh · KE=½mv² · P=IV. Check against notes.'},
-    {t:'8:00pm+',dot:'#888',title:'Early night',desc:'TWO exams tomorrow. Bed by 9:30pm.'},
-  ]},
-  {date:'2026-06-23',isExam:true,badge:'Maths P1 · 9:10 · Physics · 14:35',label:'MATHS P1 + PHYSICS',sessions:[
-    {t:'Before school',dot:'var(--ma)',title:'Maths Paper 1 — last glance only',desc:'Formula notes only. Good breakfast.'},
-    {t:'9:10–10:10am',dot:'var(--ma)',title:'Maths Paper 1 · non-calculator',desc:'Show all working. Move on if stuck. Check at end.'},
-    {t:'Between exams',dot:'var(--ph)',title:'Light physics card only',desc:'Key equations on a small card. Nothing new.'},
-    {t:'2:35–3:20pm',dot:'var(--ph)',title:'Physics exam · Period 5',desc:'Units in every answer. Attempt every question.'},
-    {t:'4:30–5:00pm',dot:'#888',title:'Rest — double exam day done!',desc:''},
-    {t:'5:00–6:30pm',dot:'var(--ch)',title:'Chemistry — atoms, bonding, periodic table',desc:'Electron config, ionic/covalent/metallic bonding. Chemistry in 2 days.'},
-    {t:'6:30pm+',dot:'#888',title:'Dinner & early night',desc:''},
-  ]},
-  {date:'2026-06-24',schoolDay:true,sessions:[
-    {t:'4:30–5:00pm',dot:'#888',title:'Snack & wind-down',desc:''},
-    {t:'5:00–6:30pm',dot:'var(--ch)',title:'Chemistry — Rates & Organic Chemistry',desc:'Rate factors, exo/endo, alkanes vs alkenes, cracking.'},
-    {t:'6:30–7:00pm',dot:'#888',title:'Break / dinner',desc:''},
-    {t:'7:00–8:00pm',dot:'var(--ch)',title:'Chemistry — Electrolysis & Acids',desc:'OIL RIG, brine products, neutralisation, pH scale.'},
-    {t:'8:00–8:30pm',dot:'var(--ch)',title:'Chemistry quiz sprint',desc:'Quiz tab → Chemistry. 20 questions. Early night — exam tomorrow.'},
-  ]},
-  {date:'2026-06-25',isExam:true,badge:'Chemistry · 14:35',label:'CHEMISTRY EXAM',sessions:[
-    {t:'School (free time)',dot:'var(--ch)',title:'Quick recall only',desc:'OIL RIG, cracking, alkanes vs alkenes, rates factors.'},
-    {t:'2:35–3:20pm',dot:'var(--ch)',title:'Chemistry exam · Period 5',desc:'Balance equations. Show working. Check sig figs.'},
-    {t:'4:30–5:00pm',dot:'#888',title:'Rest after exam',desc:''},
-    {t:'5:00–6:30pm',dot:'var(--ma)',title:'Maths Paper 2 — final prep',desc:'Stats, probability, tree diagrams, proportion, quadratic graphs.'},
-    {t:'6:30pm+',dot:'#888',title:'Dinner & early night',desc:'Maths P2 first thing tomorrow.'},
-  ]},
-  {date:'2026-06-26',isExam:true,badge:'Maths P2 · 9:10',label:'MATHS P2 EXAM',sessions:[
-    {t:'Before school',dot:'var(--ma)',title:'Last glance',desc:'Check calculator. Remind yourself: show all working.'},
-    {t:'9:10–10:10am',dot:'var(--ma)',title:'Maths Paper 2 · calculator',desc:'Show all working even with calculator. Method marks count.'},
-    {t:'After',dot:'#1D9E75',title:'🎉 ALL EXAMS DONE! Celebrate!',desc:'Biology · Maths P1 · Physics · Chemistry · Maths P2 — all done. Amazing work!'},
-  ]},
-];
-const grid=document.getElementById('plan-grid');
-PLAN.forEach(day=>{
-  const d=new Date(day.date);d.setHours(0,0,0,0);
-  const diff=Math.round((d-today)/86400000);
-  if(diff<-1)return;
-  const isPast=diff<0,isToday=diff===0;
-  const ds=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-  const ds2=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-  let lbl=isToday?`Today — ${ds}`:day.isExam?`${ds2} — 🎯 ${day.label}`:day.weekend?`${ds2} — Weekend`:ds2;
-  let chips='';
-  if(day.schoolDay)chips+=`<span class="day-chip" style="background:#F0EDE4;color:#666;">🏫 School day — from 4:30pm</span>`;
-  if(day.weekend)chips+=`<span class="day-chip" style="background:#E6F5EE;color:#0A5C3A;">🟢 Full day free</span>`;
-  if(day.badge)chips+=`<span class="day-chip" style="background:var(--ph-l);color:var(--ph-d);margin-left:auto;">${day.badge}</span>`;
-  let hdS=day.isExam?'background:#E4F0FB':day.weekend?'background:#E9F7F1':'';
-  let sesH=day.sessions.map(s=>`<div class="sess"><span class="s-t">${s.t}</span><span class="s-dot" style="background:${s.dot}"></span><div><p class="s-title">${s.title}</p>${s.desc?`<p class="s-desc">${s.desc}</p>`:''}</div></div>`).join('');
-  grid.innerHTML+=`<div class="day${isPast?' day-past':''}"><div class="day-hd" style="${hdS}"><span class="day-lbl">${lbl}</span>${chips}</div><div class="sessions">${sesH}</div></div>`;
-});
-
-// ════════════════════════════════════════════════════
-// PANEL / TAB SWITCHING
-// ════════════════════════════════════════════════════
-function showPanel(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('panel-'+id).classList.add('on');btn.classList.add('on');}
-function showAct(id,btn){document.querySelectorAll('.act-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));document.getElementById('act-'+id).classList.add('on');btn.classList.add('on');}
-function showNoteSubj(id,btn){document.querySelectorAll('.note-subj').forEach(p=>p.classList.remove('on'));document.querySelectorAll('#panel-notes .sp').forEach(b=>b.classList.remove('on'));document.getElementById('note-'+id).classList.add('on');btn.classList.add('on');}
-function setSPills(container,btn){container.querySelectorAll('.sp').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-
-// ════════════════════════════════════════════════════
-// FLASHCARD DATA
-// ════════════════════════════════════════════════════
-const FC_DATA=[
-  // Biology
-  {s:'bio',q:'What is the equation for photosynthesis?',a:'6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂\n(needs light & chlorophyll, in chloroplasts)'},
-  {s:'bio',q:'What is the equation for aerobic respiration?',a:'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP\n(in mitochondria)'},
-  {s:'bio',q:'What is the equation for anaerobic respiration in animals?',a:'Glucose → Lactic acid + small amount of ATP\n(causes muscle cramp)'},
-  {s:'bio',q:'What 3 structures does a plant cell have that an animal cell does NOT?',a:'1. Cell wall (cellulose)\n2. Large permanent vacuole\n3. Chloroplasts'},
-  {s:'bio',q:'What makes bacterial cells different from animal/plant cells?',a:'Prokaryotic — no membrane-bound nucleus.\nHave: plasmids, chromosomal DNA free in cytoplasm, cell wall, ribosomes.'},
-  {s:'bio',q:'What is the difference between mitosis and meiosis?',a:'Mitosis: 2 identical diploid cells → growth & repair.\nMeiosis: 4 non-identical haploid cells → gametes (sex cells).'},
-  {s:'bio',q:'Define: dominant allele vs recessive allele',a:'Dominant (capital letter): expressed even with one copy.\nRecessive (lowercase): only expressed when homozygous (two copies).'},
-  {s:'bio',q:'What is the probability of aa offspring from Aa × Aa?',a:'25% (1 in 4).\nPunnett square gives: AA : Aa : Aa : aa = 1:2:1.'},
-  {s:'bio',q:'Name 4 types of pathogen and one example of each.',a:'Bacteria (Salmonella) · Virus (Influenza)\nFungus (Athlete\'s foot) · Protist (Malaria)'},
-  {s:'bio',q:'How does a vaccine create immunity?',a:'Introduces weakened/dead pathogen or antigen → immune system produces antibodies & memory cells → faster response if real pathogen appears later.'},
-  {s:'bio',q:'What is osmosis?',a:'Net movement of water molecules from high water potential to low water potential across a partially permeable membrane.'},
-  {s:'bio',q:'Name 3 limiting factors of photosynthesis.',a:'1. Light intensity\n2. CO₂ concentration\n3. Temperature (enzymes denature above ~45°C)'},
-  {s:'bio',q:'What adaptations does a red blood cell have?',a:'Biconcave disc shape (↑ surface area)\nNo nucleus (more room for haemoglobin)\nFlexible (squeeze through capillaries)'},
-  {s:'bio',q:'State Darwin\'s 4 steps of natural selection.',a:'1. Variation in population\n2. Better adapted survive & reproduce more\n3. Traits passed to offspring\n4. Over generations → evolution'},
-  {s:'bio',q:'What do phagocytes and lymphocytes each do?',a:'Phagocytes: engulf & destroy pathogens (phagocytosis).\nLymphocytes: produce specific antibodies against antigens.'},
-  // Maths
-  {s:'maths',q:'State the quadratic formula.',a:'x = (−b ± √(b²−4ac)) / 2a\nFor ax² + bx + c = 0'},
-  {s:'maths',q:'What is the nth term formula for an arithmetic sequence?',a:'nth term = a + (n−1)d\nwhere a = first term, d = common difference'},
-  {s:'maths',q:'How do you find the gradient between two points?',a:'m = (y₂ − y₁) / (x₂ − x₁)\ne.g. (1,2) to (5,10): m = (10−2)/(5−1) = 8/4 = 2'},
-  {s:'maths',q:'State SOH CAH TOA.',a:'Sin θ = Opposite / Hypotenuse\nCos θ = Adjacent / Hypotenuse\nTan θ = Opposite / Adjacent'},
-  {s:'maths',q:'Area and circumference of a circle?',a:'Area = πr²\nCircumference = 2πr = πd'},
-  {s:'maths',q:'How do you simplify √72?',a:'Find largest perfect square factor: √72 = √(36×2) = √36 × √2 = 6√2'},
-  {s:'maths',q:'What is the AND rule for probability?',a:'P(A and B) = P(A) × P(B)\n(Only valid for independent events)'},
-  {s:'maths',q:'Interior angle sum of a polygon with n sides?',a:'Sum = (n−2) × 180°\ne.g. hexagon: (6−2)×180 = 720°, each angle = 720÷6 = 120°'},
-  {s:'maths',q:'How do you calculate percentage change?',a:'% change = (change ÷ original) × 100\nAlways divide by the ORIGINAL value.'},
-  {s:'maths',q:'Volume formulas for cylinder, cone, sphere?',a:'Cylinder: πr²h\nCone: ⅓πr²h\nSphere: (4/3)πr³'},
-  {s:'maths',q:'What does the discriminant (b²−4ac) tell you?',a:'>0: two real solutions\n=0: one repeated solution\n<0: no real solutions'},
-  {s:'maths',q:'How do you do a reverse percentage?',a:'Divide by the multiplier.\ne.g. price after 20% rise = £120 → original = 120 ÷ 1.2 = £100'},
-  // Physics
-  {s:'phys',q:'State Newton\'s three laws of motion.',a:'1st: constant velocity unless resultant force acts.\n2nd: F = ma.\n3rd: equal & opposite reaction on a different object.'},
-  {s:'phys',q:'What do the gradient and area represent on a velocity-time graph?',a:'Gradient = acceleration (m/s²)\nArea under graph = distance travelled (m)'},
-  {s:'phys',q:'State Ohm\'s Law and the power equations.',a:'V = IR\nP = IV = I²R = V²/R'},
-  {s:'phys',q:'How do series and parallel circuits differ?',a:'Series: same current everywhere; voltage shared; R = R₁+R₂.\nParallel: same voltage everywhere; current splits; 1/R = 1/R₁+1/R₂.'},
-  {s:'phys',q:'State the wave speed equation.',a:'v = fλ\nwave speed (m/s) = frequency (Hz) × wavelength (m)'},
-  {s:'phys',q:'Write the EM spectrum in order of increasing frequency.',a:'Radio · Microwaves · Infrared · Visible · UV · X-rays · Gamma rays\n(All travel at 3×10⁸ m/s in vacuum)'},
-  {s:'phys',q:'GPE and KE equations?',a:'GPE = mgh (g = 10 N/kg on Earth)\nKE = ½mv²'},
-  {s:'phys',q:'How is efficiency calculated?',a:'Efficiency = useful output energy / total input energy\nMultiply × 100 for %. Always ≤ 100%.'},
-  {s:'phys',q:'Compare alpha, beta and gamma radiation.',a:'α: 2p+2n; stopped by paper; most ionising; atomic number −2.\nβ: fast electron; stopped by Al; atomic number +1.\nγ: EM wave; stopped by lead; least ionising.'},
-  {s:'phys',q:'What is half-life?',a:'Time for half the radioactive nuclei in a sample to decay.\nAfter 3 half-lives → ⅛ of original remains.'},
-  {s:'phys',q:'What is the equation for momentum?',a:'p = mv\nmomentum (kg m/s) = mass (kg) × velocity (m/s)\nMomentum is conserved in all collisions.'},
-  {s:'phys',q:'What evidence supports the Big Bang theory?',a:'1. Redshift — galaxies moving away from us.\n2. Cosmic Microwave Background Radiation (CMBR).'},
-  // Chemistry
-  {s:'chem',q:'What do group number and period number tell you?',a:'Group number = number of outer shell electrons.\nPeriod number = number of electron shells.'},
-  {s:'chem',q:'How does reactivity change in Group 1 and Group 7?',a:'Group 1: reactivity INCREASES down (outer electron further from nucleus, more shielded).\nGroup 7: reactivity DECREASES down.'},
-  {s:'chem',q:'Compare ionic, covalent and metallic bonding.',a:'Ionic: metal+non-metal; electron transfer; giant lattice; high MP; conducts when dissolved.\nCovalent: non-metals; electron sharing; simple molecular (low MP) or giant (high MP).\nMetallic: positive ions in sea of electrons; conducts; malleable.'},
-  {s:'chem',q:'What 4 things increase rate of reaction?',a:'1. Higher temperature (more frequent, energetic collisions)\n2. Higher concentration / pressure\n3. Smaller particle size (↑ surface area)\n4. Catalyst (lowers activation energy)'},
-  {s:'chem',q:'Exothermic vs endothermic reactions — give examples.',a:'Exothermic: releases heat; ΔH negative. e.g. combustion, neutralisation, respiration.\nEndothermic: absorbs heat; ΔH positive. e.g. photosynthesis, thermal decomposition.'},
-  {s:'chem',q:'General formula for alkanes and alkenes?',a:'Alkanes: CₙH₂ₙ₊₂ (saturated, single bonds).\nAlkenes: CₙH₂ₙ (unsaturated, C=C double bond).\nAlkenes decolourise bromine water; alkanes do not.'},
-  {s:'chem',q:'What is cracking?',a:'Breaking long-chain alkanes into shorter alkanes + alkenes.\nThermal cracking: high temp & pressure.\nCatalytic cracking: zeolite catalyst, lower temp.'},
-  {s:'chem',q:'Products of brine electrolysis?',a:'Cathode (−): hydrogen gas (H₂)\nAnode (+): chlorine gas (Cl₂)\nLeft in solution: sodium hydroxide (NaOH)'},
-  {s:'chem',q:'What does OIL RIG stand for?',a:'Oxidation Is Loss (of electrons)\nReduction Is Gain (of electrons)'},
-  {s:'chem',q:'What happens when acid reacts with a metal carbonate?',a:'Acid + metal carbonate → salt + water + carbon dioxide\ne.g. HCl + CaCO₃ → CaCl₂ + H₂O + CO₂'},
-  {s:'chem',q:'Why does graphite conduct electricity?',a:'Each carbon atom forms 3 covalent bonds, leaving one delocalised electron per atom. These free electrons allow electrical conduction. Graphite is unique among giant covalent structures in conducting electricity.'},
-  {s:'chem',q:'What is an isotope?',a:'Atoms of the same element (same proton number) with different numbers of neutrons.\ne.g. Carbon-12 and Carbon-14 are both carbon but C-14 has 8 neutrons vs 6.'},
-];
-
-let fcFiltered=[...FC_DATA],fcIdx=0,fcFlipped=false;
-function loadFC(s,btn){
-  setSPills(btn.closest('.subj-pills'),btn);
-  fcFiltered=s==='all'?[...FC_DATA]:FC_DATA.filter(c=>c.s===s);
-  fcIdx=0;fcFlipped=false;renderFC();
-}
-function renderFC(){
-  if(!fcFiltered.length)return;
-  const c=fcFiltered[fcIdx];
-  document.getElementById('fc-card').classList.remove('flipped');
-  fcFlipped=false;
-  document.getElementById('fc-front-text').textContent=c.q;
-  document.getElementById('fc-back-text').textContent=c.a;
-  const labels={bio:'🧬 Biology',maths:'📐 Maths',phys:'⚡ Physics',chem:'🧪 Chemistry'};
-  document.getElementById('fc-subj-label').textContent=labels[c.s]||'';
-  document.getElementById('fc-count').textContent=`Card ${fcIdx+1} of ${fcFiltered.length}`;
-  const dots=document.getElementById('fc-dots');
-  dots.innerHTML='';
-  fcFiltered.forEach((_,i)=>{const d=document.createElement('div');d.className='fc-dot'+(i===fcIdx?' cur':i<fcIdx?' seen':'');d.onclick=()=>{fcIdx=i;renderFC();};dots.appendChild(d);});
-}
-function flipFC(){const card=document.getElementById('fc-card');fcFlipped=!fcFlipped;card.classList.toggle('flipped',fcFlipped);}
-function nextFC(){fcIdx=(fcIdx+1)%fcFiltered.length;renderFC();}
-function prevFC(){fcIdx=(fcIdx-1+fcFiltered.length)%fcFiltered.length;renderFC();}
-function shuffleFC(){for(let i=fcFiltered.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[fcFiltered[i],fcFiltered[j]]=[fcFiltered[j],fcFiltered[i]];}fcIdx=0;renderFC();}
-renderFC();
-
-// ════════════════════════════════════════════════════
-// FILL IN THE BLANK DATA
-// ════════════════════════════════════════════════════
-const FITB_DATA=[
-  {s:'bio',text:'Photosynthesis takes in [CO₂] and [water] and produces [glucose] and [oxygen].',blanks:['CO₂','water','glucose','oxygen'],clue:'word equation'},
-  {s:'bio',text:'Aerobic respiration produces [carbon dioxide], [water] and [ATP] (energy).',blanks:['carbon dioxide','water','ATP'],clue:'products'},
-  {s:'bio',text:'Mitosis produces [2] identical [diploid] cells used for [growth] and repair.',blanks:['2','diploid','growth'],clue:'mitosis facts'},
-  {s:'bio',text:'A dominant allele is written as a [capital] letter and is always [expressed], even with one copy.',blanks:['capital','expressed'],clue:'genetics'},
-  {s:'bio',text:'Vaccines work by introducing a [weakened] pathogen, triggering production of [antibodies] and [memory] cells.',blanks:['weakened','antibodies','memory'],clue:'immunity'},
-  {s:'bio',text:'The three limiting factors of photosynthesis are [light intensity], [CO₂ concentration] and [temperature].',blanks:['light intensity','CO₂ concentration','temperature'],clue:'limiting factors'},
-  {s:'bio',text:'[Phagocytes] engulf pathogens by phagocytosis, while [lymphocytes] produce specific antibodies.',blanks:['Phagocytes','lymphocytes'],clue:'white blood cells'},
-  {s:'maths',text:'The quadratic formula is x = (−b ± √(b²−[4]ac)) / [2]a.',blanks:['4','2'],clue:'quadratic formula'},
-  {s:'maths',text:'The gradient of a straight line is calculated as (y₂ − y₁) divided by ([x₂] − [x₁]).',blanks:['x₂','x₁'],clue:'gradient formula'},
-  {s:'maths',text:'The area of a circle is [π][r²] and the circumference is [2πr].',blanks:['π','r²','2πr'],clue:'circle formulas'},
-  {s:'maths',text:'SOH means Sin = [Opposite] / [Hypotenuse].',blanks:['Opposite','Hypotenuse'],clue:'trigonometry'},
-  {s:'maths',text:'Percentage change = (change ÷ [original]) × [100].',blanks:['original','100'],clue:'percentage change'},
-  {s:'maths',text:'In a parallel circuit, all components share the same [voltage], and the total resistance is [lower] than any individual resistor.',blanks:['voltage','lower'],clue:'parallel circuits'},
-  {s:'phys',text:'Newton\'s second law states that Force = [mass] × [acceleration].',blanks:['mass','acceleration'],clue:"Newton's 2nd law"},
-  {s:'phys',text:'Ohm\'s Law states that Voltage = [Current] × [Resistance].',blanks:['Current','Resistance'],clue:"Ohm's Law"},
-  {s:'phys',text:'Wave speed = [frequency] × [wavelength].',blanks:['frequency','wavelength'],clue:'wave equation'},
-  {s:'phys',text:'GPE = mass × [g] × [height], where g on Earth = [10] N/kg.',blanks:['g','height','10'],clue:'GPE equation'},
-  {s:'phys',text:'Alpha radiation is stopped by [paper], beta by [aluminium], and gamma by [lead].',blanks:['paper','aluminium','lead'],clue:'radiation penetration'},
-  {s:'phys',text:'After [3] half-lives, [⅛] of the original radioactive sample remains.',blanks:['3','⅛'],clue:'half-life'},
-  {s:'phys',text:'The gradient of a velocity-time graph gives [acceleration], and the area gives [distance].',blanks:['acceleration','distance'],clue:'v-t graph'},
-  {s:'chem',text:'The group number in the periodic table tells you the number of [outer] electrons.',blanks:['outer'],clue:'periodic table'},
-  {s:'chem',text:'In Group 1, reactivity [increases] going down the group because the outer electron is [further] from the nucleus.',blanks:['increases','further'],clue:'Group 1 reactivity'},
-  {s:'chem',text:'An exothermic reaction [releases] heat to surroundings (ΔH is [negative]).',blanks:['releases','negative'],clue:'exothermic'},
-  {s:'chem',text:'Alkanes have the formula CₙH[2n+2] and are [saturated] (only single bonds).',blanks:['2n+2','saturated'],clue:'alkanes'},
-  {s:'chem',text:'In electrolysis of brine: [hydrogen] forms at the cathode, [chlorine] at the anode, and [NaOH] remains in solution.',blanks:['hydrogen','chlorine','NaOH'],clue:'brine electrolysis'},
-  {s:'chem',text:'OIL RIG: Oxidation Is [Loss] of electrons; Reduction Is [Gain].',blanks:['Loss','Gain'],clue:'OIL RIG'},
-  {s:'chem',text:'A catalyst increases reaction rate by providing an alternative pathway with [lower] activation energy, and is not [used up].',blanks:['lower','used up'],clue:'catalyst'},
-];
-
-let fitbCurrent=[],currentFITBSubj='all',fitbScoreVal=0,fitbTotalVal=0;
-function loadFITB(s,btn){
-  if(btn)setSPills(btn.closest('.subj-pills'),btn);
-  currentFITBSubj=s;fitbScoreVal=0;fitbTotalVal=0;
-  document.getElementById('fitb-score').textContent='0';
-  document.getElementById('fitb-total').textContent='0';
-  const pool=(s==='all'?FITB_DATA:FITB_DATA.filter(q=>q.s===s)).slice();
-  // pick 5 random
-  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-  fitbCurrent=pool.slice(0,5);
-  const con=document.getElementById('fitb-container');
-  con.innerHTML='';
-  fitbCurrent.forEach((q,qi)=>{
-    // build text with inputs
-    let html=q.text;let bi=0;
-    html=html.replace(/\[([^\]]+)\]/g,(match,ans)=>{
-      return `<input class="fitb-inp" data-qi="${qi}" data-bi="${bi++}" data-ans="${ans.toLowerCase()}" placeholder="?" autocomplete="off">`;
-    });
-    con.innerHTML+=`<div class="fitb-q"><div class="fitb-text">${html}</div><div style="font-size:12px;color:var(--ink3);margin-bottom:8px">Hint: ${q.clue}</div><div class="fitb-fb" id="fitb-fb-${qi}"></div></div>`;
-  });
-}
-function checkAllFITB(){
-  let correct=0,total=0;
-  fitbCurrent.forEach((q,qi)=>{
-    const inputs=document.querySelectorAll(`input[data-qi="${qi}"]`);
-    let allOk=true;
-    inputs.forEach(inp=>{
-      total++;
-      const val=inp.value.trim().toLowerCase();
-      const ans=inp.dataset.ans.trim().toLowerCase();
-      const ok=val===ans||ans.includes(val)&&val.length>2;
-      inp.classList.toggle('ok',ok);inp.classList.toggle('no',!ok);
-      if(!ok)allOk=false;else correct++;
-    });
-    const fb=document.getElementById(`fitb-fb-${qi}`);
-    fb.style.display='block';
-    fb.innerHTML=allOk?'✓ Perfect!':'Answers: '+q.blanks.map(b=>`<b>${b}</b>`).join(', ');
-  });
-  fitbScoreVal=correct;fitbTotalVal=total;
-  document.getElementById('fitb-score').textContent=correct;
-  document.getElementById('fitb-total').textContent=total;
-}
-loadFITB('all',null);
-
-// ════════════════════════════════════════════════════
-// MATCHING DATA
-// ════════════════════════════════════════════════════
-const MATCH_DATA=[
-  {s:'bio',pairs:[
-    ['Mitosis','Produces 2 identical diploid cells for growth'],
-    ['Meiosis','Produces 4 haploid sex cells (gametes)'],
-    ['Dominant allele','Expressed even with only one copy'],
-    ['Lymphocyte','Produces specific antibodies against antigens'],
-    ['Limiting factor','Something that prevents photosynthesis going faster'],
-    ['Osmosis','Water moving across partially permeable membrane'],
-  ]},
-  {s:'bio',pairs:[
-    ['Chloroplast','Site of photosynthesis in plant cells'],
-    ['Mitochondria','Site of aerobic respiration'],
-    ['Ribosome','Site of protein synthesis'],
-    ['Phagocyte','Engulfs and destroys pathogens'],
-    ['Plasmid','Small circular DNA loop in bacterial cells'],
-    ['Lactic acid','Product of anaerobic respiration in animals'],
-  ]},
-  {s:'maths',pairs:[
-    ['πr²','Area of a circle'],
-    ['(n−2)×180°','Sum of interior angles of a polygon'],
-    ['a + (n−1)d','nth term of arithmetic sequence'],
-    ['(y₂−y₁)/(x₂−x₁)','Gradient between two points'],
-    ['1 − P(A)','Probability of event NOT A'],
-    ['⅓πr²h','Volume of a cone'],
-  ]},
-  {s:'maths',pairs:[
-    ['Homozygous','Two identical alleles (AA or aa)'],
-    ['Surd','Irrational square root e.g. √2'],
-    ['IQR','Q3 minus Q1 (interquartile range)'],
-    ['Discriminant','b²−4ac (from quadratic formula)'],
-    ['Standard form','Number written as a×10ⁿ'],
-    ['Inverse proportion','y = k/x (hyperbola graph)'],
-  ]},
-  {s:'phys',pairs:[
-    ['F = ma','Newton\'s Second Law'],
-    ['V = IR','Ohm\'s Law'],
-    ['v = fλ','Wave speed equation'],
-    ['GPE = mgh','Gravitational potential energy'],
-    ['KE = ½mv²','Kinetic energy'],
-    ['p = mv','Momentum equation'],
-  ]},
-  {s:'phys',pairs:[
-    ['Alpha radiation','Stopped by paper; removes 2p+2n from nucleus'],
-    ['Beta radiation','Stopped by aluminium; fast electron from nucleus'],
-    ['Gamma radiation','Stopped by lead; electromagnetic wave'],
-    ['Half-life','Time for half of radioactive nuclei to decay'],
-    ['Redshift','Evidence that galaxies are moving away — Big Bang'],
-    ['Series circuit','Total resistance = sum of all resistors'],
-  ]},
-  {s:'chem',pairs:[
-    ['Ionic bonding','Transfer of electrons between metal and non-metal'],
-    ['Covalent bonding','Sharing of electron pairs between non-metals'],
-    ['Metallic bonding','Positive ions in a sea of delocalised electrons'],
-    ['Exothermic','Releases heat; ΔH negative'],
-    ['Endothermic','Absorbs heat; ΔH positive'],
-    ['Catalyst','Lowers activation energy; not used up'],
-  ]},
-  {s:'chem',pairs:[
-    ['Alkane','Saturated hydrocarbon; CₙH₂ₙ₊₂'],
-    ['Alkene','Unsaturated; has C=C double bond; CₙH₂ₙ'],
-    ['Cracking','Breaking long alkanes into shorter alkanes + alkenes'],
-    ['OIL RIG','Oxidation Is Loss; Reduction Is Gain'],
-    ['Cathode','Negative electrode; reduction occurs here'],
-    ['Anode','Positive electrode; oxidation occurs here'],
-  ]},
-];
-
-let matchLeft=null,matchScore=0,matchTotal=0,currentMatchSubj='all';
-function loadMatch(s,btn){
-  if(btn)setSPills(btn.closest('.subj-pills'),btn);
-  currentMatchSubj=s;matchLeft=null;matchScore=0;
-  const pool=(s==='all'?MATCH_DATA:MATCH_DATA.filter(d=>d.s===s));
-  const set=pool[Math.floor(Math.random()*pool.length)];
-  matchTotal=set.pairs.length;
-  document.getElementById('match-score').textContent=0;
-  document.getElementById('match-total').textContent=matchTotal;
-  const lEl=document.getElementById('match-left');
-  const rEl=document.getElementById('match-right');
-  const shuffledPairs=[...set.pairs].sort(()=>Math.random()-.5);
-  const shuffledRight=shuffledPairs.map(p=>p[1]).sort(()=>Math.random()-.5);
-  lEl.innerHTML='';rEl.innerHTML='';
-  shuffledPairs.forEach(p=>{
-    const el=document.createElement('div');el.className='match-item';el.textContent=p[0];
-    el.dataset.key=p[0];el.onclick=()=>matchClick('left',el,p[1]);
-    lEl.appendChild(el);
-  });
-  shuffledRight.forEach(def=>{
-    const key=set.pairs.find(p=>p[1]===def)[0];
-    const el=document.createElement('div');el.className='match-item';el.textContent=def;
-    el.dataset.key=key;el.onclick=()=>matchClick('right',el,null);
-    rEl.appendChild(el);
-  });
-}
-function matchClick(side,el,correctDef){
-  if(el.classList.contains('matched-ok')||el.classList.contains('matched-no'))return;
-  if(side==='left'){
-    document.querySelectorAll('.match-item.selected').forEach(e=>e.classList.remove('selected'));
-    el.classList.add('selected');matchLeft=el;
-  } else {
-    if(!matchLeft)return;
-    const correct=el.dataset.key===matchLeft.dataset.key;
-    if(correct){
-      matchLeft.classList.add('matched-ok');el.classList.add('matched-ok');
-      matchScore++;document.getElementById('match-score').textContent=matchScore;
-    } else {
-      matchLeft.classList.add('matched-no');el.classList.add('matched-no');
-      setTimeout(()=>{matchLeft.classList.remove('matched-no','selected');el.classList.remove('matched-no');},700);
-    }
-    matchLeft.classList.remove('selected');matchLeft=null;
+const SUBJECTS = {
+  biology: {
+    fill: 'fill-bio',
+    cards: [
+      {q:"What is the function of mitochondria?", a:"Mitochondria are the site of aerobic respiration. They produce ATP (energy) for the cell. Every cell that needs energy has mitochondria."},
+      {q:"What is diffusion?", a:"The net movement of particles from an area of high concentration to low concentration, down the concentration gradient. No energy is needed — it is a passive process."},
+      {q:"What are the four bases in DNA?", a:"Adenine (A), Thymine (T), Guanine (G), and Cytosine (C). A always pairs with T; G always pairs with C. These are complementary base pairs."},
+      {q:"What is the role of the enzyme amylase?", a:"Amylase breaks down starch into maltose (a sugar). It is produced in the salivary glands and the pancreas, and works in the mouth and small intestine."},
+      {q:"What is natural selection?", a:"Individuals with advantageous traits survive and reproduce more successfully, passing those traits to offspring. Over many generations, the population changes — this is evolution."},
+      {q:"What is the difference between aerobic and anaerobic respiration?", a:"Aerobic uses oxygen → produces CO₂ + water + lots of ATP. Anaerobic has no oxygen → produces lactic acid in animals (or ethanol + CO₂ in yeast) + less ATP."},
+      {q:"What do guard cells do?", a:"Guard cells control the opening and closing of stomata on leaves. They regulate gas exchange (CO₂ in, O₂ out) and water loss through transpiration."},
+      {q:"What is osmosis?", a:"The movement of water molecules through a partially permeable membrane from a region of low solute concentration (dilute) to high solute concentration (concentrated). It is passive."},
+      {q:"Name three types of blood vessel and their features.", a:"Arteries: thick muscular walls, carry oxygenated blood away from the heart. Veins: thinner walls, have valves, carry blood to the heart. Capillaries: one cell thick, site of gas/nutrient exchange."},
+      {q:"What is a gene?", a:"A section of DNA on a chromosome that codes for a specific protein, which determines a characteristic. Humans have about 20,000 genes on 23 pairs of chromosomes."},
+    ],
+    practice: [
+      {q:"Which organelle is responsible for producing energy in a cell?", opts:["Nucleus","Ribosome","Mitochondria","Cell membrane"], ans:2, exp:"Mitochondria carry out aerobic respiration to produce ATP — the cell's energy currency. Cells with high energy demands (like muscle cells) have many mitochondria."},
+      {q:"A student places a potato chip in salty water. What happens and why?", opts:["It gains mass — osmosis into the chip","It loses mass — osmosis out of the chip","It gains mass — diffusion","Nothing happens"], ans:1, exp:"The salt water is more concentrated than the potato cells, so water moves OUT of the chip by osmosis (down the concentration gradient), causing it to lose mass and become flaccid."},
+      {q:"In the equation for photosynthesis, what are the two products?", opts:["CO₂ and water","Glucose and oxygen","Glucose and CO₂","Oxygen and water"], ans:1, exp:"6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂. Glucose is the food/energy store for the plant; oxygen is released as a by-product through stomata."},
+      {q:"What base pairs with Guanine in DNA?", opts:["Adenine","Thymine","Cytosine","Uracil"], ans:2, exp:"G–C and A–T are the complementary base pairs in DNA. The pairing is held by hydrogen bonds. Uracil appears in RNA, not DNA."},
+      {q:"An organism is well camouflaged. How does this relate to natural selection?", opts:["It directly causes a mutation","It has no effect on survival","It is more likely to survive and pass its genes on","It will always produce identical offspring"], ans:2, exp:"Better camouflage → less predation → survives longer → reproduces more → passes camouflage genes to more offspring. Over generations, the population becomes better camouflaged."},
+      {q:"What is the word equation for aerobic respiration?", opts:["Glucose + oxygen → carbon dioxide + water","Glucose → lactic acid","Carbon dioxide + water → glucose + oxygen","Glucose + water → ethanol + CO₂"], ans:0, exp:"Glucose + oxygen → carbon dioxide + water (+ energy as ATP). This happens in the mitochondria and releases far more energy than anaerobic respiration."},
+      {q:"Where does photosynthesis take place inside a plant cell?", opts:["Mitochondria","Nucleus","Chloroplasts","Ribosomes"], ans:2, exp:"Chloroplasts contain chlorophyll, the green pigment that absorbs light energy. They are found mainly in leaf cells (mesophyll) and are the site of photosynthesis."},
+      {q:"What is the function of the cell membrane?", opts:["Produces proteins","Controls what enters and leaves the cell","Contains the genetic material","Provides energy"], ans:1, exp:"The cell membrane is selectively permeable — it controls the movement of substances in and out of the cell. It is made of a phospholipid bilayer with embedded proteins."},
+      {q:"Which blood vessel carries oxygenated blood AWAY from the heart?", opts:["Vein","Capillary","Pulmonary vein","Aorta (artery)"], ans:3, exp:"The aorta is the main artery leaving the heart, carrying oxygenated blood to the body. Arteries always carry blood AWAY from the heart — remember A for Away."},
+      {q:"A plant is placed in the dark for 24 hours. What happens to starch levels?", opts:["Starch increases","Starch stays the same","Starch decreases or disappears","Glucose disappears first then starch"], ans:2, exp:"Without light, the plant cannot photosynthesise, so it cannot make glucose or starch. Existing starch is used up for respiration. This is why we destarch plants before photosynthesis experiments."},
+      {q:"What is a mutation?", opts:["A change in an organism's behaviour","A random change in the DNA sequence","Death of a cell","A type of natural selection"], ans:1, exp:"A mutation is a random change in the base sequence of DNA. Most mutations have no effect, some are harmful, and rarely one can be beneficial. Mutations are the source of new alleles and variation."},
+      {q:"What is the role of insulin in the body?", opts:["Breaks down fats","Lowers blood glucose levels","Raises blood glucose levels","Produced by the pituitary gland"], ans:1, exp:"Insulin is produced by the pancreas when blood glucose is too HIGH. It causes cells (especially liver and muscle) to absorb glucose and convert it to glycogen for storage, lowering blood glucose back to normal."},
+      {q:"During anaerobic respiration in humans, what is produced?", opts:["Ethanol and CO₂","Carbon dioxide and water","Lactic acid","Glucose and oxygen"], ans:2, exp:"In humans (and other animals), anaerobic respiration produces lactic acid. This builds up in muscles during intense exercise, causing the burning feeling. Yeast produces ethanol and CO₂ instead."},
+      {q:"What does the term 'double helix' describe?", opts:["Two separate DNA molecules","The two-stranded twisted structure of DNA","Two chromosomes","A protein structure"], ans:1, exp:"DNA has a double helix structure — two strands of nucleotides twisted around each other, held together by complementary base pairs (A-T and G-C). Discovered by Watson and Crick in 1953."},
+      {q:"Which part of the digestive system absorbs most nutrients?", opts:["Stomach","Large intestine","Small intestine","Oesophagus"], ans:2, exp:"The small intestine is lined with villi (tiny finger-like projections) which massively increase surface area for absorption. Digested food molecules pass into the blood through the villi walls."},
+    ]
+  },
+  physics: {
+    fill: 'fill-phy',
+    cards: [
+      {q:"State Newton's Second Law of Motion.", a:"Force = mass × acceleration (F = ma). Increasing the force increases acceleration; increasing the mass decreases acceleration for the same force. Units: force in Newtons (N)."},
+      {q:"What is the difference between speed and velocity?", a:"Speed is a scalar — it has magnitude only (e.g. 10 m/s). Velocity is a vector — it has both magnitude AND direction (e.g. 10 m/s north). Changing direction = changing velocity."},
+      {q:"State the law of conservation of energy.", a:"Energy cannot be created or destroyed, only transferred from one form to another. The total energy in a closed system always remains constant."},
+      {q:"State Ohm's Law.", a:"Voltage = Current × Resistance (V = IR). For an ohmic conductor, current is directly proportional to voltage at constant temperature. If V doubles, I doubles."},
+      {q:"What is the equation for gravitational potential energy?", a:"GPE = mass × gravitational field strength × height (GPE = mgh). On Earth, g ≈ 10 N/kg. Units are joules (J). Doubling the height doubles the GPE."},
+      {q:"What is the difference between transverse and longitudinal waves?", a:"Transverse: vibrations are perpendicular to the direction of travel (e.g. light, water waves). Longitudinal: vibrations are parallel to the direction of travel (e.g. sound)."},
+      {q:"What is the equation for wave speed?", a:"Wave speed = frequency × wavelength (v = fλ). Speed in m/s, frequency in Hz, wavelength in metres. All electromagnetic waves travel at 3×10⁸ m/s in a vacuum."},
+      {q:"What are the three types of nuclear radiation?", a:"Alpha (α): 2 protons + 2 neutrons, stopped by paper, most ionising. Beta (β): fast electron, stopped by aluminium. Gamma (γ): electromagnetic wave, reduced by thick lead, least ionising."},
+      {q:"State Hooke's Law.", a:"The extension of a spring is directly proportional to the force applied, provided the elastic limit is not exceeded. Formula: F = ke, where k is the spring constant (N/m)."},
+      {q:"What is the equation for kinetic energy?", a:"KE = ½ × mass × velocity² (KE = ½mv²). Measured in joules. If speed doubles, KE quadruples (because v is squared). This is why speed is so dangerous in cars."},
+    ],
+    practice: [
+      {q:"A car of mass 1000 kg accelerates at 3 m/s². What is the resultant force?", opts:["300 N","3000 N","333 N","30 N"], ans:1, exp:"F = ma = 1000 × 3 = 3000 N. Always check units — mass in kg, acceleration in m/s², force in Newtons."},
+      {q:"A 2 kg ball is lifted 5 m. What is its GPE? (g = 10 N/kg)", opts:["10 J","100 J","25 J","1000 J"], ans:1, exp:"GPE = mgh = 2 × 10 × 5 = 100 J. If the ball is then dropped, all this GPE converts to KE (ignoring air resistance)."},
+      {q:"What type of wave is sound?", opts:["Transverse","Longitudinal","Electromagnetic","Mechanical transverse"], ans:1, exp:"Sound is longitudinal — particles vibrate back and forth in the same direction as the wave travels, creating compressions and rarefactions. It needs a medium to travel through."},
+      {q:"A resistor has a voltage of 12 V and a current of 3 A. What is its resistance?", opts:["36 Ω","4 Ω","0.25 Ω","15 Ω"], ans:1, exp:"R = V ÷ I = 12 ÷ 3 = 4 Ω. Rearrange V = IR → R = V/I. Always show your rearrangement in exams."},
+      {q:"Which type of nuclear radiation is most ionising?", opts:["Gamma","Beta","Alpha","X-rays"], ans:2, exp:"Alpha particles are the most ionising — they are large (2p + 2n), move slowly, and interact strongly with matter. They are also the least penetrating (stopped by paper or skin)."},
+      {q:"A wave has a frequency of 50 Hz and wavelength 2 m. What is its speed?", opts:["25 m/s","100 m/s","52 m/s","0.04 m/s"], ans:1, exp:"v = fλ = 50 × 2 = 100 m/s. Frequency × wavelength always gives wave speed. Make sure you multiply, not divide!"},
+      {q:"What happens to the resistance of a wire if its length is doubled?", opts:["Resistance halves","Resistance stays the same","Resistance doubles","Resistance quadruples"], ans:2, exp:"Resistance is directly proportional to length (R ∝ L). Doubling the length doubles the resistance, because electrons have further to travel and experience more collisions with ions."},
+      {q:"A spring has a spring constant of 40 N/m. It is stretched 0.5 m. What is the force?", opts:["80 N","20 N","0.0125 N","40.5 N"], ans:1, exp:"F = ke = 40 × 0.5 = 20 N. Hooke's Law: force = spring constant × extension. Always check the extension is in metres."},
+      {q:"An object travels 60 m in 12 s at constant speed. What is its speed?", opts:["720 m/s","0.2 m/s","5 m/s","48 m/s"], ans:2, exp:"Speed = distance ÷ time = 60 ÷ 12 = 5 m/s. This is the basic speed equation. Don't confuse speed (scalar) with velocity (vector, needs direction)."},
+      {q:"Which of these is a scalar quantity?", opts:["Velocity","Force","Acceleration","Speed"], ans:3, exp:"Speed is a scalar — it has magnitude only (e.g. 30 m/s). Velocity, force, and acceleration are all vectors — they need both magnitude and direction to be fully described."},
+      {q:"What energy transfer happens when a ball falls from a height?", opts:["KE → GPE","Chemical → KE","GPE → KE","Thermal → GPE"], ans:2, exp:"As the ball falls, gravitational potential energy (GPE) converts to kinetic energy (KE). At the bottom, all the GPE has become KE (ignoring air resistance). Energy is conserved."},
+      {q:"Beta radiation is emitted from a nucleus. What happens to the atomic number?", opts:["Decreases by 2","Stays the same","Increases by 1","Decreases by 1"], ans:2, exp:"In beta decay, a neutron turns into a proton + electron (the beta particle). The proton stays in the nucleus, so atomic number increases by 1. Mass number stays the same."},
+      {q:"Two resistors of 4 Ω and 6 Ω are connected in series. What is the total resistance?", opts:["2.4 Ω","10 Ω","5 Ω","24 Ω"], ans:1, exp:"In series, total resistance = R₁ + R₂ = 4 + 6 = 10 Ω. In parallel, it would be lower. Series resistors simply add together."},
+      {q:"A 5 kg object has KE of 250 J. What is its speed?", opts:["50 m/s","10 m/s","5 m/s","100 m/s"], ans:1, exp:"KE = ½mv² → v² = 2KE/m = 2×250/5 = 100 → v = √100 = 10 m/s. Always rearrange carefully and remember to square root at the end."},
+      {q:"What is the unit of frequency?", opts:["Metres (m)","Newtons (N)","Hertz (Hz)","Joules (J)"], ans:2, exp:"Frequency is measured in Hertz (Hz), which means 'cycles per second'. 1 Hz = 1 wave per second. Higher frequency = shorter wavelength (for same wave speed)."},
+    ]
+  },
+  chemistry: {
+    fill: 'fill-chem',
+    cards: [
+      {q:"What is the difference between an atom, element, and compound?", a:"Atom: the smallest particle of an element. Element: a substance made of only one type of atom. Compound: two or more elements chemically bonded together in fixed ratios."},
+      {q:"What happens to particles when a substance is heated?", a:"Particles gain kinetic energy and move faster. They collide more frequently and with more energy. This can cause changes of state (e.g. melting, boiling) or increase reaction rate."},
+      {q:"What is the word equation for complete combustion?", a:"Hydrocarbon + oxygen → carbon dioxide + water. Incomplete combustion (not enough O₂) produces carbon monoxide and/or carbon (soot), which are toxic/harmful."},
+      {q:"What is an endothermic reaction?", a:"A reaction that absorbs heat energy from the surroundings, causing the temperature to decrease. Example: dissolving ammonium nitrate in water, or thermal decomposition."},
+      {q:"State the law of conservation of mass.", a:"Mass is neither created nor destroyed in a chemical reaction. The total mass of reactants always equals the total mass of products. Atoms are just rearranged, not made or destroyed."},
+      {q:"What is the difference between ionic and covalent bonding?", a:"Ionic: electrons are transferred from a metal to a non-metal, forming oppositely charged ions held by electrostatic attraction. Covalent: electrons are shared between non-metal atoms."},
+      {q:"What is pH and what does it measure?", a:"pH measures the concentration of H⁺ ions in solution. pH 7 = neutral (pure water). Below 7 = acidic (more H⁺). Above 7 = alkaline (fewer H⁺). The scale runs from 0 (very acidic) to 14 (very alkaline)."},
+      {q:"What is the reactivity series?", a:"Metals listed in order of reactivity: K > Na > Ca > Mg > Al > Zn > Fe > Cu > Ag > Au. More reactive metals displace less reactive ones from solutions. Used to predict displacement reactions."},
+      {q:"What are the products of a neutralisation reaction?", a:"Acid + base → salt + water. Example: hydrochloric acid + sodium hydroxide → sodium chloride + water. The H⁺ from the acid reacts with the OH⁻ from the base."},
+      {q:"Describe the structure of an atom.", a:"A central nucleus containing protons (positive charge) and neutrons (no charge), surrounded by electrons (negative charge) arranged in shells. Atoms are mostly empty space. Atomic number = number of protons."},
+    ],
+    practice: [
+      {q:"Iron is added to copper sulfate solution. What do you observe?", opts:["No reaction occurs","Iron dissolves and copper metal is deposited","Copper dissolves and iron is deposited","The solution turns green immediately"], ans:1, exp:"Iron is more reactive than copper, so it displaces copper from the solution. Iron dissolves (forming iron sulfate) and copper metal deposits — you'd see a brown coating on the iron and the blue solution fading."},
+      {q:"A reaction releases heat to the surroundings. What type of reaction is this?", opts:["Endothermic","Reversible","Exothermic","Catalytic"], ans:2, exp:"Exothermic reactions release energy to surroundings, raising the temperature. Examples: combustion, neutralisation, oxidation. Endothermic reactions absorb energy, lowering the temperature."},
+      {q:"What is the approximate pH of a strong acid like hydrochloric acid?", opts:["7","10","1–2","5–6"], ans:2, exp:"Strong acids fully dissociate, releasing many H⁺ ions, giving a very low pH (often 1–2). Weak acids partially dissociate and have a higher pH (e.g. 4–6). pH 7 is neutral."},
+      {q:"Magnesium is burned in oxygen. What is the product?", opts:["Magnesium chloride","Magnesium oxide","Magnesium hydroxide","Magnesium carbonate"], ans:1, exp:"2Mg + O₂ → 2MgO. A very bright white flame is produced and white magnesium oxide powder forms. It's an oxidation reaction — magnesium gains oxygen."},
+      {q:"Which type of bonding involves the transfer of electrons?", opts:["Covalent","Metallic","Ionic","Hydrogen bonding"], ans:2, exp:"Ionic bonding: a metal atom loses electrons → becomes a positive ion (cation); a non-metal gains electrons → becomes a negative ion (anion). The oppositely charged ions attract each other electrostatically."},
+      {q:"What does the atomic number of an element tell you?", opts:["Number of neutrons","Number of protons","Mass of the atom","Number of electron shells"], ans:1, exp:"The atomic number = number of protons in the nucleus. It also equals the number of electrons in a neutral atom. Elements are arranged in the periodic table in order of atomic number."},
+      {q:"Which of the following is a mixture?", opts:["Water (H₂O)","Carbon dioxide (CO₂)","Air","Sodium chloride (NaCl)"], ans:2, exp:"Air is a mixture — it contains nitrogen, oxygen, argon, CO₂ and other gases NOT chemically bonded together. Mixtures can be separated by physical methods. Compounds cannot."},
+      {q:"What is produced when an acid reacts with a metal carbonate?", opts:["Salt + water only","Salt + water + carbon dioxide","Salt + hydrogen","Water + carbon dioxide only"], ans:1, exp:"Acid + metal carbonate → salt + water + carbon dioxide. E.g. HCl + CaCO₃ → CaCl₂ + H₂O + CO₂. The CO₂ gas can be tested with limewater (turns milky)."},
+      {q:"How can you test for hydrogen gas?", opts:["Glowing splint relights","Damp litmus paper turns red","Lighted splint causes a squeaky pop","It turns limewater milky"], ans:2, exp:"The squeaky pop test: hold a lit splint near the gas. Hydrogen ignites with a squeaky pop sound. A glowing splint relights in oxygen; limewater turns milky with CO₂."},
+      {q:"A student heats copper carbonate. What colour change do they observe?", opts:["Green to black","Blue to white","Orange to silver","White to green"], ans:0, exp:"Copper carbonate (green) thermally decomposes: CuCO₃ → CuO + CO₂. Copper oxide is black. This is an endothermic decomposition reaction — heat energy is absorbed to break down the compound."},
+      {q:"What is the charge of a proton?", opts:["−1","0","+1","+2"], ans:2, exp:"Protons have a charge of +1. Neutrons have no charge (0). Electrons have a charge of −1. In a neutral atom, the number of protons equals the number of electrons, so charges cancel out."},
+      {q:"Sodium is in Group 1. How many electrons does it lose when it forms an ion?", opts:["2","3","1","7"], ans:2, exp:"Group 1 metals have 1 electron in their outer shell. They lose this 1 electron to form a +1 ion (Na⁺). Group 2 metals lose 2 electrons (2+ ion); Group 7 non-metals gain 1 electron (−1 ion)."},
+      {q:"Which method would you use to separate salt from salt water?", opts:["Filtration","Distillation or evaporation","Chromatography","Decanting"], ans:1, exp:"Evaporation removes water, leaving salt crystals. Distillation can collect the water as well. Filtration only separates insoluble solids from liquids — salt dissolves so it passes through filter paper."},
+      {q:"What happens to the rate of reaction when a catalyst is added?", opts:["It slows down","It stays the same","It speeds up but the catalyst is used up","It speeds up and the catalyst is unchanged"], ans:3, exp:"A catalyst increases the rate of reaction by providing an alternative pathway with lower activation energy. Crucially, the catalyst is NOT used up — it can be reused. This makes catalysts valuable industrially."},
+      {q:"Carbon dioxide is bubbled into limewater. What do you observe?", opts:["It turns blue","It turns red","It turns milky/cloudy","No change"], ans:2, exp:"CO₂ reacts with calcium hydroxide (limewater) to form calcium carbonate, an insoluble white precipitate: Ca(OH)₂ + CO₂ → CaCO₃ + H₂O. This is the standard test for CO₂."},
+    ]
+  },
+  maths: {
+    fill: 'fill-math',
+    cards: [
+      {q:"What is the formula for the area of a circle?", a:"A = πr², where r is the radius. Circumference = 2πr (or πd). Common mistake: don't use the diameter in the area formula — always use the radius (half the diameter)."},
+      {q:"How do you find the gradient of a straight line?", a:"Gradient m = (y₂ − y₁) ÷ (x₂ − x₁) = rise ÷ run. Pick two clear points on the line. A positive gradient slopes up left to right; negative slopes down."},
+      {q:"State Pythagoras' theorem.", a:"a² + b² = c², where c is the hypotenuse (the longest side, opposite the right angle). To find the hypotenuse: c = √(a² + b²). To find another side: a = √(c² − b²)."},
+      {q:"How do you calculate the mean of a data set?", a:"Mean = sum of all values ÷ number of values. Compare with: median (middle value when ordered), mode (most common value), range (max − min)."},
+      {q:"What is the equation of a straight line?", a:"y = mx + c, where m is the gradient and c is the y-intercept (where the line crosses the y-axis). You can find the equation from two points by calculating m first, then substituting."},
+      {q:"How do you expand double brackets, e.g. (x + 3)(x − 2)?", a:"Use FOIL: First (x·x = x²), Outer (x·−2 = −2x), Inner (3·x = 3x), Last (3·−2 = −6). Collect like terms: x² + x − 6."},
+      {q:"What is the formula for the area of a trapezium?", a:"A = ½(a + b)h, where a and b are the two parallel sides and h is the perpendicular height between them. Don't confuse h with the slant side."},
+      {q:"How do you solve a linear equation like 3x + 5 = 17?", a:"Work in reverse: subtract 5 from both sides → 3x = 12. Divide both sides by 3 → x = 4. Always perform the same operation to BOTH sides. Check by substituting back."},
+      {q:"What is a prime number?", a:"A number with exactly two factors: 1 and itself. Primes: 2, 3, 5, 7, 11, 13, 17, 19, 23... Note: 1 is NOT prime (only one factor). 2 is the only even prime."},
+      {q:"How do you calculate percentage change?", a:"% change = (new value − original value) ÷ original value × 100. Positive result = percentage increase; negative = percentage decrease. Always divide by the ORIGINAL value."},
+    ],
+    practice: [
+      {q:"A circle has radius 5 cm. What is its area? (use π ≈ 3.14)", opts:["15.7 cm²","78.5 cm²","31.4 cm²","62.8 cm²"], ans:1, exp:"A = πr² = 3.14 × 5² = 3.14 × 25 = 78.5 cm². Common mistake: using diameter (10) instead of radius (5). Always halve the diameter first."},
+      {q:"Expand and simplify: (x + 4)(x − 3)", opts:["x² + x − 12","x² + 7x − 12","x² − x − 12","x² + x + 12"], ans:0, exp:"FOIL: x² − 3x + 4x − 12 = x² + x − 12. The key step is collecting like terms: −3x + 4x = +x. Watch the signs carefully!"},
+      {q:"A price rises from £40 to £50. What is the percentage increase?", opts:["10%","20%","25%","15%"], ans:2, exp:"% increase = (50 − 40) ÷ 40 × 100 = 10 ÷ 40 × 100 = 25%. Divide by the ORIGINAL value (40), not the new value. This is the most common mistake in percentage change questions."},
+      {q:"A right triangle has legs of 6 cm and 8 cm. What is the hypotenuse?", opts:["10 cm","14 cm","12 cm","100 cm"], ans:0, exp:"c² = 6² + 8² = 36 + 64 = 100, so c = √100 = 10 cm. This is the classic 3-4-5 Pythagorean triple scaled by 2. Recognising these triples saves time in exams."},
+      {q:"What is the gradient of the line through (1, 3) and (4, 9)?", opts:["2","3","6","½"], ans:0, exp:"Gradient = (9 − 3) ÷ (4 − 1) = 6 ÷ 3 = 2. The line rises 6 units for every 3 across. With gradient 2 and point (1,3): y = 2x + 1."},
+      {q:"Solve: 2x + 7 = 15", opts:["x = 11","x = 4","x = 3","x = 8"], ans:1, exp:"Subtract 7 from both sides: 2x = 8. Divide by 2: x = 4. Check: 2(4) + 7 = 8 + 7 = 15 ✓. Always check by substituting your answer back in."},
+      {q:"What is the area of a trapezium with parallel sides 5 cm and 9 cm, height 4 cm?", opts:["28 cm²","18 cm²","36 cm²","14 cm²"], ans:0, exp:"A = ½(a+b)h = ½(5+9)×4 = ½×14×4 = 28 cm². Add the parallel sides first, then multiply by height, then halve. Don't forget to halve!"},
+      {q:"What are the factors of 24?", opts:["1,2,3,4,6,8,12,24","1,2,4,6,8,24","1,3,6,8,12,24","2,3,4,6,8,12"], ans:0, exp:"Factors of 24: 1×24, 2×12, 3×8, 4×6. So factors are 1,2,3,4,6,8,12,24. A quick method: go through numbers 1,2,3... and check if they divide exactly into 24."},
+      {q:"The mean of 5 numbers is 12. What is their total?", opts:["12","2.4","60","17"], ans:2, exp:"Mean = total ÷ count, so total = mean × count = 12 × 5 = 60. This is a key rearrangement — if you know the mean and how many values, you can always find the total."},
+      {q:"What is the interior angle of a regular hexagon?", opts:["60°","90°","120°","108°"], ans:2, exp:"Sum of interior angles of a hexagon = (6−2)×180 = 720°. Each angle = 720°÷6 = 120°. Formula: (n−2)×180 for any polygon, then divide by n for the angle of a regular polygon."},
+      {q:"Simplify: 3x + 2y − x + 5y", opts:["2x + 7y","4x + 7y","2x + 3y","3x + 7y"], ans:0, exp:"Collect like terms: (3x − x) + (2y + 5y) = 2x + 7y. Only terms with the same letter (and power) can be combined. x terms with x terms, y terms with y terms."},
+      {q:"A bag has 3 red, 5 blue, 2 green balls. What is the probability of picking a blue ball?", opts:["5","½","1/2","5/10 = ½"], ans:3, exp:"P(blue) = number of blue ÷ total = 5 ÷ (3+5+2) = 5/10 = ½. Always find the total number of outcomes first. Probability is always between 0 and 1."},
+      {q:"What is 15% of 240?", opts:["36","24","360","3.6"], ans:0, exp:"10% of 240 = 24. 5% = 12. 15% = 24 + 12 = 36. Or: 0.15 × 240 = 36. Breaking percentages into 10% + 5% is a quick mental method."},
+      {q:"Factorise: x² + 5x + 6", opts:["(x+2)(x+3)","(x+1)(x+6)","(x−2)(x−3)","(x+6)(x−1)"], ans:0, exp:"Find two numbers that multiply to 6 and add to 5: 2 and 3. So x² + 5x + 6 = (x+2)(x+3). Always check by expanding back out: x² + 3x + 2x + 6 = x² + 5x + 6 ✓"},
+      {q:"A line has equation y = 3x − 2. What is the y-intercept?", opts:["3","−2","2","−3"], ans:1, exp:"In y = mx + c, c is the y-intercept (where the line crosses the y-axis, i.e. when x=0). Here c = −2, so the line crosses the y-axis at (0, −2). The gradient m = 3."},
+    ]
   }
+};
+
+let subject = 'biology';
+let mode = 'flash';
+let cardIdx = 0;
+let flipped = false;
+let shuffleOn = false;
+let shuffledOrder = [];
+let pqIdx = 0;
+let correct = 0;
+let wrong = 0;
+let answered = false;
+let roundSize = 10;
+let activeQs = [];
+
+// --- Shuffle helpers ---
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
-loadMatch('all',null);
 
-// ════════════════════════════════════════════════════
-// EQUATION PRACTICE DATA
-// ════════════════════════════════════════════════════
-const EQ_DATA=[
-  {s:'phys',q:'A 4 kg object accelerates at 5 m/s². What is the resultant force?',context:'Use F = ma',ans:20,unit:'N',exp:'F = ma = 4 × 5 = 20 N'},
-  {s:'phys',q:'A circuit has voltage 24 V and resistance 8 Ω. What is the current?',context:'Use V = IR, rearrange for I',ans:3,unit:'A',exp:'I = V/R = 24/8 = 3 A'},
-  {s:'phys',q:'A wave has frequency 250 Hz and wavelength 1.2 m. What is its speed?',context:'Use v = fλ',ans:300,unit:'m/s',exp:'v = 250 × 1.2 = 300 m/s'},
-  {s:'phys',q:'A 3 kg object is lifted 8 m. What is its GPE? (g = 10 N/kg)',context:'Use GPE = mgh',ans:240,unit:'J',exp:'GPE = 3 × 10 × 8 = 240 J'},
-  {s:'phys',q:'A car of mass 800 kg travels at 20 m/s. What is its KE?',context:'Use KE = ½mv²',ans:160000,unit:'J',exp:'KE = ½ × 800 × 400 = 160,000 J'},
-  {s:'phys',q:'A heater draws 5 A at 230 V. What is its power?',context:'Use P = IV',ans:1150,unit:'W',exp:'P = 5 × 230 = 1150 W'},
-  {s:'phys',q:'A machine has useful output of 600 J and total input of 800 J. What is its efficiency?',context:'Efficiency = useful out/total in × 100',ans:75,unit:'%',exp:'600/800 × 100 = 75%'},
-  {s:'phys',q:'A 1500 kg car travels at 30 m/s. What is its momentum?',context:'Use p = mv',ans:45000,unit:'kg m/s',exp:'p = 1500 × 30 = 45,000 kg m/s'},
-  {s:'phys',q:'Two resistors of 4 Ω and 8 Ω are in parallel. What is the total resistance?',context:'Use 1/R = 1/R₁ + 1/R₂',ans:2.67,unit:'Ω',tol:0.1,exp:'1/R = 1/4 + 1/8 = 3/8, so R = 8/3 ≈ 2.67 Ω'},
-  {s:'maths',q:'Find the gradient of the line joining (2,1) and (6,13).',context:'Use m = (y₂−y₁)/(x₂−x₁)',ans:3,unit:'',exp:'m = (13−1)/(6−2) = 12/4 = 3'},
-  {s:'maths',q:'What is the area of a circle with radius 7 cm? (Give answer to 1 d.p.)',context:'Use Area = πr²',ans:153.9,unit:'cm²',tol:0.2,exp:'π × 7² = π × 49 ≈ 153.9 cm²'},
-  {s:'maths',q:'A triangle has opposite=9, hypotenuse=15. Find the angle (to nearest degree).',context:'Use SOH: sinθ = opp/hyp',ans:37,unit:'°',tol:1,exp:'sin θ = 9/15 = 0.6 → θ = sin⁻¹(0.6) ≈ 37°'},
-  {s:'maths',q:'Find the volume of a cylinder with radius 3 cm and height 10 cm. (1 d.p.)',context:'Use V = πr²h',ans:282.7,unit:'cm³',tol:0.5,exp:'V = π × 9 × 10 = 90π ≈ 282.7 cm³'},
-  {s:'maths',q:'What is the interior angle sum of a heptagon (7 sides)?',context:'Use (n−2)×180',ans:900,unit:'°',exp:'(7−2)×180 = 5×180 = 900°'},
-  {s:'chem',q:'Sodium has atomic number 11. How many electrons in its outer shell?',context:'Draw electron configuration: 2, 8, ?',ans:1,unit:'electrons',exp:'11 electrons: shells 2, 8, 1. So 1 outer electron → Group 1.'},
-  {s:'chem',q:'After 2 half-lives, what percentage of a radioactive sample remains?',context:'Each half-life halves the amount',ans:25,unit:'%',exp:'After 1: 50%. After 2: 25%. (½ × ½ = ¼ = 25%)'},
-  {s:'bio',q:'A cell image is 35 mm and the actual cell is 0.05 mm. What is the magnification?',context:'Use magnification = image ÷ actual',ans:700,unit:'×',exp:'35 ÷ 0.05 = 700. The microscope magnifies 700 times.'},
-  {s:'bio',q:'In a Punnett square Bb × Bb, how many offspring (out of 4) will show the dominant phenotype?',context:'B is dominant, b is recessive',ans:3,unit:'out of 4',exp:'BB, Bb, Bb, bb → 3 out of 4 show dominant phenotype (BB or Bb).'},
-];
+function buildOrder(len) {
+  const arr = Array.from({length: len}, (_, i) => i);
+  return shuffleOn ? shuffleArray(arr) : arr;
+}
 
-let currentEQSubj='all';
-function loadEQ(s,btn){
-  if(btn)setSPills(btn.closest('.subj-pills'),btn);
-  currentEQSubj=s;
-  const pool=(s==='all'?EQ_DATA:EQ_DATA.filter(q=>q.s===s)).slice();
-  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-  const qs=pool.slice(0,5);
-  const con=document.getElementById('eq-container');con.innerHTML='';
-  qs.forEach((q,i)=>{
-    const tags={bio:'🧬 Biology',maths:'📐 Maths',phys:'⚡ Physics',chem:'🧪 Chemistry'};
-    con.innerHTML+=`<div class="eq-prac">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px">${tags[q.s]}</div>
-      <div class="eq-q">${q.q}</div>
-      <div class="eq-context">${q.context}</div>
-      <div class="eq-row">
-        <input class="eq-input" id="eq-inp-${i}" type="number" step="any" placeholder="?">
-        <span class="eq-unit">${q.unit}</span>
-        <button class="eq-check" onclick="checkEQ(${i},${q.ans},${q.tol||0},'${q.exp}')">Check</button>
-      </div>
-      <div class="eq-fb" id="eq-fb-${i}"></div>
+function buildActiveQs() {
+  const all = SUBJECTS[subject].practice;
+  const shuffled = shuffleArray([...all]);
+  activeQs = shuffled.slice(0, Math.min(roundSize, all.length));
+}
+
+function toggleShuffle() {
+  shuffleOn = !shuffleOn;
+  const btn = document.getElementById('shuffle-btn');
+  btn.classList.toggle('on', shuffleOn);
+  shuffledOrder = buildOrder(SUBJECTS[subject].cards.length);
+  cardIdx = 0;
+  flipped = false;
+  updateShuffleBadge();
+  renderCard();
+}
+
+function updateShuffleBadge() {
+  document.getElementById('shuffle-badge').textContent = shuffleOn ? 'shuffled' : '';
+}
+
+function currentCard() {
+  return SUBJECTS[subject].cards[shuffledOrder[cardIdx]];
+}
+
+function setRoundSize(n, btn) {
+  roundSize = n;
+  document.querySelectorAll('.pq-size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  pqIdx = 0; correct = 0; wrong = 0; answered = false;
+  buildActiveQs();
+  renderPQ();
+}
+
+// --- Subject / mode switching ---
+function switchSubject(s) {
+  subject = s;
+  cardIdx = 0; flipped = false; pqIdx = 0; correct = 0; wrong = 0; answered = false;
+  shuffledOrder = buildOrder(SUBJECTS[subject].cards.length);
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-s="${s}"]`).classList.add('active');
+  if (mode === 'flash') renderCard();
+  else { buildActiveQs(); renderPQ(); }
+}
+
+function switchMode(m, btn) {
+  mode = m;
+  pqIdx = 0; correct = 0; wrong = 0; answered = false;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('flash-section').classList.toggle('section-hidden', m !== 'flash');
+  document.getElementById('practice-section').classList.toggle('section-hidden', m !== 'practice');
+  if (m === 'flash') renderCard();
+  else { buildActiveQs(); renderPQ(); }
+}
+
+// --- Flashcard rendering ---
+function renderCard() {
+  const cards = SUBJECTS[subject].cards;
+  const c = currentCard();
+  flipped = false;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  document.getElementById('fc-q').textContent = c.q;
+  document.getElementById('fc-a').textContent = c.a;
+  document.getElementById('fc-counter').textContent = `${cardIdx + 1} / ${cards.length}`;
+  const pct = cards.length > 1 ? Math.round((cardIdx / (cards.length - 1)) * 100) : 100;
+  const pf = document.getElementById('pf');
+  pf.style.width = pct + '%';
+  pf.className = 'prog-fill ' + SUBJECTS[subject].fill;
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('fc-inner').classList.toggle('flipped', flipped);
+}
+
+function nextCard() {
+  cardIdx = (cardIdx + 1) % SUBJECTS[subject].cards.length;
+  flashBtn('btn-next');
+  renderCard();
+}
+function prevCard() {
+  cardIdx = (cardIdx - 1 + SUBJECTS[subject].cards.length) % SUBJECTS[subject].cards.length;
+  flashBtn('btn-prev');
+  renderCard();
+}
+
+function flashBtn(id) {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.classList.add('flash');
+  setTimeout(() => b.classList.remove('flash'), 200);
+}
+
+function litKey(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('lit');
+  setTimeout(() => el.classList.remove('lit'), 150);
+}
+
+// --- Keyboard controls ---
+document.addEventListener('keydown', e => {
+  if (mode !== 'flash') return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    e.preventDefault(); litKey('k-left'); prevCard();
+  } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    e.preventDefault(); litKey('k-right'); nextCard();
+  } else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+    e.preventDefault(); litKey('k-space'); flipCard();
+  }
+});
+
+// --- Practice questions ---
+function renderPQ() {
+  answered = false;
+  updateScoreRow();
+  const area = document.getElementById('pq-area');
+  if (pqIdx >= activeQs.length) {
+    const pct = Math.round((correct / activeQs.length) * 100);
+    area.innerHTML = `<div class="finish-box">
+      <div class="finish-score">${correct}/${activeQs.length}</div>
+      <div class="finish-label">${pct >= 80 ? '🎉 Great work!' : pct >= 60 ? '👍 Good effort!' : '📚 Keep revising!'} — ${pct}%</div>
+      <button class="retry-btn" onclick="resetPQ()">New random round ↺</button>
     </div>`;
-  });
+    return;
+  }
+  const q = activeQs[pqIdx];
+  area.innerHTML = `<div class="pq-card">
+    <div class="pq-q">Q${pqIdx + 1}. ${q.q}</div>
+    <div class="pq-opts">${q.opts.map((o,i)=>`<button class="pq-opt" onclick="selectOpt(${i})">${'ABCD'[i]}. ${o}</button>`).join('')}</div>
+    <div class="pq-exp" id="pq-exp"></div>
+    <button class="pq-next" id="pq-next" onclick="nextPQ()">Next question →</button>
+  </div>`;
 }
-function checkEQ(i,ans,tol,exp){
-  const inp=document.getElementById(`eq-inp-${i}`);
-  const val=parseFloat(inp.value);
-  const ok=Math.abs(val-ans)<=Math.max(tol,0.001);
-  inp.classList.toggle('ok',ok);inp.classList.toggle('no',!ok);
-  const fb=document.getElementById(`eq-fb-${i}`);
-  fb.style.display='block';
-  fb.innerHTML=ok?'✓ Correct! '+exp:'✗ Not quite. '+exp;
-  inp.disabled=true;
-}
-loadEQ('all',null);
 
-// ════════════════════════════════════════════════════
-// QUIZ
-// ════════════════════════════════════════════════════
-const QB=[
-  {s:'bio',q:'What structure in a plant cell carries out photosynthesis?',opts:['Mitochondria','Nucleus','Chloroplast','Ribosome'],a:2,e:'Chloroplasts contain chlorophyll which absorbs light energy. Mitochondria carry out aerobic respiration.'},
-  {s:'bio',q:'Why do red blood cells have no nucleus?',opts:['To save energy','To make more room for haemoglobin','Because they are prokaryotic','They do have a nucleus'],a:1,e:'No nucleus means more space for haemoglobin, which binds oxygen for transport.'},
-  {s:'bio',q:'Which pathogen type is treated with antibiotics?',opts:['Viruses','Bacteria','Fungi (all types)','Protists'],a:1,e:'Antibiotics only kill bacteria. They have no effect on viruses. Overuse leads to antibiotic-resistant strains like MRSA.'},
-  {s:'bio',q:'What is osmosis?',opts:['Active transport of ions','Movement of particles from high to low concentration','Movement of water from high to low water potential across a partially permeable membrane','Diffusion of glucose'],a:2,e:'Osmosis is specifically water movement across a partially permeable membrane, down the water potential gradient.'},
-  {s:'bio',q:'Aa × Aa cross: probability of aa offspring?',opts:['25%','50%','75%','100%'],a:0,e:'Punnett square: AA, Aa, Aa, aa → 1:2:1. Probability of aa = 1/4 = 25%.'},
-  {s:'bio',q:'What is natural selection?',opts:['Humans choosing which breed','Random DNA mutation only','Better-adapted individuals survive and reproduce more, passing on traits','Organisms changing traits in their lifetime'],a:2,e:'Darwin: variation → better-adapted survive → pass on traits → population changes over generations.'},
-  {s:'bio',q:'What do lymphocytes produce?',opts:['Phagocytosis enzymes','Specific antibodies','Hormones','Platelets'],a:1,e:'Lymphocytes produce antibodies specific to each antigen. Memory lymphocytes remain after infection for future immunity.'},
-  {s:'bio',q:'Products of anaerobic respiration in yeast?',opts:['Lactic acid + CO₂','Ethanol + CO₂','Ethanol + water','Glucose + oxygen'],a:1,e:'Yeast: glucose → ethanol + CO₂. This is fermentation — used in bread and alcohol production.'},
-  {s:'bio',q:'What is the magnification if the image is 30 mm and actual cell is 0.05 mm?',opts:['150×','600×','1500×','60×'],a:1,e:'Magnification = image/actual = 30/0.05 = 600×'},
-  {s:'bio',q:'What makes a cell prokaryotic?',opts:['No cell membrane','No membrane-bound nucleus','Has chloroplasts','Has a large vacuole'],a:1,e:'Prokaryotic cells (like bacteria) have no membrane-bound nucleus. Their DNA floats free in the cytoplasm.'},
-  {s:'maths',q:'Gradient of line joining (1,3) and (5,11)?',opts:['2','3','4','8'],a:0,e:'m = (11−3)/(5−1) = 8/4 = 2'},
-  {s:'maths',q:'Factorise: x² + 7x + 12',opts:['(x+3)(x+4)','(x+2)(x+6)','(x+1)(x+12)','(x−3)(x−4)'],a:0,e:'Find two numbers: × to 12, + to 7 → 3 and 4. So (x+3)(x+4).'},
-  {s:'maths',q:'Simplify √72',opts:['6√2','8√3','4√6','36√2'],a:0,e:'√72 = √(36×2) = 6√2. Always find the largest perfect square factor.'},
-  {s:'maths',q:'A price rises from £80 to £100. What is the percentage increase?',opts:['20%','25%','80%','125%'],a:1,e:'% increase = (20/80) × 100 = 25%. Always divide by the ORIGINAL.'},
-  {s:'maths',q:'Interior angle of a regular hexagon?',opts:['108°','120°','135°','60°'],a:1,e:'Sum = (6−2)×180 = 720°. Each angle = 720/6 = 120°.'},
-  {s:'maths',q:'Solve x² − 5x + 6 = 0',opts:['x=2 or x=3','x=−2 or x=−3','x=1 or x=6','x=5 or x=1'],a:0,e:'Factorise: (x−2)(x−3)=0 → x=2 or x=3.'},
-  {s:'maths',q:'Volume of cylinder radius 4 cm, height 10 cm?',opts:['160π cm³','80π cm³','40π cm³','320π cm³'],a:0,e:'V = πr²h = π × 16 × 10 = 160π cm³ ≈ 503 cm³'},
-  {s:'maths',q:'If y is inversely proportional to x, and y=8 when x=3, find y when x=6.',opts:['4','16','2','12'],a:0,e:'y = k/x → k = 24. When x=6: y = 24/6 = 4.'},
-  {s:'maths',q:'Mean of 5 numbers is 12. Four are 9,14,8,15. Find the 5th.',opts:['12','14','16','10'],a:1,e:'Sum = 60. Known sum = 46. Missing = 60−46 = 14.'},
-  {s:'maths',q:'Expand and simplify: (2x−3)(x+5)',opts:['2x²+7x−15','2x²−7x+15','2x²+10x−15','2x²−3x+10'],a:0,e:'2x·x + 2x·5 − 3·x − 3·5 = 2x² + 10x − 3x − 15 = 2x² + 7x − 15'},
-  {s:'phys',q:'A 5 kg object accelerates at 4 m/s². Resultant force?',opts:['20 N','9 N','1.25 N','0.8 N'],a:0,e:'F = ma = 5 × 4 = 20 N'},
-  {s:'phys',q:'Circuit: voltage 12 V, resistance 6 Ω. Current?',opts:['72 A','2 A','0.5 A','18 A'],a:1,e:'I = V/R = 12/6 = 2 A'},
-  {s:'phys',q:'Wave: f=500 Hz, λ=0.68 m. Speed?',opts:['340 m/s','500.68 m/s','735 m/s','0.00136 m/s'],a:0,e:'v = fλ = 500 × 0.68 = 340 m/s (speed of sound in air)'},
-  {s:'phys',q:'What does a steeper gradient on a velocity-time graph mean?',opts:['Greater distance','Greater speed','Greater acceleration','More time'],a:2,e:'Gradient of v-t graph = acceleration. Area under graph = distance.'},
-  {s:'phys',q:'Alpha particle emitted: how does atomic number change?',opts:['+2','−2','+4','−4'],a:1,e:'Alpha = 2 protons + 2 neutrons. Losing it reduces atomic number by 2 and mass number by 4.'},
-  {s:'phys',q:'After 3 half-lives, what fraction remains?',opts:['½','¼','⅛','1/16'],a:2,e:'½ → ¼ → ⅛. Each half-life halves the remaining amount.'},
-  {s:'phys',q:'Two 6Ω resistors in parallel. Total resistance?',opts:['12 Ω','6 Ω','3 Ω','2 Ω'],a:2,e:'1/R = 1/6 + 1/6 = 2/6 = 1/3, so R = 3 Ω. Parallel always gives LOWER resistance.'},
-  {s:'phys',q:'KE of 4 kg object at 10 m/s?',opts:['40 J','200 J','400 J','80 J'],a:1,e:'KE = ½mv² = ½ × 4 × 100 = 200 J'},
-  {s:'phys',q:'Heater: 3000 W for 2 hours. Energy used?',opts:['6000 J','1,500 J','21,600,000 J','3002 J'],a:2,e:'E = Pt = 3000 × 7200 = 21,600,000 J (2 hours = 7200 seconds)'},
-  {s:'phys',q:'Which EM wave has the highest frequency?',opts:['Radio waves','Infrared','Visible light','Gamma rays'],a:3,e:'Frequency: Radio < Micro < IR < Visible < UV < X-ray < Gamma. Higher = more energetic.'},
-  {s:'chem',q:'Group 2 element: how many outer electrons?',opts:['1','2','3','7'],a:1,e:'Group number = number of outer electrons. Group 2 → 2 outer electrons.'},
-  {s:'chem',q:'Which does NOT increase rate of reaction?',opts:['Raising temperature','Adding catalyst','Using larger particle size','Increasing concentration'],a:2,e:'Larger particles = LESS surface area → fewer collisions → slower rate. Use SMALLER particles.'},
-  {s:'chem',q:'Alkenes vs alkanes: which test tells them apart?',opts:['Limewater','Universal indicator','Bromine water','Litmus paper'],a:2,e:'Alkenes decolourise orange bromine water (addition reaction). Alkanes do not react with it.'},
-  {s:'chem',q:'What forms at the cathode during brine electrolysis?',opts:['Chlorine','Oxygen','Hydrogen','Sodium'],a:2,e:'Cathode (−): H⁺ ions reduced → H₂ gas. Anode (+): Cl⁻ ions oxidised → Cl₂ gas. NaOH stays in solution.'},
-  {s:'chem',q:'Exothermic reaction: which is correct?',opts:['Absorbs heat','ΔH is positive','Products have higher energy than reactants','Releases heat to surroundings'],a:3,e:'Exothermic = releases heat (surroundings get warmer). ΔH is negative. Examples: combustion, neutralisation.'},
-  {s:'chem',q:'What is the general formula for alkanes?',opts:['CₙH₂ₙ','CₙHₙ','CₙH₂ₙ₊₂','CₙH₂ₙ₋₂'],a:2,e:'Alkanes: CₙH₂ₙ₊₂ (saturated). Alkenes: CₙH₂ₙ (unsaturated, C=C double bond).'},
-  {s:'chem',q:'Why does graphite conduct electricity?',opts:['It contains ions','Each C has one delocalised electron','It has metallic bonds','Carbon is naturally conductive'],a:1,e:'Each carbon forms 3 bonds → 1 delocalised electron per atom → conducts. Unique among giant covalent structures.'},
-  {s:'chem',q:'What is produced when acid reacts with metal carbonate?',opts:['Salt + water only','Salt + hydrogen','Salt + water + CO₂','Metal oxide + water'],a:2,e:'Acid + metal carbonate → salt + water + carbon dioxide. The fizzing is CO₂ gas.'},
-  {s:'chem',q:'What does OIL RIG stand for?',opts:['Oxidation Is Loss; Reduction Is Gain','Oxidation Involves Light; Reduction Involves Gas','Only In Labs; Reactions In Gas','Oxidised Iron Layer; Reduced Iron Gas'],a:0,e:'OIL RIG: Oxidation Is Loss of electrons. Reduction Is Gain of electrons. Cathode = reduction. Anode = oxidation.'},
-  {s:'chem',q:'What is an isotope?',opts:['Different element, same neutrons','Same element, different protons','Same proton number, different neutron number','Ions with different charges'],a:2,e:'Isotopes: same element (same protons), different number of neutrons. e.g. C-12 and C-14.'},
-];
+function selectOpt(i) {
+  if (answered) return;
+  answered = true;
+  const q = activeQs[pqIdx];
+  const btns = document.querySelectorAll('.pq-opt');
+  btns.forEach(b => b.disabled = true);
+  btns[q.ans].classList.add('correct');
+  if (i !== q.ans) { btns[i].classList.add('wrong'); wrong++; } else correct++;
+  document.getElementById('pq-exp').textContent = q.exp;
+  document.getElementById('pq-exp').classList.add('show');
+  document.getElementById('pq-next').classList.add('show');
+  updateScoreRow();
+}
 
-const SCOLS={bio:'var(--bio)',maths:'var(--ma)',phys:'var(--ph)',chem:'var(--ch)'};
-const SLBLS={bio:'🧬 Biology',maths:'📐 Maths',phys:'⚡ Physics',chem:'🧪 Chemistry'};
-let curSubj='all',qFiltered=[...QB],usedQ=[],qScore=0,qTotal=0,qAnswered=false;
-function setSubj(s,btn){
-  curSubj=s;document.querySelectorAll('.qf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
-  qFiltered=s==='all'?[...QB]:QB.filter(q=>q.s===s);usedQ=[];qScore=0;qTotal=0;
-  document.getElementById('qscore').textContent=0;document.getElementById('qtotal').textContent=0;nextQ();
+function nextPQ() { pqIdx++; renderPQ(); }
+function resetPQ() { pqIdx = 0; correct = 0; wrong = 0; buildActiveQs(); renderPQ(); }
+
+function updateScoreRow() {
+  document.getElementById('sc-correct').textContent = `✓ Correct: ${correct}`;
+  document.getElementById('sc-wrong').textContent = `✗ Wrong: ${wrong}`;
+  document.getElementById('sc-prog').textContent = `Q ${Math.min(pqIdx+1, activeQs.length)} of ${activeQs.length}`;
 }
-function nextQ(){
-  qAnswered=false;
-  if(usedQ.length>=qFiltered.length)usedQ=[];
-  const pool=qFiltered.filter((_,i)=>!usedQ.includes(i));
-  const q=pool[Math.floor(Math.random()*pool.length)];
-  usedQ.push(qFiltered.indexOf(q));
-  const shuf=q.opts.map((o,i)=>({o,i})).sort(()=>Math.random()-.5);
-  const correctIdx=shuf.findIndex(x=>x.i===q.a);
-  document.getElementById('qtag').textContent=SLBLS[q.s];
-  document.getElementById('qtag').style.cssText=`background:${SCOLS[q.s]}22;color:${SCOLS[q.s]}`;
-  document.getElementById('qtext').textContent=q.q;
-  document.getElementById('qprog').textContent=`  ${usedQ.length}/${qFiltered.length} used`;
-  const opts=document.getElementById('qopts');opts.innerHTML='';
-  shuf.forEach((item,si)=>{
-    const b=document.createElement('button');b.className='q-opt';b.textContent=item.o;
-    b.onclick=()=>answerQ(si,correctIdx,q.e);opts.appendChild(b);
-  });
-  document.getElementById('qfb').style.display='none';
-  document.getElementById('qnext').style.display='none';
-}
-function answerQ(chosen,correct,exp){
-  if(qAnswered)return;qAnswered=true;qTotal++;
-  document.getElementById('qtotal').textContent=qTotal;
-  const btns=document.querySelectorAll('.q-opt');btns.forEach(b=>b.disabled=true);
-  if(chosen===correct){btns[chosen].classList.add('ok');qScore++;document.getElementById('qscore').textContent=qScore;document.getElementById('qfb').innerHTML='<b>✓ Correct!</b> '+exp;}
-  else{btns[chosen].classList.add('no');btns[correct].classList.add('ok');document.getElementById('qfb').innerHTML='<b>✗ Not quite.</b> '+exp;}
-  document.getElementById('qfb').style.display='block';document.getElementById('qnext').style.display='inline-block';
-}
-nextQ();
+
+// Init
+shuffledOrder = buildOrder(SUBJECTS[subject].cards.length);
+buildActiveQs();
+renderCard();
 </script>
 </body>
 </html>
